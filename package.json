@@ -1,20 +1,23 @@
 {
-  "name": "core",
-  "version": "0.0.0",
+  "name": "@pounce-lang/core",
+  "version": "1.0.1",
+  "description": "core interpreter for the pounce programming language in JS",
+  "main": "dist/index.js",
+  "module": "dist/index.ems.js",
   "files": [
     "dist"
   ],
-  "main": "dist/core.cjs.js",
-  "module": "dist/core.esm.js",
-  "source": "src/core.js",
-  "browser": "dist/core.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "klap build",
-    "prepublishOnly": "klap build",
-    "start": "klap start",
-    "watch": "klap watch"
+    "build": "rollup -c",
+    "watch": "rollup -cw"
   },
+  "repository": "https://github.com/pounce-lang/core.git",
+  "author": "Nate Morse <morse.nate@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
-    "klap": "3.5.2"
+    "rollup": "^1.27.13",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "typescript": "^3.7.3"
   }
 }
