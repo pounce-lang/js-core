@@ -1,2 +1,4 @@
-// src/index.ts
-export const greet = () => console.log('Hello, world!');
+// pounce core
+import * as r from 'ramda';
+
+export const pounce = (ps: string) => r.split(' ', ps);

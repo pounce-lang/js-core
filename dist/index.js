@@ -2,7 +2,9 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-// src/index.ts
-var greet = function () { return console.log('Hello, world!'); };
+var r = require('ramda');
 
-exports.greet = greet;
+// pounce core
+var pounce = function (ps) { return r.split(' ', ps); };
+
+exports.pounce = pounce;

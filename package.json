@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "core interpreter for the pounce programming language in JS",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
@@ -16,8 +16,12 @@
   "author": "Nate Morse <morse.nate@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/ramda": "^0.26.38",
     "rollup": "^1.27.13",
     "rollup-plugin-typescript2": "^0.25.3",
     "typescript": "^3.7.3"
+  },
+  "dependencies": {
+    "ramda": "^0.26.1"
   }
 }

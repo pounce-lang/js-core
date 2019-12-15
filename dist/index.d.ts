@@ -1,1 +1,1 @@
-export declare const greet: () => void;
+export declare const pounce: (ps: string) => string[];

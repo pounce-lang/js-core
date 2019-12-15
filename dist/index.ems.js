@@ -1,4 +1,6 @@
-// src/index.ts
-var greet = function () { return console.log('Hello, world!'); };
+import { split } from 'ramda';
 
-export { greet };
+// pounce core
+var pounce = function (ps) { return split(' ', ps); };
+
+export { pounce };
