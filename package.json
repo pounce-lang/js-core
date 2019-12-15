@@ -10,7 +10,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c",
-    "watch": "rollup -cw"
+    "watch": "rollup -cw",
+    "publish": "npm publish --access public"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse <morse.nate@gmail.com>",
