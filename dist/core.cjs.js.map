@@ -1,1 +1,0 @@
-{"version":3,"file":"core.cjs.js","sources":["../src/core.js"],"sourcesContent":["export const sum = (a, b) => a + b;\n"],"names":["a","b"],"mappings":"YAAmB,CAACA,EAAGC,IAAMD,EAAIC"}
