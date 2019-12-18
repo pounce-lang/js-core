@@ -6,7 +6,7 @@ var r = require('ramda');
 
 // pounce core
 var parse = function (ps) { return r.split(' ', ps); };
-var pounce = function (ps) { return r.split(' ', ps); };
+var pounce = function (pl) { return ([[], r.map(function (p) { return p; }, pl)]); };
 
 exports.parse = parse;
 exports.pounce = pounce;
