@@ -11,7 +11,8 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "publish": "npm publish --access public"
+    "publish": "npm publish --access public",
+    "test": "node ./tests/index.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse <morse.nate@gmail.com>",
