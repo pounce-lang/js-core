@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "core interpreter for the pounce programming language in JS",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "publish": "npm publish --access public",
+    "publish": "npm login; npm publish --access public",
     "test": "node ./tests/index.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
