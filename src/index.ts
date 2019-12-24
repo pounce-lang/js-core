@@ -1,40 +1,58 @@
 // pounce core
 import * as r from 'ramda';
 import { words } from './words';
-import { Dictionary, Json, PL } from './types';
+import { Dictionary, Json, Word, WS } from './types';
+
+export const coreWords = words;
 
 const hasWord = (k: string) => (o: object): boolean => r.complement(r.isNil)(r.prop(k)(o));
-let halt = false;
+
+const runWord = (term: string, wd: Word, pl: Word[], stack: Word[], wordstack: WS): [Word[], Word[], WS] => {
+  console.log(term);
+  if(r.is(Array, wd)) {
+    const newPl = r.prepend(wd, pl);
+    return [newPl, stack, wordstack];
+  }
+  if(r.is(Object, wd) && hasWord('definition')(wd)) {
+    // const definition: (stack: Word[], pl: Word[], ws: WS) => [Word[], Word[], WS] = r.prop("definition")(wd);
+    // if(definition && r.is(Function, definition)) {
+    //   const [nextStack, nextPl, nextWordStack] = definition(stack, pl, wordstack);
+    //   return [nextPl, nextStack, nextWordStack];
+    // }
+    // else {
+    //   return [pl, stack, wordstack];
+    // }
+  }
+
+  return [pl, stack, wordstack];
+}
 
 export const parse = (ps: string) => r.split(' ', ps);
-export const pounce = (pl: PL, stack: Json[] = [], wordstack: Dictionary[]): any[] => {
+export const pounce = (pl: Word[], stack: Word[], wordstack: Dictionary[]): any[] => {
   if (pl.length > 0) {
     const term = r.head(pl);
     const restPl = r.tail(pl);
-    if (r.is(Array, term) || r.is(Object, term)) {
+    if (r.is(Array, term)) {
       return pounce(restPl, r.append(term, stack), wordstack);
     }
     else if (r.is(String, term)) {
+      const termStr: string = term.toString();
       console.log(term);
-      const thisWord = r.findLast(hasWord(term as string))(wordstack);
+      const thisWord = r.findLast(hasWord(termStr))(wordstack);
       console.log('*** thisWord', thisWord);
-
-      // if (thisWord) {
-      //   [nextPl, newStack, newWordStack] = runWord(thisWord, stack, pl);
-      //   pounce(nextPl, newStack, newWordStack);
-      // }
-      // else {
-      return pounce(restPl, r.append(term, stack), wordstack);
-      // }
+      const thisWD = r.prop(termStr);
+      console.log('*** thisWD', thisWD(thisWord as object));
+      if (thisWord && r.complement(r.isNil)(thisWD(thisWord as object))) {
+        const [nextPl, nextStack, nextWordStack] = runWord(termStr, thisWD(thisWord as Record<string, Word>), stack, pl, wordstack);
+        return pounce(nextPl, nextStack, nextWordStack);
+      }
+      else {
+        return pounce(restPl, r.append(term, stack), wordstack);
+      }
     }
-
   }
   return ([pl, stack, wordstack]);
 };
-
-
-
-
 
 
 

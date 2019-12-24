@@ -1,2 +1,2 @@
-import { Json } from './types';
-export declare const words: Json;
+import { Dictionary } from './types';
+export declare const words: Dictionary;
