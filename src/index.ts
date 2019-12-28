@@ -1,34 +1,34 @@
 // pounce core
 import * as r from 'ramda';
 import { words } from './words';
-import { Dictionary, Json, Word, WS } from './types';
+import { Dictionary, Word, DS } from './types';
 
 export const coreWords = words;
 
 const hasWord = (k: string) => (o: object): boolean => r.complement(r.isNil)(r.prop(k)(o));
 
-const runWord = (term: string, wd: Word, pl: Word[], stack: Word[], wordstack: WS): [Word[], Word[], WS] => {
-  console.log(term);
+const runWord = (term: string, wd: Word, pl: Word[], stack: Word[], wordstack: DS): [Word[], Word[], DS] => {
   if(r.is(Array, wd)) {
-    const newPl = r.prepend(wd, pl);
+    console.log(term);
+    const newPl = r.prepend(wd[0], pl);
     return [newPl, stack, wordstack];
   }
-  if(r.is(Object, wd) && hasWord('definition')(wd)) {
-    // const definition: (stack: Word[], pl: Word[], ws: WS) => [Word[], Word[], WS] = r.prop("definition")(wd);
-    // if(definition && r.is(Function, definition)) {
-    //   const [nextStack, nextPl, nextWordStack] = definition(stack, pl, wordstack);
-    //   return [nextPl, nextStack, nextWordStack];
-    // }
-    // else {
-    //   return [pl, stack, wordstack];
-    // }
-  }
+  // if(r.is(Object, wd) && hasWord('definition')(wd)) {
+  //   // const definition: (stack: Word[], pl: Word[], ws: WS) => [Word[], Word[], WS] = r.prop("definition")(wd);
+  //   // if(definition && r.is(Function, definition)) {
+  //   //   const [nextStack, nextPl, nextWordStack] = definition(stack, pl, wordstack);
+  //   //   return [nextPl, nextStack, nextWordStack];
+  //   // }
+  //   // else {
+  //   //   return [pl, stack, wordstack];
+  //   // }
+  // }
 
   return [pl, stack, wordstack];
 }
 
 export const parse = (ps: string) => r.split(' ', ps);
-export const pounce = (pl: Word[], stack: Word[], wordstack: Dictionary[]): any[] => {
+export const pounce = (pl: Word[], stack: Word[], wordstack: DS): any[] => {
   if (pl.length > 0) {
     const term = r.head(pl);
     const restPl = r.tail(pl);
@@ -53,9 +53,6 @@ export const pounce = (pl: Word[], stack: Word[], wordstack: Dictionary[]): any[
   }
   return ([pl, stack, wordstack]);
 };
-
-
-
 
 ////////////////////////////////////////////
 // run expects a parsed program list (pl).

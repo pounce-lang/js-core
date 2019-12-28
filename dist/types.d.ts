@@ -1,20 +1,6 @@
-export declare type Json = string | number | boolean | null | {
-    [property: string]: Json;
-} | Json[];
-export declare type PL = Json[];
-export declare type WordArr = Json[];
-export declare type WordObj = {
-    expects: {
-        desc: string;
-        ofType: string;
-    }[];
-    effects: number[];
-    tests: Json[];
-    desc: string;
-    definition: (stack: Json[], pl: Word[], ws: WS) => [Json[], Word[], WS];
-};
-export declare type Word = WordArr | WordObj;
+export declare type Word = string;
+export declare type WordArr = string[];
 export declare type Dictionary = {
     [keyof: string]: Word;
 };
-export declare type WS = Dictionary[];
+export declare type DS = Dictionary[];

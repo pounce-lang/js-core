@@ -520,12 +520,21 @@ var words = {
 var coreWords = words;
 var hasWord = function (k) { return function (o) { return complement(isNil)(prop(k)(o)); }; };
 var runWord = function (term, wd, pl, stack, wordstack) {
-    console.log(term);
     if (is(Array, wd)) {
-        var newPl = prepend(wd, pl);
+        console.log(term);
+        var newPl = prepend(wd[0], pl);
         return [newPl, stack, wordstack];
     }
-    if (is(Object, wd) && hasWord('definition')(wd)) ;
+    // if(r.is(Object, wd) && hasWord('definition')(wd)) {
+    //   // const definition: (stack: Word[], pl: Word[], ws: WS) => [Word[], Word[], WS] = r.prop("definition")(wd);
+    //   // if(definition && r.is(Function, definition)) {
+    //   //   const [nextStack, nextPl, nextWordStack] = definition(stack, pl, wordstack);
+    //   //   return [nextPl, nextStack, nextWordStack];
+    //   // }
+    //   // else {
+    //   //   return [pl, stack, wordstack];
+    //   // }
+    // }
     return [pl, stack, wordstack];
 };
 var parse = function (ps) { return split(' ', ps); };

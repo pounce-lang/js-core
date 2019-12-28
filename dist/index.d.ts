@@ -1,8 +1,6 @@
-import { Word } from './types';
+import { DS } from './types';
 export declare const coreWords: {
-    [keyof: string]: Word;
+    [keyof: string]: string;
 };
 export declare const parse: (ps: string) => string[];
-export declare const pounce: (pl: Word[], stack: Word[], wordstack: {
-    [keyof: string]: Word;
-}[]) => any[];
+export declare const pounce: (pl: string[], stack: string[], wordstack: DS) => any[];
