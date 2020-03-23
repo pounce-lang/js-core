@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "core interpreter for the pounce programming language in JS",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
@@ -12,7 +12,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "publish": "npm login; npm publish --access public",
-    "test": "node ./tests/index.js"
+    "tests": "node ./tests/index.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse <morse.nate@gmail.com>",
@@ -24,6 +24,7 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
+    "fp-ts": "^2.3.1",
     "ramda": "^0.26.1"
   }
 }

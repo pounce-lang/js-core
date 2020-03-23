@@ -1,6 +1,8 @@
-import { DS } from './types';
-export declare const coreWords: {
-    [keyof: string]: string;
-};
-export declare const parse: (ps: string) => string[];
-export declare const pounce: (pl: string[], stack: string[], wordstack: DS) => any[];
+declare type Word = string | number;
+declare type ValueStack = Array<Word>;
+declare type ProgramList = Array<Word>;
+interface WordDictionary {
+    [key: string]: ProgramList | ((s: ValueStack) => ValueStack);
+}
+export declare function purr(programList: ProgramList, wd: WordDictionary): Generator<string | Word[], void, unknown>;
+export {};
