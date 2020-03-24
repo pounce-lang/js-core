@@ -5,15 +5,16 @@
 type Word = string | number;
 type ValueStack = Array<Word>;
 type ProgramList = Array<Word>;
+type StackFunction = ((s: ValueStack) => ValueStack);
 interface WordDictionary {
-  [key: string]: ProgramList | ((s: ValueStack) => ValueStack)
+  [key: string]: ProgramList | StackFunction;
 }
 
 
-export function* purr(programList: ProgramList, wd: WordDictionary) {
+export function* purr(programList: ProgramList, wd: WordDictionary, opt: {debug?: boolean} = {debug: true}) {
   let pl = programList || [];
-  let vstack = [];
-
+  let vstack: ValueStack = [];
+  yield opt?.debug ? [vstack, pl]: null;
   let w;
   const maxWordsProcessed = 100;
   let wordsProcessed = 0;
@@ -23,21 +24,21 @@ export function* purr(programList: ProgramList, wd: WordDictionary) {
     while (wds) {
       if (typeof wds === 'function') {
         wds(vstack);
-        yield vstack;
       }
       else {
         pl.unshift(...wds);
       }
+      yield opt?.debug ? [vstack, pl]: null;
       w = pl.shift();
       wds = wd[w];
     }
     if (w) {
       vstack.push(w);
     }
-    yield vstack;
+    yield opt?.debug ? [vstack, pl]: null;
   }
   if (wordsProcessed >= maxWordsProcessed) {
-    yield "maxWordsProcessed exceeded: this may be a ";
+    yield [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "];
   }
   else {
     yield "fin: all words have been processed with stack of [" + vstack + "]";

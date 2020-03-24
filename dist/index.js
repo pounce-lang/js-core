@@ -46,55 +46,59 @@ function __generator(thisArg, body) {
 }
 
 // Pounce core engine is purr thanks EL for naming that.
-function purr(programList, wd) {
+function purr(programList, wd, opt) {
     var pl, vstack, w, maxWordsProcessed, wordsProcessed, wds;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    if (opt === void 0) { opt = { debug: true }; }
+    var _a, _b, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
                 pl = programList || [];
                 vstack = [];
+                return [4 /*yield*/, ((_a = opt) === null || _a === void 0 ? void 0 : _a.debug) ? [vstack, pl] : null];
+            case 1:
+                _d.sent();
                 maxWordsProcessed = 100;
                 wordsProcessed = 0;
-                _a.label = 1;
-            case 1:
-                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 8];
+                _d.label = 2;
+            case 2:
+                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 7];
                 wordsProcessed += 1;
                 wds = wd[w];
-                _a.label = 2;
-            case 2:
-                if (!wds) return [3 /*break*/, 6];
-                if (!(typeof wds === 'function')) return [3 /*break*/, 4];
-                wds(vstack);
-                return [4 /*yield*/, vstack];
+                _d.label = 3;
             case 3:
-                _a.sent();
-                return [3 /*break*/, 5];
+                if (!wds) return [3 /*break*/, 5];
+                if (typeof wds === 'function') {
+                    wds(vstack);
+                }
+                else {
+                    pl.unshift.apply(pl, wds);
+                }
+                return [4 /*yield*/, ((_b = opt) === null || _b === void 0 ? void 0 : _b.debug) ? [vstack, pl] : null];
             case 4:
-                pl.unshift.apply(pl, wds);
-                _a.label = 5;
-            case 5:
+                _d.sent();
                 w = pl.shift();
                 wds = wd[w];
-                return [3 /*break*/, 2];
-            case 6:
+                return [3 /*break*/, 3];
+            case 5:
                 if (w) {
                     vstack.push(w);
                 }
-                return [4 /*yield*/, vstack];
+                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
+            case 6:
+                _d.sent();
+                return [3 /*break*/, 2];
             case 7:
-                _a.sent();
-                return [3 /*break*/, 1];
+                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 9];
+                return [4 /*yield*/, [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "]];
             case 8:
-                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 10];
-                return [4 /*yield*/, "maxWordsProcessed exceeded: this may be a "];
-            case 9:
-                _a.sent();
-                return [3 /*break*/, 12];
-            case 10: return [4 /*yield*/, "fin: all words have been processed with stack of [" + vstack + "]"];
-            case 11:
-                _a.sent();
-                _a.label = 12;
-            case 12: return [2 /*return*/];
+                _d.sent();
+                return [3 /*break*/, 11];
+            case 9: return [4 /*yield*/, "fin: all words have been processed with stack of [" + vstack + "]"];
+            case 10:
+                _d.sent();
+                _d.label = 11;
+            case 11: return [2 /*return*/];
         }
     });
 }

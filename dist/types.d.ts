@@ -1,6 +1,8 @@
-export declare type Word = string;
-export declare type WordArr = string[];
-export declare type Dictionary = {
-    [keyof: string]: Word;
-};
-export declare type DS = Dictionary[];
+declare module "pTypes" {
+    type Word = string | number;
+    type ValueStack = Array<Word>;
+    type ProgramList = Array<Word>;
+    interface WordDictionary {
+        [key: string]: ProgramList | ((s: ValueStack) => ValueStack);
+    }
+}

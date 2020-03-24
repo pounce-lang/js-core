@@ -14,8 +14,8 @@ const sequence = purr(["a", "dup", "cat", "b", "c", 1, 3, "cat"],
     d: ["DDD", "dup", "b9"],
     dup: s => { s.push(s[s.length - 1]); return s; },
     cat: s => {
-      let arg1 = s.pop();
       let arg2 = s.pop();
+      let arg1 = s.pop();
       if (typeof arg1 === typeof arg2) {
         if (typeof arg1 === "string") {
           s.push(arg1 + arg2);
@@ -30,7 +30,7 @@ const sequence = purr(["a", "dup", "cat", "b", "c", 1, 3, "cat"],
       else {
         throw "the type of args was not the same"
       }
-    return s;
+      return s;
     }
   });
 

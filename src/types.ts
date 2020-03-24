@@ -12,28 +12,13 @@
 // export type FnRet =  [Json[], PL | undefined, Dictionary | undefined];
 // export type DefFn = function (Json[], PL | undefined, Dictionary[] | undefined): FnRet => void;
 
-export type Word =
-    | string;
-export type WordArr =
-    | string[];
-export type Dictionary =
-    | { [keyof: string]: Word };
+declare module "pTypes" {
+    export type Word = string | number;
+    export type ValueStack = Array<Word>;
+    export type ProgramList = Array<Word>;
+    export interface WordDictionary {
+        [key: string]: ProgramList | ((s: ValueStack) => ValueStack)
+    }
 
-export type DS = Dictionary[]
-// export type WordObj =
-//     {
-//         expects: {
-//             desc: string;
-//             ofType: string;
-//         }[];
-//         effects: number[];
-//         tests: Json[];
-//         desc: string;
-//         definition: (stack: Json[], pl: Word[], ws: WS) => [Json[], Word[], WS];
-//     };
-
-// export type Word =
-//     | WordArr
-//     | WordObj;
-
+}
 
