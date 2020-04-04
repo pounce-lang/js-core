@@ -1,8 +1,3 @@
-declare module "pTypes" {
-    type Word = string | number;
-    type ValueStack = Array<Word>;
-    type ProgramList = Array<Word>;
-    interface WordDictionary {
-        [key: string]: ProgramList | ((s: ValueStack) => ValueStack);
-    }
-}
+export declare type Word = string | number | Array<Word>;
+export declare type ValueStack = Array<Word>;
+export declare type ProgramList = Array<Word>;

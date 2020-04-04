@@ -1,5 +1,6 @@
 # Pounce-lang/core
-The core of the pounce language is a parser, interpreter and a core dictionary of pounce words. 
+Pounce is a small concatenative language that runs in Javascript.
+The core of the language includes a parser called "pinna" and an interpreter called "purr". A core dictionary of Pounce words is included, but can be overridden with a custom, perhaps more efficient, dictionary of words.
 
 
 ## about this repo

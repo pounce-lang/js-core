@@ -1,6 +1,4 @@
-import { ProgramList } from './types';
-import { WordDictionary } from "./WordDictionary";
-export declare const parser: {
+export declare const pinna: {
     Grammar: {
         _read_pounce: () => any;
         _read_pounce_pl: () => any;
@@ -34,6 +32,3 @@ export declare const parser: {
     Parser: any;
     parse: (input: string, options: any) => any;
 };
-export declare function purr(programList: ProgramList, wd?: WordDictionary, opt?: {
-    debug?: boolean;
-}): Generator<ProgramList[] | (string | ProgramList[])[], void, unknown>;
