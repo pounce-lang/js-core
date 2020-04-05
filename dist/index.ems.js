@@ -1,4 +1,4 @@
-import { is, last } from 'ramda';
+import { is } from 'ramda';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -43,16 +43,211 @@ function __generator(thisArg, body) {
     }
 }
 
+var toNumOrNull = function (u) {
+    return is(Number, u) ? u : null;
+};
+var toArrOrNull = function (u) {
+    return is(Array, u) ? u : null;
+};
 var coreWords = {
-    dup: function (s) { s.push(s[s.length - 1]); return s; },
-    pop: function (s) {
-        var top = s[s.length - 1];
-        if (is(Array, top)) {
-            s.push(last(top));
-        }
+    'dup': function (s) { s.push(s[s.length - 1]); return s; },
+    // 'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return s; },
+    'pop': function (s) {
+        var arr = toArrOrNull(s[s.length - 1]);
+        s.push(arr ? arr.pop() : null);
         return s;
     },
-    drop: function (s) { s.pop(); return s; },
+    'swap': function (s) {
+        var top = s.pop();
+        var under = s.pop();
+        s.push(top);
+        s.push(under);
+        return s;
+    },
+    'drop': function (s) { s.pop(); return s; },
+    // 'def': {
+    //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a word',
+    //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
+    //         const key = toString(s.pop());
+    //         const definition = s.pop();
+    //         wordstack[0][key] = definition;
+    //         return [s];
+    //     }
+    // },
+    // // 'define': {
+    // //     expects: [{ ofType: 'record', desc: 'definition of word' }, { ofType: 'string', desc: 'word name' }], effects: [-2], tests: [], desc: 'defines a word given a record',
+    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
+    // //         const name = toString(s.pop());
+    // //         wordstack[0][name] = s.pop();
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'local-def': {
+    // //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a local word',
+    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
+    // //         const top = wordstack.length - 1;
+    // //         if (top > 0) {
+    // //             const key = toString(s.pop());
+    // //             const definition = s.pop();
+    // //             wordstack[top][key] = definition;
+    // //         }
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'internal=>drop-local-words': {
+    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
+    // //         wordstack.pop();
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'import': {
+    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
+    // //         const importable = toString(s.pop());
+    // //         if (typeof importable === 'string') {
+    // //             if (imported[importable]) {
+    // //                 // already imported
+    // //                 return [s];
+    // //             }
+    // //             // given a path to a dictionary load it or fetch and load
+    // //             // options are to extend the core dictionary or pushit on a stack
+    // //             // 1. Object.assign(window[importable].words, wordstack[0]);
+    // //             // 2. wordstack.push(window[importable].words);
+    // //             if (window[importable]) {
+    // //                 imported[importable] = true;
+    // //                 wordstack.push(window[importable].words);
+    // //             } else {
+    // //                 console.log('TBD: code to load resourse:', importable)
+    // //             }
+    // //         } else {
+    // //             // given a dictionary
+    // //             wordstack.push(importable);
+    // //         }
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'apply': {
+    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const block = s.pop();
+    // //         if (isArray(block)) {
+    // //             pl = block.concat(pl);
+    // //         }
+    // //         else {
+    // //             pl.unshift(block);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'dip': {
+    // //     expects: [{ desc: 'a', ofType: 'list' }], effects: [-1], tests: [], desc: 'apply under the top of the stack (see apply)',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const block = s.pop();
+    // //         const item = s.pop();
+    // //         pl = [item].concat(pl);
+    // //         if (isArray(block)) {
+    // //             pl = block.concat(pl);
+    // //         }
+    // //         else {
+    // //             pl.unshift(block);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'dip2': {
+    // //     expects: [{ desc: 'a', ofType: 'list' }, { desc: 'an item', ofType: 'any' }], effects: [-1], tests: [], desc: 'apply two under the top of the stack (see apply)',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const block = s.pop();
+    // //         const item1 = s.pop();
+    // //         const item2 = s.pop();
+    // //         pl = [item1].concat(pl);
+    // //         pl = [item2].concat(pl);
+    // //         if (isArray(block)) {
+    // //             pl = block.concat(pl);
+    // //         }
+    // //         else {
+    // //             pl.unshift(block);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'log': {
+    // //     definition: (s: Json[]) => {
+    // //         console.log(s);
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'drop': {
+    // //     expects: [{ desc: 'some value', ofType: 'any' }], effects: [-1], tests: [], desc: 'remove one element from the top of the stack',
+    // //     definition: function (s: Json[]) {
+    // //         s.pop();
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'dup': {
+    // //     expects: [{ desc: 'some item', ofType: 'any' }], effects: [1], tests: [], desc: 'duplicate the top element on the stack',
+    // //     definition: function (s: Json[]) {
+    // //         const top = s.length - 1;
+    // //         const a = cloneItem(s[top]);
+    // //         s.push(a);
+    // //         return [s];
+    // //     }
+    // // },
+    // // 'dup2': {
+    // //     expects: [{ desc: 'some item', ofType: 'any' }, { desc: 'another item', ofType: 'any' }], effects: [2], tests: [], desc: 'duplicate the top two elements on the stack',
+    // //     definition: [['dup'], 'dip', 'dup', ['swap'], 'dip']
+    // //     //function (s: Json[]) {
+    // //     //  const top = s.length - 1;
+    // //     //  const a = cloneItem(s[top]);
+    // //     //  const b = cloneItem(s[top - 1]);
+    // //     //  s.push(b, a);
+    // //     //  return [s];
+    // //     //}
+    // // },
+    '+': function (s) {
+        var b = toNumOrNull(s.pop());
+        var a = toNumOrNull(s.pop());
+        if (a !== null && b !== null) {
+            s.push(a + b);
+            return s;
+        }
+        return null;
+    },
+    '-': function (s) {
+        var b = toNumOrNull(s.pop());
+        var a = toNumOrNull(s.pop());
+        if (a !== null && b !== null) {
+            s.push(a - b);
+            return s;
+        }
+        return null;
+    },
+    '/': function (s) {
+        var b = toNumOrNull(s.pop());
+        var a = toNumOrNull(s.pop());
+        if (a !== null && b !== null && b !== 0) {
+            s.push(a / b);
+            return s;
+        }
+        return null;
+    },
+    '%': function (s) {
+        var b = toNumOrNull(s.pop());
+        var a = toNumOrNull(s.pop());
+        if (a !== null && b !== null && b !== 0) {
+            s.push(a % b);
+            return s;
+        }
+        return null;
+    },
+    '*': function (s) {
+        var b = toNumOrNull(s.pop());
+        var a = toNumOrNull(s.pop());
+        if (a !== null && b !== null) {
+            s.push(a * b);
+            return s;
+        }
+        return null;
+    },
 };
 
 var pinnaParser = function () {
@@ -2610,9 +2805,9 @@ function purr(programList, wd, opt) {
                 wordsProcessed = 0;
                 _d.label = 2;
             case 2:
-                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 8];
+                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 9];
                 wordsProcessed += 1;
-                wds = !is(Array, w) ? wd[w] : [];
+                wds = !is(Array, w) ? wd[w] : null;
                 _d.label = 3;
             case 3:
                 if (!wds) return [3 /*break*/, 5];
@@ -2629,20 +2824,31 @@ function purr(programList, wd, opt) {
                 wds = !is(Array, w) ? wd[w] : [];
                 return [3 /*break*/, 3];
             case 5:
-                if (!w) return [3 /*break*/, 7];
-                vstack.push(w);
+                if (!(w || is(Array, w))) return [3 /*break*/, 7];
+                if (is(Array, w)) {
+                    // console.log('*** w ***', w);
+                    vstack.push([].concat(w));
+                }
+                else {
+                    // console.log('*** w2 ***', w);
+                    //      vstack.push(JSON.parse(JSON.stringify(w)));
+                    vstack.push(w);
+                }
                 return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
             case 6:
                 _d.sent();
-                _d.label = 7;
-            case 7: return [3 /*break*/, 2];
-            case 8:
-                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 10];
-                return [4 /*yield*/, [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "]];
+                return [3 /*break*/, 8];
+            case 7:
+                console.log("*** no sure what word is", w);
+                _d.label = 8;
+            case 8: return [3 /*break*/, 2];
             case 9:
+                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 11];
+                return [4 /*yield*/, [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "]];
+            case 10:
                 _d.sent();
-                return [3 /*break*/, 10];
-            case 10: return [2 /*return*/];
+                return [3 /*break*/, 11];
+            case 11: return [2 /*return*/];
         }
     });
 }

@@ -1,17 +1,9 @@
+// Pounce interpreter types
 
-// export type Json =
-//     | string
-//     | number
-//     | boolean
-//     | null
-//     | { [property: string]: Json }
-//     | Json[];
+export type Word = string | number | Word[] | boolean | { [property: string]: Word };
+export type ValueStack = Word[];
+export type ProgramList = Word[];
 
-// export type PL = Json[];
-
-// export type FnRet =  [Json[], PL | undefined, Dictionary | undefined];
-// export type DefFn = function (Json[], PL | undefined, Dictionary[] | undefined): FnRet => void;
-    export type Word = string | number | Array<Word>;
-    export type ValueStack = Array<Word>;
-    export type ProgramList = Array<Word>;
+// export type FnRet =  [Word[], PL | undefined, Dictionary | undefined];
+// export type DefFn = function (Word[], PL | undefined, Dictionary[] | undefined): FnRet => void;
 
