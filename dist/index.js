@@ -2796,63 +2796,52 @@ function purr(programList, wd, opt) {
     var pl, vstack, w, maxWordsProcessed, wordsProcessed, wds;
     if (wd === void 0) { wd = coreWords; }
     if (opt === void 0) { opt = { debug: true }; }
-    var _a, _b, _c;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
                 pl = programList || [];
                 vstack = [];
                 return [4 /*yield*/, ((_a = opt) === null || _a === void 0 ? void 0 : _a.debug) ? [vstack, pl] : null];
             case 1:
-                _d.sent();
+                _c.sent();
                 maxWordsProcessed = 10000;
                 wordsProcessed = 0;
-                _d.label = 2;
+                _c.label = 2;
             case 2:
-                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 9];
+                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 4];
                 wordsProcessed += 1;
                 wds = !r.is(Array, w) ? wd[w] : null;
-                _d.label = 3;
-            case 3:
-                if (!wds) return [3 /*break*/, 5];
-                if (typeof wds === 'function') {
-                    wds(vstack);
+                if (wds) {
+                    if (typeof wds === 'function') {
+                        wds(vstack);
+                    }
+                    else {
+                        pl.unshift.apply(pl, wds);
+                    }
+                }
+                else if (w || r.is(Array, w)) {
+                    if (r.is(Array, w)) {
+                        vstack.push([].concat(w));
+                    }
+                    else {
+                        vstack.push(w);
+                    }
                 }
                 else {
-                    pl.unshift.apply(pl, wds);
+                    console.log("*** no sure what this word is", w);
                 }
                 return [4 /*yield*/, ((_b = opt) === null || _b === void 0 ? void 0 : _b.debug) ? [vstack, pl] : null];
+            case 3:
+                _c.sent();
+                return [3 /*break*/, 2];
             case 4:
-                _d.sent();
-                w = pl.shift();
-                wds = !r.is(Array, w) ? wd[w] : [];
-                return [3 /*break*/, 3];
-            case 5:
-                if (!(w || r.is(Array, w))) return [3 /*break*/, 7];
-                if (r.is(Array, w)) {
-                    // console.log('*** w ***', w);
-                    vstack.push([].concat(w));
-                }
-                else {
-                    // console.log('*** w2 ***', w);
-                    //      vstack.push(JSON.parse(JSON.stringify(w)));
-                    vstack.push(w);
-                }
-                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
-            case 6:
-                _d.sent();
-                return [3 /*break*/, 8];
-            case 7:
-                console.log("*** no sure what word is", w);
-                _d.label = 8;
-            case 8: return [3 /*break*/, 2];
-            case 9:
-                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 11];
+                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 6];
                 return [4 /*yield*/, [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "]];
-            case 10:
-                _d.sent();
-                return [3 /*break*/, 11];
-            case 11: return [2 /*return*/];
+            case 5:
+                _c.sent();
+                _c.label = 6;
+            case 6: return [2 /*return*/];
         }
     });
 }

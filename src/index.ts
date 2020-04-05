@@ -18,39 +18,30 @@ export function* purr(programList: ProgramList,
   while (wordsProcessed < maxWordsProcessed && (w = pl.shift())) {
     wordsProcessed += 1;
     let wds = !r.is(Array, w) ? wd[w as string | number] : null;
-    while (wds) {
+    if (wds) {
       if (typeof wds === 'function') {
         wds(vstack);
       }
       else {
         pl.unshift(...wds);
       }
-      yield opt?.debug ? [vstack, pl] : null;
-      w = pl.shift();
-      wds = !r.is(Array, w) ? wd[w as string | number] : [];
     }
-    // console.log('*** not in dictionary w ***', w);
-    if (w || r.is(Array, w)) {
+    else if (w || r.is(Array, w)) {
       if (r.is(Array, w)) {
-        // console.log('*** w ***', w);
         vstack.push([].concat(w));
       }
       else {
-        // console.log('*** w2 ***', w);
-        //      vstack.push(JSON.parse(JSON.stringify(w)));
         vstack.push(w);
       }
-      yield opt?.debug ? [vstack, pl] : null;
     }
     else {
-      console.log("*** no sure what word is", w);
+      console.log("*** no sure what this word is", w);
     }
+    yield opt?.debug ? [vstack, pl] : null;
+
   }
   if (wordsProcessed >= maxWordsProcessed) {
     yield [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "];
-  }
-  else {
-    // yield [vstack, pl];
   }
 }
 

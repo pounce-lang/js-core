@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "core interpreter for the pounce programming language in JS",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",

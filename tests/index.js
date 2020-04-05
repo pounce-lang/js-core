@@ -52,7 +52,7 @@ while (result !== undefined) {
 }
 // should be [ 13 ]
 console.log("---------------")
-const test2 = purr(pinna.parse("[5 8] dup drop pop swap pop swap drop +"));
+const test2 = purr(pinna.parse("[5 8] dup drop pop swap pop swap drop swap +"));
 result = test2.next().value;
 while (result !== undefined) {
   if (result !== null) {console.log(result);}
