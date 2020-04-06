@@ -8,19 +8,20 @@ import { pinna } from './parser/Pinna';
 export const parser = pinna;
 export function* purr(programList: ProgramList,
   wd: WordDictionary = coreWords,
-  opt: { debug?: boolean } = { debug: true }) {
-  let pl = programList || [];
+  opt: { debug: boolean, maxCycles?: number } = { debug: false }
+  ) {
+  let pl = [].concat(programList);
   let vstack: ValueStack = [];
   yield opt?.debug ? [vstack, pl] : null;
   let w;
-  const maxWordsProcessed = 10000;
-  let wordsProcessed = 0;
-  while (wordsProcessed < maxWordsProcessed && (w = pl.shift())) {
-    wordsProcessed += 1;
+  const maxCycles = opt.maxCycles || 10000;
+  let cycles = 0;
+  while (cycles < maxCycles && (w = pl.shift())) {
+    cycles += 1;
     let wds = !r.is(Array, w) ? wd[w as string | number] : null;
     if (wds) {
       if (typeof wds === 'function') {
-        wds(vstack);
+        [vstack, pl] = wds(vstack, pl);
       }
       else {
         pl.unshift(...wds);
@@ -34,14 +35,11 @@ export function* purr(programList: ProgramList,
         vstack.push(w);
       }
     }
-    else {
-      console.log("*** no sure what this word is", w);
-    }
     yield opt?.debug ? [vstack, pl] : null;
-
   }
-  if (wordsProcessed >= maxWordsProcessed) {
-    yield [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "];
+  if (cycles >= maxCycles) {
+    yield [[vstack, pl], "maxCycles exceeded: this may be an infinite loop "];
   }
+  yield !opt?.debug ? [vstack, pl] : null;
 }
 

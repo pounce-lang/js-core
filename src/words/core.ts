@@ -1,35 +1,96 @@
 import * as r from "ramda";
 import { WordDictionary } from "../WordDictionary";
-import { Word } from '../types';
+import { Word, ProgramList } from '../types';
 
 const toNumOrNull = (u: any): number | null =>
-    r.is(Number, u) ? u : null
+    r.is(Number, u) ? u : null;
 const toArrOrNull = (u: any): [] | null =>
-    r.is(Array, u) ? u : null
+    r.is(Array, u) ? u : null;
+const toPLOrNull = (u: any): ProgramList | null =>
+    r.is(Array, u) ? u : null;
 
 export const coreWords: WordDictionary = {
-    'dup': s => { s.push(s[s.length - 1]); return s; },
-    // 'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return s; },
-    'pop': s => {
+    'dup': (s, pl) => { s.push(s[s.length - 1]); return [s, pl]; },
+//    'dup': (s, pl) => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s, pl]; },
+    'pop': (s, pl) => {
         const arr = toArrOrNull(s[s.length - 1]);
         s.push(arr ? arr.pop() : null);
-        return s;
+        return [s, pl];
     },
-    'swap':  s => { 
+    'swap': (s, pl) => { 
         const top = s.pop();
         const under = s.pop();
         s.push(top); 
         s.push(under); 
-        return s; 
+        return [s, pl];
     },
-    'drop': s => { s.pop(); return s; },
+    'drop': (s, pl) => { s.pop(); return [s, pl]; },
+
+    '+': (s, pl) => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        if (a !== null && b !== null) {
+            s.push(a + b);
+            return [s, pl];
+        } 
+        return null;
+    },
+    '-': (s, pl) => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        if (a !== null && b !== null) {
+            s.push(a - b);
+            return [s, pl];
+        } 
+        return null;
+    },
+    '/': (s, pl) => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        if (a !== null && b !== null && b !== 0) {
+            s.push(a / b);
+            return [s, pl];
+        } 
+        return null;
+    },
+    '%': (s, pl) => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        if (a !== null && b !== null && b !== 0) {
+            s.push(a % b);
+            return [s, pl];
+        } 
+        return null;
+    },
+    '*': (s, pl) => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        if (a !== null && b !== null) {
+            s.push(a * b);
+            return [s, pl];
+        } 
+        return null;
+    },
+    'dip': (s, pl) => {
+        const block = toPLOrNull(s.pop());
+        const item = s.pop();
+        pl = [item].concat(pl);
+        if (block) {
+            pl = block.concat(pl);
+        }
+        else {
+            pl.unshift(block);
+        }
+        return [s, pl];
+    },
+
     // 'def': {
     //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a word',
     //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     //         const key = toString(s.pop());
     //         const definition = s.pop();
     //         wordstack[0][key] = definition;
-    //         return [s];
+    //         return [s, pl];
     //     }
     // },
     // // 'define': {
@@ -37,7 +98,7 @@ export const coreWords: WordDictionary = {
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         const name = toString(s.pop());
     // //         wordstack[0][name] = s.pop();
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'local-def': {
@@ -49,13 +110,13 @@ export const coreWords: WordDictionary = {
     // //             const definition = s.pop();
     // //             wordstack[top][key] = definition;
     // //         }
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'internal=>drop-local-words': {
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         wordstack.pop();
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'import': {
@@ -64,7 +125,7 @@ export const coreWords: WordDictionary = {
     // //         if (typeof importable === 'string') {
     // //             if (imported[importable]) {
     // //                 // already imported
-    // //                 return [s];
+    // //                 return [s, pl];
     // //             }
 
     // //             // given a path to a dictionary load it or fetch and load
@@ -81,28 +142,13 @@ export const coreWords: WordDictionary = {
     // //             // given a dictionary
     // //             wordstack.push(importable);
     // //         }
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'apply': {
     // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
     // //     definition: function (s: Json[], pl: PL) {
     // //         const block = s.pop();
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'dip': {
-    // //     expects: [{ desc: 'a', ofType: 'list' }], effects: [-1], tests: [], desc: 'apply under the top of the stack (see apply)',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         const item = s.pop();
-    // //         pl = [item].concat(pl);
     // //         if (isArray(block)) {
     // //             pl = block.concat(pl);
     // //         }
@@ -129,17 +175,11 @@ export const coreWords: WordDictionary = {
     // //         return [s, pl];
     // //     }
     // // },
-    // // 'log': {
-    // //     definition: (s: Json[]) => {
-    // //         console.log(s);
-    // //         return [s];
-    // //     }
-    // // },
     // // 'drop': {
     // //     expects: [{ desc: 'some value', ofType: 'any' }], effects: [-1], tests: [], desc: 'remove one element from the top of the stack',
     // //     definition: function (s: Json[]) {
     // //         s.pop();
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'dup': {
@@ -148,7 +188,7 @@ export const coreWords: WordDictionary = {
     // //         const top = s.length - 1;
     // //         const a = cloneItem(s[top]);
     // //         s.push(a);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'dup2': {
@@ -159,59 +199,13 @@ export const coreWords: WordDictionary = {
     // //     //  const a = cloneItem(s[top]);
     // //     //  const b = cloneItem(s[top - 1]);
     // //     //  s.push(b, a);
-    // //     //  return [s];
+    // //     //  return [s, pl];
     // //     //}
     // // },
-
-    '+': s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a + b);
-            return s;
-        } 
-        return null;
-    },
-    '-': s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a - b);
-            return s;
-        } 
-        return null;
-    },
-    '/': s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null && b !== 0) {
-            s.push(a / b);
-            return s;
-        } 
-        return null;
-    },
-    '%': s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null && b !== 0) {
-            s.push(a % b);
-            return s;
-        } 
-        return null;
-    },
-    '*': s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a * b);
-            return s;
-        } 
-        return null;
-    },
     // // 'random': {
     // //     definition: function (s: Json[]) {
     // //         s.push(Math.random());
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'round': {
@@ -219,14 +213,14 @@ export const coreWords: WordDictionary = {
     // //         const pres = s.pop();
     // //         const n = s.pop();
     // //         s.push(Math.round(n / pres) * pres);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'abs': {
     // //     definition: function (s: Json[]) {
     // //         const n = s.pop();
     // //         s.push(Math.abs(n));
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 's2int': {
@@ -235,7 +229,7 @@ export const coreWords: WordDictionary = {
     // //         const radix = s.pop();
     // //         const str = toString(s.pop());
     // //         s.push(Number.parseInt(str, radix));
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'int2s': {
@@ -244,7 +238,7 @@ export const coreWords: WordDictionary = {
     // //         const radix = s.pop();
     // //         const n = s.pop();
     // //         s.push(n.toString(radix));
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '<<': {
@@ -253,7 +247,7 @@ export const coreWords: WordDictionary = {
     // //         const shift = s.pop();
     // //         const n = s.pop();
     // //         s.push(n << shift);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '>>': {
@@ -262,7 +256,7 @@ export const coreWords: WordDictionary = {
     // //         const shift = s.pop();
     // //         const n = s.pop();
     // //         s.push(n >> shift);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'XOR': {
@@ -271,7 +265,7 @@ export const coreWords: WordDictionary = {
     // //         const shift = s.pop();
     // //         const n = s.pop();
     // //         s.push(n ^ shift);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'AND': {
@@ -280,35 +274,35 @@ export const coreWords: WordDictionary = {
     // //         const shift = s.pop();
     // //         const n = s.pop();
     // //         s.push(n & shift);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'store.set': {
     // //     definition: function (s: Json[]) {
     // //         const name = toString(s.pop());
     // //         localStorage.setItem(name, JSON.stringify(s.pop()));
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'store.get': {
     // //     definition: function (s: Json[]) {
     // //         const name = toString(s.pop());
     // //         s.push(JSON.parse(localStorage.getItem(name)));
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'store.remove': {
     // //     definition: function (s: Json[]) {
     // //         const name = toString(s.pop());
     // //         localStorage.removeItem(name);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'depth': {
     // //     expects: [], effects: [1], tests: [], desc: 'stack depth',
     // //     definition: function (s: Json[], pl: PL) {
     // //         s.push(s.length);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '==': {
@@ -317,7 +311,7 @@ export const coreWords: WordDictionary = {
     // //         const b = s.pop();
     // //         const a = s.pop();
     // //         s.push(a === b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '>': {
@@ -326,7 +320,7 @@ export const coreWords: WordDictionary = {
     // //         const b = s.pop();
     // //         const a = s.pop();
     // //         s.push(a > b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '>=': {
@@ -335,7 +329,7 @@ export const coreWords: WordDictionary = {
     // //         const b = s.pop();
     // //         const a = s.pop();
     // //         s.push(a >= b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '<': {
@@ -344,7 +338,7 @@ export const coreWords: WordDictionary = {
     // //         const b = s.pop();
     // //         const a = s.pop();
     // //         s.push(a < b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // '<=': {
@@ -353,7 +347,7 @@ export const coreWords: WordDictionary = {
     // //         const b = s.pop();
     // //         const a = s.pop();
     // //         s.push(a <= b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'and': {
@@ -362,7 +356,7 @@ export const coreWords: WordDictionary = {
     // //         const b = toBoolean(s.pop());
     // //         const a = toBoolean(s.pop());
     // //         s.push(a && b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'or': {
@@ -371,7 +365,7 @@ export const coreWords: WordDictionary = {
     // //         const b = toBoolean(s.pop());
     // //         const a = toBoolean(s.pop());
     // //         s.push(a || b);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'not': {
@@ -379,7 +373,7 @@ export const coreWords: WordDictionary = {
     // //     definition: function (s: Json[]) {
     // //         const a = toBoolean(s.pop());
     // //         s.push(!a);
-    // //         return [s];
+    // //         return [s, pl];
     // //     }
     // // },
     // // 'bubble-up': {

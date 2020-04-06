@@ -53,204 +53,81 @@ var toNumOrNull = function (u) {
 var toArrOrNull = function (u) {
     return r.is(Array, u) ? u : null;
 };
+var toPLOrNull = function (u) {
+    return r.is(Array, u) ? u : null;
+};
 var coreWords = {
-    'dup': function (s) { s.push(s[s.length - 1]); return s; },
-    // 'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return s; },
-    'pop': function (s) {
+    'dup': function (s, pl) { s.push(s[s.length - 1]); return [s, pl]; },
+    //    'dup': (s, pl) => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s, pl]; },
+    'pop': function (s, pl) {
         var arr = toArrOrNull(s[s.length - 1]);
         s.push(arr ? arr.pop() : null);
-        return s;
+        return [s, pl];
     },
-    'swap': function (s) {
+    'swap': function (s, pl) {
         var top = s.pop();
         var under = s.pop();
         s.push(top);
         s.push(under);
-        return s;
+        return [s, pl];
     },
-    'drop': function (s) { s.pop(); return s; },
-    // 'def': {
-    //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a word',
-    //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    //         const key = toString(s.pop());
-    //         const definition = s.pop();
-    //         wordstack[0][key] = definition;
-    //         return [s];
-    //     }
-    // },
-    // // 'define': {
-    // //     expects: [{ ofType: 'record', desc: 'definition of word' }, { ofType: 'string', desc: 'word name' }], effects: [-2], tests: [], desc: 'defines a word given a record',
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         const name = toString(s.pop());
-    // //         wordstack[0][name] = s.pop();
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'local-def': {
-    // //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a local word',
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         const top = wordstack.length - 1;
-    // //         if (top > 0) {
-    // //             const key = toString(s.pop());
-    // //             const definition = s.pop();
-    // //             wordstack[top][key] = definition;
-    // //         }
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'internal=>drop-local-words': {
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         wordstack.pop();
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'import': {
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         const importable = toString(s.pop());
-    // //         if (typeof importable === 'string') {
-    // //             if (imported[importable]) {
-    // //                 // already imported
-    // //                 return [s];
-    // //             }
-    // //             // given a path to a dictionary load it or fetch and load
-    // //             // options are to extend the core dictionary or pushit on a stack
-    // //             // 1. Object.assign(window[importable].words, wordstack[0]);
-    // //             // 2. wordstack.push(window[importable].words);
-    // //             if (window[importable]) {
-    // //                 imported[importable] = true;
-    // //                 wordstack.push(window[importable].words);
-    // //             } else {
-    // //                 console.log('TBD: code to load resourse:', importable)
-    // //             }
-    // //         } else {
-    // //             // given a dictionary
-    // //             wordstack.push(importable);
-    // //         }
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'apply': {
-    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'dip': {
-    // //     expects: [{ desc: 'a', ofType: 'list' }], effects: [-1], tests: [], desc: 'apply under the top of the stack (see apply)',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         const item = s.pop();
-    // //         pl = [item].concat(pl);
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'dip2': {
-    // //     expects: [{ desc: 'a', ofType: 'list' }, { desc: 'an item', ofType: 'any' }], effects: [-1], tests: [], desc: 'apply two under the top of the stack (see apply)',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         const item1 = s.pop();
-    // //         const item2 = s.pop();
-    // //         pl = [item1].concat(pl);
-    // //         pl = [item2].concat(pl);
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'log': {
-    // //     definition: (s: Json[]) => {
-    // //         console.log(s);
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'drop': {
-    // //     expects: [{ desc: 'some value', ofType: 'any' }], effects: [-1], tests: [], desc: 'remove one element from the top of the stack',
-    // //     definition: function (s: Json[]) {
-    // //         s.pop();
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'dup': {
-    // //     expects: [{ desc: 'some item', ofType: 'any' }], effects: [1], tests: [], desc: 'duplicate the top element on the stack',
-    // //     definition: function (s: Json[]) {
-    // //         const top = s.length - 1;
-    // //         const a = cloneItem(s[top]);
-    // //         s.push(a);
-    // //         return [s];
-    // //     }
-    // // },
-    // // 'dup2': {
-    // //     expects: [{ desc: 'some item', ofType: 'any' }, { desc: 'another item', ofType: 'any' }], effects: [2], tests: [], desc: 'duplicate the top two elements on the stack',
-    // //     definition: [['dup'], 'dip', 'dup', ['swap'], 'dip']
-    // //     //function (s: Json[]) {
-    // //     //  const top = s.length - 1;
-    // //     //  const a = cloneItem(s[top]);
-    // //     //  const b = cloneItem(s[top - 1]);
-    // //     //  s.push(b, a);
-    // //     //  return [s];
-    // //     //}
-    // // },
-    '+': function (s) {
+    'drop': function (s, pl) { s.pop(); return [s, pl]; },
+    '+': function (s, pl) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a + b);
-            return s;
+            return [s, pl];
         }
         return null;
     },
-    '-': function (s) {
+    '-': function (s, pl) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a - b);
-            return s;
+            return [s, pl];
         }
         return null;
     },
-    '/': function (s) {
+    '/': function (s, pl) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
             s.push(a / b);
-            return s;
+            return [s, pl];
         }
         return null;
     },
-    '%': function (s) {
+    '%': function (s, pl) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
             s.push(a % b);
-            return s;
+            return [s, pl];
         }
         return null;
     },
-    '*': function (s) {
+    '*': function (s, pl) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a * b);
-            return s;
+            return [s, pl];
         }
         return null;
+    },
+    'dip': function (s, pl) {
+        var block = toPLOrNull(s.pop());
+        var item = s.pop();
+        pl = [item].concat(pl);
+        if (block) {
+            pl = block.concat(pl);
+        }
+        else {
+            pl.unshift(block);
+        }
+        return [s, pl];
     },
 };
 
@@ -2793,28 +2670,29 @@ var pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
 
 var parser = pinna;
 function purr(programList, wd, opt) {
-    var pl, vstack, w, maxWordsProcessed, wordsProcessed, wds;
+    var pl, vstack, w, maxCycles, cycles, wds;
+    var _a;
     if (wd === void 0) { wd = coreWords; }
-    if (opt === void 0) { opt = { debug: true }; }
-    var _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    if (opt === void 0) { opt = { debug: false }; }
+    var _b, _c, _d;
+    return __generator(this, function (_e) {
+        switch (_e.label) {
             case 0:
-                pl = programList || [];
+                pl = [].concat(programList);
                 vstack = [];
-                return [4 /*yield*/, ((_a = opt) === null || _a === void 0 ? void 0 : _a.debug) ? [vstack, pl] : null];
+                return [4 /*yield*/, ((_b = opt) === null || _b === void 0 ? void 0 : _b.debug) ? [vstack, pl] : null];
             case 1:
-                _c.sent();
-                maxWordsProcessed = 10000;
-                wordsProcessed = 0;
-                _c.label = 2;
+                _e.sent();
+                maxCycles = opt.maxCycles || 10000;
+                cycles = 0;
+                _e.label = 2;
             case 2:
-                if (!(wordsProcessed < maxWordsProcessed && (w = pl.shift()))) return [3 /*break*/, 4];
-                wordsProcessed += 1;
+                if (!(cycles < maxCycles && (w = pl.shift()))) return [3 /*break*/, 4];
+                cycles += 1;
                 wds = !r.is(Array, w) ? wd[w] : null;
                 if (wds) {
                     if (typeof wds === 'function') {
-                        wds(vstack);
+                        _a = wds(vstack, pl), vstack = _a[0], pl = _a[1];
                     }
                     else {
                         pl.unshift.apply(pl, wds);
@@ -2828,20 +2706,20 @@ function purr(programList, wd, opt) {
                         vstack.push(w);
                     }
                 }
-                else {
-                    console.log("*** no sure what this word is", w);
-                }
-                return [4 /*yield*/, ((_b = opt) === null || _b === void 0 ? void 0 : _b.debug) ? [vstack, pl] : null];
+                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
             case 3:
-                _c.sent();
+                _e.sent();
                 return [3 /*break*/, 2];
             case 4:
-                if (!(wordsProcessed >= maxWordsProcessed)) return [3 /*break*/, 6];
-                return [4 /*yield*/, [[vstack, pl], "maxWordsProcessed exceeded: this may be an infinite loop "]];
+                if (!(cycles >= maxCycles)) return [3 /*break*/, 6];
+                return [4 /*yield*/, [[vstack, pl], "maxCycles exceeded: this may be an infinite loop "]];
             case 5:
-                _c.sent();
-                _c.label = 6;
-            case 6: return [2 /*return*/];
+                _e.sent();
+                _e.label = 6;
+            case 6: return [4 /*yield*/, !((_d = opt) === null || _d === void 0 ? void 0 : _d.debug) ? [vstack, pl] : null];
+            case 7:
+                _e.sent();
+                return [2 /*return*/];
         }
     });
 }

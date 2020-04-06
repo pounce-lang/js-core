@@ -35,5 +35,6 @@ export declare const parser: {
     parse: (input: string, options: any) => any;
 };
 export declare function purr(programList: ProgramList, wd?: WordDictionary, opt?: {
-    debug?: boolean;
-}): Generator<ProgramList[] | (string | ProgramList[])[], void, unknown>;
+    debug: boolean;
+    maxCycles?: number;
+}): Generator<any[][] | (string | any[][])[], void, unknown>;
