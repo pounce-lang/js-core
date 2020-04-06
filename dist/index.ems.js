@@ -53,63 +53,63 @@ var toPLOrNull = function (u) {
     return is(Array, u) ? u : null;
 };
 var coreWords = {
-    'dup': function (s, pl) { s.push(s[s.length - 1]); return [s, pl]; },
-    //    'dup': (s, pl) => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s, pl]; },
-    'pop': function (s, pl) {
+    'dup': function (s) { s.push(s[s.length - 1]); return [s]; },
+    //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
+    'pop': function (s) {
         var arr = toArrOrNull(s[s.length - 1]);
         s.push(arr ? arr.pop() : null);
-        return [s, pl];
+        return [s];
     },
-    'swap': function (s, pl) {
+    'swap': function (s) {
         var top = s.pop();
         var under = s.pop();
         s.push(top);
         s.push(under);
-        return [s, pl];
+        return [s];
     },
-    'drop': function (s, pl) { s.pop(); return [s, pl]; },
-    '+': function (s, pl) {
+    'drop': function (s) { s.pop(); return [s]; },
+    '+': function (s) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a + b);
-            return [s, pl];
+            return [s];
         }
         return null;
     },
-    '-': function (s, pl) {
+    '-': function (s) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a - b);
-            return [s, pl];
+            return [s];
         }
         return null;
     },
-    '/': function (s, pl) {
+    '/': function (s) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
             s.push(a / b);
-            return [s, pl];
+            return [s];
         }
         return null;
     },
-    '%': function (s, pl) {
+    '%': function (s) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
             s.push(a % b);
-            return [s, pl];
+            return [s];
         }
         return null;
     },
-    '*': function (s, pl) {
+    '*': function (s) {
         var b = toNumOrNull(s.pop());
         var a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a * b);
-            return [s, pl];
+            return [s];
         }
         return null;
     },
@@ -2664,31 +2664,31 @@ var pinnaParser = function () {
 var p = pinnaParser();
 var pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
 
-var parser = pinna;
+var pinna$1 = pinna.parse;
 function purr(programList, wd, opt) {
     var pl, vstack, w, maxCycles, cycles, wds;
-    var _a;
+    var _a, _b;
     if (wd === void 0) { wd = coreWords; }
     if (opt === void 0) { opt = { debug: false }; }
-    var _b, _c, _d;
-    return __generator(this, function (_e) {
-        switch (_e.label) {
+    var _c, _d, _e;
+    return __generator(this, function (_f) {
+        switch (_f.label) {
             case 0:
                 pl = [].concat(programList);
                 vstack = [];
-                return [4 /*yield*/, ((_b = opt) === null || _b === void 0 ? void 0 : _b.debug) ? [vstack, pl] : null];
+                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
             case 1:
-                _e.sent();
+                _f.sent();
                 maxCycles = opt.maxCycles || 10000;
                 cycles = 0;
-                _e.label = 2;
+                _f.label = 2;
             case 2:
                 if (!(cycles < maxCycles && (w = pl.shift()))) return [3 /*break*/, 4];
                 cycles += 1;
                 wds = !is(Array, w) ? wd[w] : null;
                 if (wds) {
                     if (typeof wds === 'function') {
-                        _a = wds(vstack, pl), vstack = _a[0], pl = _a[1];
+                        _a = wds(vstack, pl), vstack = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
                     }
                     else {
                         pl.unshift.apply(pl, wds);
@@ -2702,22 +2702,22 @@ function purr(programList, wd, opt) {
                         vstack.push(w);
                     }
                 }
-                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
+                return [4 /*yield*/, ((_d = opt) === null || _d === void 0 ? void 0 : _d.debug) ? [vstack, pl] : null];
             case 3:
-                _e.sent();
+                _f.sent();
                 return [3 /*break*/, 2];
             case 4:
                 if (!(cycles >= maxCycles)) return [3 /*break*/, 6];
                 return [4 /*yield*/, [[vstack, pl], "maxCycles exceeded: this may be an infinite loop "]];
             case 5:
-                _e.sent();
-                _e.label = 6;
-            case 6: return [4 /*yield*/, !((_d = opt) === null || _d === void 0 ? void 0 : _d.debug) ? [vstack, pl] : null];
+                _f.sent();
+                _f.label = 6;
+            case 6: return [4 /*yield*/, !((_e = opt) === null || _e === void 0 ? void 0 : _e.debug) ? [vstack, pl] : null];
             case 7:
-                _e.sent();
+                _f.sent();
                 return [2 /*return*/];
         }
     });
 }
 
-export { parser, purr };
+export { pinna$1 as pinna, purr };

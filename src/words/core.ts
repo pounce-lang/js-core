@@ -10,64 +10,64 @@ const toPLOrNull = (u: any): ProgramList | null =>
     r.is(Array, u) ? u : null;
 
 export const coreWords: WordDictionary = {
-    'dup': (s, pl) => { s.push(s[s.length - 1]); return [s, pl]; },
-//    'dup': (s, pl) => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s, pl]; },
-    'pop': (s, pl) => {
+    'dup': s => { s.push(s[s.length - 1]); return [s]; },
+//    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
+    'pop': s => {
         const arr = toArrOrNull(s[s.length - 1]);
         s.push(arr ? arr.pop() : null);
-        return [s, pl];
+        return [s];
     },
-    'swap': (s, pl) => { 
+    'swap': s => { 
         const top = s.pop();
         const under = s.pop();
         s.push(top); 
         s.push(under); 
-        return [s, pl];
+        return [s];
     },
-    'drop': (s, pl) => { s.pop(); return [s, pl]; },
+    'drop': s => { s.pop(); return [s]; },
 
-    '+': (s, pl) => {
+    '+': s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a + b);
-            return [s, pl];
+            return [s];
         } 
         return null;
     },
-    '-': (s, pl) => {
+    '-': s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a - b);
-            return [s, pl];
+            return [s];
         } 
         return null;
     },
-    '/': (s, pl) => {
+    '/': s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
             s.push(a / b);
-            return [s, pl];
+            return [s];
         } 
         return null;
     },
-    '%': (s, pl) => {
+    '%': s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
             s.push(a % b);
-            return [s, pl];
+            return [s];
         } 
         return null;
     },
-    '*': (s, pl) => {
+    '*': s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
             s.push(a * b);
-            return [s, pl];
+            return [s];
         } 
         return null;
     },

@@ -3,9 +3,9 @@ import * as r from 'ramda';
 import { ValueStack, ProgramList } from './types';
 import { WordDictionary } from "./WordDictionary";
 import { coreWords } from './words/core';
-import { pinna } from './parser/Pinna';
+import { pinna as parser } from './parser/Pinna';
 
-export const parser = pinna;
+export const pinna = parser.parse;
 export function* purr(programList: ProgramList,
   wd: WordDictionary = coreWords,
   opt: { debug: boolean, maxCycles?: number } = { debug: false }
@@ -21,7 +21,7 @@ export function* purr(programList: ProgramList,
     let wds = !r.is(Array, w) ? wd[w as string | number] : null;
     if (wds) {
       if (typeof wds === 'function') {
-        [vstack, pl] = wds(vstack, pl);
+        [vstack, pl = pl] = wds(vstack, pl);
       }
       else {
         pl.unshift(...wds);

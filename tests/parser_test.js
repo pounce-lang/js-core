@@ -1,4 +1,4 @@
-const pinna = require('../dist/index').parser;
+const pinna = require('../dist/index').pinna;
 
 let parser_tests = [
     ['hello world', ['hello', 'world']],
@@ -60,7 +60,8 @@ parser_tests.forEach((test, i) => {
 
     // console.log(`starting parse test for: '${ps}'`);
     try {
-        const result_pl = pinna.parse(ps);
+        //parse
+        const result_pl = pinna(ps);
 
         testCount += 1;
         if (!deepCompare(result_pl, expected_stack)) {
