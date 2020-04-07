@@ -32,13 +32,37 @@ while (result !== undefined) {
 }
 // should be [ 13 ]
 console.log("---------------")
-const test2 = purr(pinna("[5 8] dup drop pop swap pop swap drop swap +"), undefined, {debug:true});
+let test2 = purr(pinna("[5 8] dup drop pop swap pop swap drop swap +"), undefined, {debug:true});
 result = test2.next().value;
 while (result !== undefined) {
   if (result !== null) {console.log(result);}
   result = test2.next().value;
 }
 // should be [ 13 ]
+console.log("---------------")
+test2 = purr(pinna("3 2 7 [+] dip -"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ -2 ]
+console.log("---------------")
+test2 = purr(pinna("true [5] [7] if-else"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ 5 ]
+console.log("---------------")
+test2 = purr(pinna("false [5] [7] if-else"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ 7 ]
 
 // # 5 factorial
 // [5, [0, '='], [1, '+'],

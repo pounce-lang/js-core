@@ -8,20 +8,22 @@ const toArrOrNull = (u: any): [] | null =>
     r.is(Array, u) ? u : null;
 const toPLOrNull = (u: any): ProgramList | null =>
     r.is(Array, u) ? u : null;
+const toBoolOrNull = (u: any): boolean | null =>
+    r.is(Boolean, u) ? u : null;
 
 export const coreWords: WordDictionary = {
     'dup': s => { s.push(s[s.length - 1]); return [s]; },
-//    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
+    //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'pop': s => {
         const arr = toArrOrNull(s[s.length - 1]);
         s.push(arr ? arr.pop() : null);
         return [s];
     },
-    'swap': s => { 
+    'swap': s => {
         const top = s.pop();
         const under = s.pop();
-        s.push(top); 
-        s.push(under); 
+        s.push(top);
+        s.push(under);
         return [s];
     },
     'drop': s => { s.pop(); return [s]; },
@@ -32,7 +34,7 @@ export const coreWords: WordDictionary = {
         if (a !== null && b !== null) {
             s.push(a + b);
             return [s];
-        } 
+        }
         return null;
     },
     '-': s => {
@@ -41,7 +43,7 @@ export const coreWords: WordDictionary = {
         if (a !== null && b !== null) {
             s.push(a - b);
             return [s];
-        } 
+        }
         return null;
     },
     '/': s => {
@@ -50,7 +52,7 @@ export const coreWords: WordDictionary = {
         if (a !== null && b !== null && b !== 0) {
             s.push(a / b);
             return [s];
-        } 
+        }
         return null;
     },
     '%': s => {
@@ -59,7 +61,7 @@ export const coreWords: WordDictionary = {
         if (a !== null && b !== null && b !== 0) {
             s.push(a % b);
             return [s];
-        } 
+        }
         return null;
     },
     '*': s => {
@@ -68,7 +70,7 @@ export const coreWords: WordDictionary = {
         if (a !== null && b !== null) {
             s.push(a * b);
             return [s];
-        } 
+        }
         return null;
     },
     'dip': (s, pl) => {
@@ -83,6 +85,47 @@ export const coreWords: WordDictionary = {
         }
         return [s, pl];
     },
+    'if-else': (s, pl) => {
+        const else_block = toPLOrNull(s.pop());
+        const then_block = toPLOrNull(s.pop());
+        const condition = toBoolOrNull(s.pop());
+        if (condition === null || then_block == null || else_block == null) {
+            return null;
+        }
+        if (condition) {
+            if (r.is(Array, then_block)) {
+                pl = then_block.concat(pl);
+            }
+            else {
+                pl.unshift(then_block);
+            }
+        }
+        else {
+            if (r.is(Array, else_block)) {
+                pl = else_block.concat(pl);
+            }
+            else {
+                pl.unshift(else_block);
+            }
+        }
+        return [s, pl];
+    },
+    // // 'if': {
+    // //     expects: [{ desc: 'conditional', ofType: 'boolean' }, { desc: 'then clause', ofType: 'list' }], effects: [-2], tests: [], desc: 'conditionally apply a quotation',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const then_block = s.pop();
+    // //         const expression = toBoolean(s.pop());
+    // //         if (expression) {
+    // //             if (isArray(then_block)) {
+    // //                 pl = then_block.concat(pl);
+    // //             }
+    // //             else {
+    // //                 pl.unshift(then_block);
+    // //             }
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
 
     // 'def': {
     //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a word',
@@ -405,22 +448,6 @@ export const coreWords: WordDictionary = {
     // //         }
     // //         else {
     // //             s.push(false);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'if': {
-    // //     expects: [{ desc: 'conditional', ofType: 'boolean' }, { desc: 'then clause', ofType: 'list' }], effects: [-2], tests: [], desc: 'conditionally apply a quotation',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const then_block = s.pop();
-    // //         const expression = toBoolean(s.pop());
-    // //         if (expression) {
-    // //             if (isArray(then_block)) {
-    // //                 pl = then_block.concat(pl);
-    // //             }
-    // //             else {
-    // //                 pl.unshift(then_block);
-    // //             }
     // //         }
     // //         return [s, pl];
     // //     }

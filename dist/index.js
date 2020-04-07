@@ -56,6 +56,9 @@ var toArrOrNull = function (u) {
 var toPLOrNull = function (u) {
     return r.is(Array, u) ? u : null;
 };
+var toBoolOrNull = function (u) {
+    return r.is(Boolean, u) ? u : null;
+};
 var coreWords = {
     'dup': function (s) { s.push(s[s.length - 1]); return [s]; },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
@@ -126,6 +129,31 @@ var coreWords = {
         }
         else {
             pl.unshift(block);
+        }
+        return [s, pl];
+    },
+    'if-else': function (s, pl) {
+        var else_block = toPLOrNull(s.pop());
+        var then_block = toPLOrNull(s.pop());
+        var condition = toBoolOrNull(s.pop());
+        if (condition === null || then_block == null || else_block == null) {
+            return null;
+        }
+        if (condition) {
+            if (r.is(Array, then_block)) {
+                pl = then_block.concat(pl);
+            }
+            else {
+                pl.unshift(then_block);
+            }
+        }
+        else {
+            if (r.is(Array, else_block)) {
+                pl = else_block.concat(pl);
+            }
+            else {
+                pl.unshift(else_block);
+            }
         }
         return [s, pl];
     },
@@ -2649,6 +2677,10 @@ var pinnaParser = function () {
         if (r.is(Array, pl)) {
             return pl.map(function (i) {
                 if (r.is(String, i)) {
+                    if (i === 'true')
+                        return true;
+                    if (i === 'false')
+                        return false;
                     var cbaN = cbaNumber(i); // cbaNumber(strip_quotes(i));
                     return r.is(String, cbaN) ? strip_quotes(i) : cbaN;
                 }
@@ -2686,7 +2718,7 @@ function purr(pl, wd, opt) {
                 cycles = 0;
                 _f.label = 2;
             case 2:
-                if (!(cycles < maxCycles && (w = pl.shift()))) return [3 /*break*/, 4];
+                if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 4];
                 cycles += 1;
                 wds = r.is(String, w) ? wd[w] : null;
                 if (wds) {
@@ -2697,7 +2729,7 @@ function purr(pl, wd, opt) {
                         pl.unshift.apply(pl, wds);
                     }
                 }
-                else if (w || r.is(Array, w)) {
+                else if (w !== undefined) {
                     if (r.is(Array, w)) {
                         s.push([].concat(w));
                     }

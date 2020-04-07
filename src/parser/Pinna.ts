@@ -2428,6 +2428,8 @@ const pinnaParser = () => {
     if (r.is(Array, pl)) {
       return pl.map((i: any) => {
         if (r.is(String, i)) {
+          if (i === 'true') return true;
+          if (i === 'false') return false;
           let cbaN = cbaNumber(i); // cbaNumber(strip_quotes(i));
           return r.is(String, cbaN) ? strip_quotes(i) : cbaN;
         }

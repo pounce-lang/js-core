@@ -31,8 +31,8 @@ let parser_tests = [
     ['a[abc]', ['a', ['abc']]],
     ['"1a1"', ["1a1"]],
     ['{a:[}', ["parse error"]],
-    ['', []],
-    ['', []],
+    ['true', [true]],
+    ['false true false true', [false, true, false, true]],
     ['', []]
 ];
 

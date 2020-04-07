@@ -17,7 +17,7 @@ export function* purr(
   let w;
   const maxCycles = opt.maxCycles || 10000;
   let cycles = 0;
-  while (cycles < maxCycles && (w = pl.shift())) {
+  while (cycles < maxCycles && (w = pl.shift()) !== undefined) {
     cycles += 1;
     let wds = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
@@ -28,7 +28,7 @@ export function* purr(
         pl.unshift(...wds);
       }
     }
-    else if (w || r.is(Array, w)) {
+    else if (w !== undefined) {
       if (r.is(Array, w)) {
         s.push([].concat(w));
       }
