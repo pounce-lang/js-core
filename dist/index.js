@@ -2669,8 +2669,8 @@ var p = pinnaParser();
 var pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
 
 var pinna$1 = pinna.parse;
-function purr(programList, wd, opt) {
-    var pl, vstack, w, maxCycles, cycles, wds;
+function purr(pl, wd, opt) {
+    var s, w, maxCycles, cycles, wds;
     var _a, _b;
     if (wd === void 0) { wd = coreWords; }
     if (opt === void 0) { opt = { debug: false }; }
@@ -2678,9 +2678,8 @@ function purr(programList, wd, opt) {
     return __generator(this, function (_f) {
         switch (_f.label) {
             case 0:
-                pl = [].concat(programList);
-                vstack = [];
-                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [vstack, pl] : null];
+                s = [];
+                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [s, pl] : null];
             case 1:
                 _f.sent();
                 maxCycles = opt.maxCycles || 10000;
@@ -2689,10 +2688,10 @@ function purr(programList, wd, opt) {
             case 2:
                 if (!(cycles < maxCycles && (w = pl.shift()))) return [3 /*break*/, 4];
                 cycles += 1;
-                wds = !r.is(Array, w) ? wd[w] : null;
+                wds = r.is(String, w) ? wd[w] : null;
                 if (wds) {
                     if (typeof wds === 'function') {
-                        _a = wds(vstack, pl), vstack = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
+                        _a = wds(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
                     }
                     else {
                         pl.unshift.apply(pl, wds);
@@ -2700,23 +2699,23 @@ function purr(programList, wd, opt) {
                 }
                 else if (w || r.is(Array, w)) {
                     if (r.is(Array, w)) {
-                        vstack.push([].concat(w));
+                        s.push([].concat(w));
                     }
                     else {
-                        vstack.push(w);
+                        s.push(w);
                     }
                 }
-                return [4 /*yield*/, ((_d = opt) === null || _d === void 0 ? void 0 : _d.debug) ? [vstack, pl] : null];
+                return [4 /*yield*/, ((_d = opt) === null || _d === void 0 ? void 0 : _d.debug) ? [s, pl] : null];
             case 3:
                 _f.sent();
                 return [3 /*break*/, 2];
             case 4:
                 if (!(cycles >= maxCycles)) return [3 /*break*/, 6];
-                return [4 /*yield*/, [[vstack, pl], "maxCycles exceeded: this may be an infinite loop "]];
+                return [4 /*yield*/, [[s, pl], "maxCycles exceeded: this may be an infinite loop "]];
             case 5:
                 _f.sent();
                 _f.label = 6;
-            case 6: return [4 /*yield*/, !((_e = opt) === null || _e === void 0 ? void 0 : _e.debug) ? [vstack, pl] : null];
+            case 6: return [4 /*yield*/, !((_e = opt) === null || _e === void 0 ? void 0 : _e.debug) ? [s, pl] : null];
             case 7:
                 _f.sent();
                 return [2 /*return*/];
