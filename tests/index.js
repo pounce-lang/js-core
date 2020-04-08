@@ -63,6 +63,40 @@ while (result !== undefined) {
   result = test2.next().value;
 }
 // should be [ 7 ]
+console.log("---------------")
+test2 = purr(pinna("false [5] [7 3 [+] apply] if-else"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ 7 ]
+console.log("---------------")
+test2 = purr(pinna("0 1 [dup] dip dup [swap] dip +"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ 7 ]
+console.log("---------------")
+test2 = purr(pinna("0 1 dup2 +"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ 7 ]
+
+console.log("---------------")
+test2 = purr(pinna("0 1 [dup2 +] 5 times"), undefined, {debug:true});
+result = test2.next().value;
+while (result !== undefined) {
+  if (result !== null) {console.log(result);}
+  result = test2.next().value;
+}
+// should be [ 7 ]
+
 
 // # 5 factorial
 // [5, [0, '='], [1, '+'],

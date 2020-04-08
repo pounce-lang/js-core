@@ -73,10 +73,47 @@ export const coreWords: WordDictionary = {
         }
         return null;
     },
+    // // 'apply': {
+    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const block = s.pop();
+    // //         if (isArray(block)) {
+    // //             pl = block.concat(pl);
+    // //         }
+    // //         else {
+    // //             pl.unshift(block);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    'apply': (s, pl) => {
+        const block = toPLOrNull(s.pop());
+        if (block) {
+            pl = block.concat(pl);
+        }
+        else {
+            pl.unshift(block);
+        }
+        return [s, pl];
+    },
     'dip': (s, pl) => {
         const block = toPLOrNull(s.pop());
         const item = s.pop();
         pl = [item].concat(pl);
+        if (block) {
+            pl = block.concat(pl);
+        }
+        else {
+            pl.unshift(block);
+        }
+        return [s, pl];
+    },
+    'dip2': (s, pl) => {
+        const block = toPLOrNull(s.pop());
+        const item2 = s.pop();
+        pl = [item2].concat(pl);
+        const item1 = s.pop();
+        pl = [item1].concat(pl);
         if (block) {
             pl = block.concat(pl);
         }
@@ -110,6 +147,14 @@ export const coreWords: WordDictionary = {
         }
         return [s, pl];
     },
+    '>': s => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        s.push(a > b);
+        return [s];
+    },
+    'dup2': [['dup'], 'dip', 'dup', ['swap'], 'dip'],
+    'times': ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'],
     // // 'if': {
     // //     expects: [{ desc: 'conditional', ofType: 'boolean' }, { desc: 'then clause', ofType: 'list' }], effects: [-2], tests: [], desc: 'conditionally apply a quotation',
     // //     definition: function (s: Json[], pl: PL) {
@@ -184,19 +229,6 @@ export const coreWords: WordDictionary = {
     // //         } else {
     // //             // given a dictionary
     // //             wordstack.push(importable);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'apply': {
-    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
     // //         }
     // //         return [s, pl];
     // //     }

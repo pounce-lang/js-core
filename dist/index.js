@@ -120,10 +120,47 @@ var coreWords = {
         }
         return null;
     },
+    // // 'apply': {
+    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const block = s.pop();
+    // //         if (isArray(block)) {
+    // //             pl = block.concat(pl);
+    // //         }
+    // //         else {
+    // //             pl.unshift(block);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    'apply': function (s, pl) {
+        var block = toPLOrNull(s.pop());
+        if (block) {
+            pl = block.concat(pl);
+        }
+        else {
+            pl.unshift(block);
+        }
+        return [s, pl];
+    },
     'dip': function (s, pl) {
         var block = toPLOrNull(s.pop());
         var item = s.pop();
         pl = [item].concat(pl);
+        if (block) {
+            pl = block.concat(pl);
+        }
+        else {
+            pl.unshift(block);
+        }
+        return [s, pl];
+    },
+    'dip2': function (s, pl) {
+        var block = toPLOrNull(s.pop());
+        var item2 = s.pop();
+        pl = [item2].concat(pl);
+        var item1 = s.pop();
+        pl = [item1].concat(pl);
         if (block) {
             pl = block.concat(pl);
         }
@@ -157,6 +194,14 @@ var coreWords = {
         }
         return [s, pl];
     },
+    '>': function (s) {
+        var b = toNumOrNull(s.pop());
+        var a = toNumOrNull(s.pop());
+        s.push(a > b);
+        return [s];
+    },
+    'dup2': [['dup'], 'dip', 'dup', ['swap'], 'dip'],
+    'times': ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'],
 };
 
 var pinnaParser = function () {
