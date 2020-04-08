@@ -13,7 +13,7 @@ export function* purr(
   ) {
 //  let pl = [].concat(programList);
   let s: ValueStack = [];
-  yield opt?.debug ? [s, pl] : null;
+  opt?.debug ? yield [s, pl, true] : null;
   let w;
   const maxCycles = opt.maxCycles || 10000;
   let cycles = 0;
@@ -36,11 +36,11 @@ export function* purr(
         s.push(w);
       }
     }
-    yield opt?.debug ? [s, pl] : null;
+    opt?.debug ? yield [s, pl, true] : null;
   }
   if (cycles >= maxCycles) {
-    yield [[s, pl], "maxCycles exceeded: this may be an infinite loop "];
+    yield [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "];
   }
-  yield !opt?.debug ? [s, pl] : null;
+  yield [s, pl, false];
 }
 

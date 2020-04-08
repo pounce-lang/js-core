@@ -3,12 +3,23 @@
 
 const coreWords = require('../dist/index').coreWords;
 const pinna = require('../dist/index').pinna;
-//console.log(pinna);
 console.log(pinna('hello world'));
 
 const purr = require('../dist/index').purr;
-// console.log(pounce(['hello', [1, 2, 3], { a: 1, b: 2, c: 3 }], [], [{ hello: "there" }]));
 
+const testIt = (p, expected_result) => {
+  const test = purr(pinna(p));
+  result = test.next();
+  while (result.value[2]) {
+    result = test.next();
+  }
+  console.log(result.value[0], "<-", p);
+  const str_exp = JSON.stringify(expected_result);
+  const str_res = JSON.stringify(result.value[0]);
+  if (str_exp !== str_res) {
+    console.error("failed test for:", p)
+  }
+};
 
 const sequence = purr(pinna("a dup concat b c 1 3 concat"),
   {
@@ -70,7 +81,7 @@ while (result !== undefined) {
   if (result !== null) {console.log(result);}
   result = test2.next().value;
 }
-// should be [ 7 ]
+// should be [ 10 ]
 console.log("---------------")
 test2 = purr(pinna("0 1 [dup] dip dup [swap] dip +"), undefined, {debug:true});
 result = test2.next().value;
@@ -78,7 +89,7 @@ while (result !== undefined) {
   if (result !== null) {console.log(result);}
   result = test2.next().value;
 }
-// should be [ 7 ]
+// should be [ 0, 1, 1 ]
 console.log("---------------")
 test2 = purr(pinna("0 1 dup2 +"), undefined, {debug:true});
 result = test2.next().value;
@@ -86,7 +97,7 @@ while (result !== undefined) {
   if (result !== null) {console.log(result);}
   result = test2.next().value;
 }
-// should be [ 7 ]
+// should be [ 0, 1, 1 ]
 
 console.log("---------------")
 test2 = purr(pinna("0 1 [dup2 +] 5 times"), undefined, {debug:true});
@@ -95,7 +106,7 @@ while (result !== undefined) {
   if (result !== null) {console.log(result);}
   result = test2.next().value;
 }
-// should be [ 7 ]
+// should be [ 0, 1, 1, 2, 3, 5, 8 ]
 
 
 // # 5 factorial
@@ -108,3 +119,4 @@ while (result !== undefined) {
 // [uncons [>] split]
 // [[swap] dip cons concat] 
 // binrec
+testIt("4 dup drop", [4]);

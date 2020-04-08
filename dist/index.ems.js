@@ -2743,28 +2743,34 @@ var pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
 
 var pinna$1 = pinna.parse;
 function purr(pl, wd, opt) {
-    var s, w, maxCycles, cycles, wds;
-    var _a, _b;
+    var s, _a, w, maxCycles, cycles, wds, _b;
+    var _c, _d;
     if (wd === void 0) { wd = coreWords; }
     if (opt === void 0) { opt = { debug: false }; }
-    var _c, _d, _e;
-    return __generator(this, function (_f) {
-        switch (_f.label) {
+    var _e, _f;
+    return __generator(this, function (_g) {
+        switch (_g.label) {
             case 0:
                 s = [];
-                return [4 /*yield*/, ((_c = opt) === null || _c === void 0 ? void 0 : _c.debug) ? [s, pl] : null];
+                if (!((_e = opt) === null || _e === void 0 ? void 0 : _e.debug)) return [3 /*break*/, 2];
+                return [4 /*yield*/, [s, pl, true]];
             case 1:
-                _f.sent();
+                _a = _g.sent();
+                return [3 /*break*/, 3];
+            case 2:
+                _a = null;
+                _g.label = 3;
+            case 3:
                 maxCycles = opt.maxCycles || 10000;
                 cycles = 0;
-                _f.label = 2;
-            case 2:
-                if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 4];
+                _g.label = 4;
+            case 4:
+                if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 8];
                 cycles += 1;
                 wds = is(String, w) ? wd[w] : null;
                 if (wds) {
                     if (typeof wds === 'function') {
-                        _a = wds(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
+                        _c = wds(s, pl), s = _c[0], _d = _c[1], pl = _d === void 0 ? pl : _d;
                     }
                     else {
                         pl.unshift.apply(pl, wds);
@@ -2778,19 +2784,25 @@ function purr(pl, wd, opt) {
                         s.push(w);
                     }
                 }
-                return [4 /*yield*/, ((_d = opt) === null || _d === void 0 ? void 0 : _d.debug) ? [s, pl] : null];
-            case 3:
-                _f.sent();
-                return [3 /*break*/, 2];
-            case 4:
-                if (!(cycles >= maxCycles)) return [3 /*break*/, 6];
-                return [4 /*yield*/, [[s, pl], "maxCycles exceeded: this may be an infinite loop "]];
+                if (!((_f = opt) === null || _f === void 0 ? void 0 : _f.debug)) return [3 /*break*/, 6];
+                return [4 /*yield*/, [s, pl, true]];
             case 5:
-                _f.sent();
-                _f.label = 6;
-            case 6: return [4 /*yield*/, !((_e = opt) === null || _e === void 0 ? void 0 : _e.debug) ? [s, pl] : null];
+                _b = _g.sent();
+                return [3 /*break*/, 7];
+            case 6:
+                _b = null;
+                _g.label = 7;
             case 7:
-                _f.sent();
+                return [3 /*break*/, 4];
+            case 8:
+                if (!(cycles >= maxCycles)) return [3 /*break*/, 10];
+                return [4 /*yield*/, [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "]];
+            case 9:
+                _g.sent();
+                _g.label = 10;
+            case 10: return [4 /*yield*/, [s, pl, false]];
+            case 11:
+                _g.sent();
                 return [2 /*return*/];
         }
     });
