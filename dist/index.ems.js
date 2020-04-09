@@ -56,66 +56,67 @@ var toBoolOrNull = function (u) {
     return is(Boolean, u) ? u : null;
 };
 var coreWords = {
-    'dup': function (s) { s.push(s[s.length - 1]); return [s]; },
+    'dup': { def: function (s) { s.push(s[s.length - 1]); return [s]; }
+    },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': function (s) {
-        var arr = toArrOrNull(s[s.length - 1]);
-        s.push(arr ? arr.pop() : null);
-        return [s];
-    },
-    'swap': function (s) {
-        var top = s.pop();
-        var under = s.pop();
-        s.push(top);
-        s.push(under);
-        return [s];
-    },
-    'drop': function (s) { s.pop(); return [s]; },
-    '+': function (s) {
-        var b = toNumOrNull(s.pop());
-        var a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a + b);
+    'pop': { def: function (s) {
+            var arr = toArrOrNull(s[s.length - 1]);
+            s.push(arr ? arr.pop() : null);
             return [s];
-        }
-        return null;
-    },
-    '-': function (s) {
-        var b = toNumOrNull(s.pop());
-        var a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a - b);
+        } },
+    'swap': { def: function (s) {
+            var top = s.pop();
+            var under = s.pop();
+            s.push(top);
+            s.push(under);
             return [s];
-        }
-        return null;
-    },
-    '/': function (s) {
-        var b = toNumOrNull(s.pop());
-        var a = toNumOrNull(s.pop());
-        if (a !== null && b !== null && b !== 0) {
-            s.push(a / b);
-            return [s];
-        }
-        return null;
-    },
-    '%': function (s) {
-        var b = toNumOrNull(s.pop());
-        var a = toNumOrNull(s.pop());
-        if (a !== null && b !== null && b !== 0) {
-            s.push(a % b);
-            return [s];
-        }
-        return null;
-    },
-    '*': function (s) {
-        var b = toNumOrNull(s.pop());
-        var a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a * b);
-            return [s];
-        }
-        return null;
-    },
+        } },
+    'drop': { def: function (s) { s.pop(); return [s]; } },
+    '+': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a + b);
+                return [s];
+            }
+            return null;
+        } },
+    '-': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a - b);
+                return [s];
+            }
+            return null;
+        } },
+    '/': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null && b !== 0) {
+                s.push(a / b);
+                return [s];
+            }
+            return null;
+        } },
+    '%': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null && b !== 0) {
+                s.push(a % b);
+                return [s];
+            }
+            return null;
+        } },
+    '*': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a * b);
+                return [s];
+            }
+            return null;
+        } },
     // // 'apply': {
     // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
     // //     definition: function (s: Json[], pl: PL) {
@@ -129,75 +130,75 @@ var coreWords = {
     // //         return [s, pl];
     // //     }
     // // },
-    'apply': function (s, pl) {
-        var block = toPLOrNull(s.pop());
-        if (block) {
-            pl = block.concat(pl);
-        }
-        else {
-            pl.unshift(block);
-        }
-        return [s, pl];
-    },
-    'dip': function (s, pl) {
-        var block = toPLOrNull(s.pop());
-        var item = s.pop();
-        pl = [item].concat(pl);
-        if (block) {
-            pl = block.concat(pl);
-        }
-        else {
-            pl.unshift(block);
-        }
-        return [s, pl];
-    },
-    'dip2': function (s, pl) {
-        var block = toPLOrNull(s.pop());
-        var item2 = s.pop();
-        pl = [item2].concat(pl);
-        var item1 = s.pop();
-        pl = [item1].concat(pl);
-        if (block) {
-            pl = block.concat(pl);
-        }
-        else {
-            pl.unshift(block);
-        }
-        return [s, pl];
-    },
-    'if-else': function (s, pl) {
-        var else_block = toPLOrNull(s.pop());
-        var then_block = toPLOrNull(s.pop());
-        var condition = toBoolOrNull(s.pop());
-        if (condition === null || then_block == null || else_block == null) {
-            return null;
-        }
-        if (condition) {
-            if (is(Array, then_block)) {
-                pl = then_block.concat(pl);
+    'apply': { def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            if (block) {
+                pl = block.concat(pl);
             }
             else {
-                pl.unshift(then_block);
+                pl.unshift(block);
             }
-        }
-        else {
-            if (is(Array, else_block)) {
-                pl = else_block.concat(pl);
+            return [s, pl];
+        } },
+    'dip': { def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            var item = s.pop();
+            pl = [item].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
             }
             else {
-                pl.unshift(else_block);
+                pl.unshift(block);
             }
-        }
-        return [s, pl];
-    },
-    '>': function (s) {
-        var b = toNumOrNull(s.pop());
-        var a = toNumOrNull(s.pop());
-        s.push(a > b);
-        return [s];
-    },
-    'dup2': [['dup'], 'dip', 'dup', ['swap'], 'dip'],
-    'times': ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'],
+            return [s, pl];
+        } },
+    'dip2': { def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            var item2 = s.pop();
+            pl = [item2].concat(pl);
+            var item1 = s.pop();
+            pl = [item1].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        } },
+    'if-else': { def: function (s, pl) {
+            var else_block = toPLOrNull(s.pop());
+            var then_block = toPLOrNull(s.pop());
+            var condition = toBoolOrNull(s.pop());
+            if (condition === null || then_block == null || else_block == null) {
+                return null;
+            }
+            if (condition) {
+                if (is(Array, then_block)) {
+                    pl = then_block.concat(pl);
+                }
+                else {
+                    pl.unshift(then_block);
+                }
+            }
+            else {
+                if (is(Array, else_block)) {
+                    pl = else_block.concat(pl);
+                }
+                else {
+                    pl.unshift(else_block);
+                }
+            }
+            return [s, pl];
+        } },
+    '>': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a > b);
+            return [s];
+        } },
+    'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip'] },
+    'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'] },
 };
 
 var pinnaParser = function () {
@@ -2769,11 +2770,11 @@ function purr(pl, wd, opt) {
                 cycles += 1;
                 wds = is(String, w) ? wd[w] : null;
                 if (wds) {
-                    if (typeof wds === 'function') {
-                        _c = wds(s, pl), s = _c[0], _d = _c[1], pl = _d === void 0 ? pl : _d;
+                    if (typeof wds.def === 'function') {
+                        _c = wds.def(s, pl), s = _c[0], _d = _c[1], pl = _d === void 0 ? pl : _d;
                     }
                     else {
-                        pl.unshift.apply(pl, wds);
+                        pl.unshift.apply(pl, wds.def);
                     }
                 }
                 else if (w !== undefined) {

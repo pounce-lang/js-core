@@ -11,7 +11,6 @@ export function* purr(
   wd: WordDictionary = coreWords,
   opt: { debug: boolean, maxCycles?: number } = { debug: false }
   ) {
-//  let pl = [].concat(programList);
   let s: ValueStack = [];
   opt?.debug ? yield [s, pl, true] : null;
   let w;
@@ -21,11 +20,11 @@ export function* purr(
     cycles += 1;
     let wds = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
-      if (typeof wds === 'function') {
-        [s, pl = pl] = wds(s, pl);
+      if (typeof wds.def === 'function') {
+        [s, pl = pl] = wds.def(s, pl);
       }
       else {
-        pl.unshift(...wds);
+        pl.unshift(...wds.def);
       }
     }
     else if (w !== undefined) {

@@ -12,23 +12,24 @@ const toBoolOrNull = (u: any): boolean | null =>
     r.is(Boolean, u) ? u : null;
 
 export const coreWords: WordDictionary = {
-    'dup': s => { s.push(s[s.length - 1]); return [s]; },
+    'dup': { def: s => { s.push(s[s.length - 1]); return [s]; }
+},
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': s => {
+    'pop': { def: s => {
         const arr = toArrOrNull(s[s.length - 1]);
         s.push(arr ? arr.pop() : null);
         return [s];
-    },
-    'swap': s => {
+    }},
+    'swap': { def: s => {
         const top = s.pop();
         const under = s.pop();
         s.push(top);
         s.push(under);
         return [s];
-    },
-    'drop': s => { s.pop(); return [s]; },
+    }},
+    'drop': { def: s => { s.pop(); return [s]; }},
 
-    '+': s => {
+    '+': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
@@ -36,8 +37,8 @@ export const coreWords: WordDictionary = {
             return [s];
         }
         return null;
-    },
-    '-': s => {
+    }},
+    '-': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
@@ -45,8 +46,8 @@ export const coreWords: WordDictionary = {
             return [s];
         }
         return null;
-    },
-    '/': s => {
+    }},
+    '/': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
@@ -54,8 +55,8 @@ export const coreWords: WordDictionary = {
             return [s];
         }
         return null;
-    },
-    '%': s => {
+    }},
+    '%': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null && b !== 0) {
@@ -63,8 +64,8 @@ export const coreWords: WordDictionary = {
             return [s];
         }
         return null;
-    },
-    '*': s => {
+    }},
+    '*': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         if (a !== null && b !== null) {
@@ -72,7 +73,7 @@ export const coreWords: WordDictionary = {
             return [s];
         }
         return null;
-    },
+    }},
     // // 'apply': {
     // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
     // //     definition: function (s: Json[], pl: PL) {
@@ -86,7 +87,7 @@ export const coreWords: WordDictionary = {
     // //         return [s, pl];
     // //     }
     // // },
-    'apply': (s, pl) => {
+    'apply': { def: (s, pl) => {
         const block = toPLOrNull(s.pop());
         if (block) {
             pl = block.concat(pl);
@@ -95,8 +96,8 @@ export const coreWords: WordDictionary = {
             pl.unshift(block);
         }
         return [s, pl];
-    },
-    'dip': (s, pl) => {
+    }},
+    'dip': { def: (s, pl) => {
         const block = toPLOrNull(s.pop());
         const item = s.pop();
         pl = [item].concat(pl);
@@ -107,8 +108,8 @@ export const coreWords: WordDictionary = {
             pl.unshift(block);
         }
         return [s, pl];
-    },
-    'dip2': (s, pl) => {
+    }},
+    'dip2': { def: (s, pl) => {
         const block = toPLOrNull(s.pop());
         const item2 = s.pop();
         pl = [item2].concat(pl);
@@ -121,8 +122,8 @@ export const coreWords: WordDictionary = {
             pl.unshift(block);
         }
         return [s, pl];
-    },
-    'if-else': (s, pl) => {
+    }},
+    'if-else': { def: (s, pl) => {
         const else_block = toPLOrNull(s.pop());
         const then_block = toPLOrNull(s.pop());
         const condition = toBoolOrNull(s.pop());
@@ -146,15 +147,15 @@ export const coreWords: WordDictionary = {
             }
         }
         return [s, pl];
-    },
-    '>': s => {
+    }},
+    '>': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         s.push(a > b);
         return [s];
-    },
-    'dup2': [['dup'], 'dip', 'dup', ['swap'], 'dip'],
-    'times': ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'],
+    }},
+    'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip']},
+    'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']},
     // // 'if': {
     // //     expects: [{ desc: 'conditional', ofType: 'boolean' }, { desc: 'then clause', ofType: 'list' }], effects: [-2], tests: [], desc: 'conditionally apply a quotation',
     // //     definition: function (s: Json[], pl: PL) {
