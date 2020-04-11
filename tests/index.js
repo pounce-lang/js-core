@@ -21,6 +21,7 @@ const testIt = (p, expected_result, d) => {
   console.error("Re running in debug mode:");
   const test2 = purr(pinna(p), d, { debug: true });
   result2 = test2.next();
+  console.error(result2.value);
   while (result2.value[2]) {
     result2 = test2.next();
     console.error(result2.value);

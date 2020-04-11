@@ -127,7 +127,7 @@ export const coreWords: WordDictionary = {
         const else_block = toPLOrNull(s.pop());
         const then_block = toPLOrNull(s.pop());
         const condition = toBoolOrNull(s.pop());
-        if (condition === null || then_block == null || else_block == null) {
+        if (condition === null || then_block === null || else_block === null) {
             return null;
         }
         if (condition) {
@@ -148,10 +148,40 @@ export const coreWords: WordDictionary = {
         }
         return [s, pl];
     }},
+    '==': { def: s => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        s.push(a === b);
+        return [s];
+    }},
+    '!=': { def: s => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        s.push(a !== b);
+        return [s];
+    }},
     '>': { def: s => {
         const b = toNumOrNull(s.pop());
         const a = toNumOrNull(s.pop());
         s.push(a > b);
+        return [s];
+    }},
+    '<': { def: s => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        s.push(a < b);
+        return [s];
+    }},
+    '>=': { def: s => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        s.push(a >= b);
+        return [s];
+    }},
+    '<=': { def: s => {
+        const b = toNumOrNull(s.pop());
+        const a = toNumOrNull(s.pop());
+        s.push(a <= b);
         return [s];
     }},
     'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip']},

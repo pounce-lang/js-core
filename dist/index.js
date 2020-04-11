@@ -174,7 +174,7 @@ var coreWords = {
             var else_block = toPLOrNull(s.pop());
             var then_block = toPLOrNull(s.pop());
             var condition = toBoolOrNull(s.pop());
-            if (condition === null || then_block == null || else_block == null) {
+            if (condition === null || then_block === null || else_block === null) {
                 return null;
             }
             if (condition) {
@@ -195,10 +195,40 @@ var coreWords = {
             }
             return [s, pl];
         } },
+    '==': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a === b);
+            return [s];
+        } },
+    '!=': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a !== b);
+            return [s];
+        } },
     '>': { def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a > b);
+            return [s];
+        } },
+    '<': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a < b);
+            return [s];
+        } },
+    '>=': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a >= b);
+            return [s];
+        } },
+    '<=': { def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a <= b);
             return [s];
         } },
     'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip'] },
@@ -2748,16 +2778,16 @@ var pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
 
 var pinna$1 = pinna.parse;
 function purr(pl, wd, opt) {
-    var s, _a, w, maxCycles, cycles, wds, _b;
-    var _c, _d;
+    var s, _a, w, maxCycles, cycles, wds, _b, _c;
+    var _d, _e;
     if (wd === void 0) { wd = coreWords; }
-    if (opt === void 0) { opt = { debug: false }; }
-    var _e, _f;
+    if (opt === void 0) { opt = { debug: false, yieldOnId: false }; }
+    var _f;
     return __generator(this, function (_g) {
         switch (_g.label) {
             case 0:
                 s = [];
-                if (!((_e = opt) === null || _e === void 0 ? void 0 : _e.debug)) return [3 /*break*/, 2];
+                if (!((_f = opt) === null || _f === void 0 ? void 0 : _f.debug)) return [3 /*break*/, 2];
                 return [4 /*yield*/, [s, pl, true]];
             case 1:
                 _a = _g.sent();
@@ -2770,27 +2800,12 @@ function purr(pl, wd, opt) {
                 cycles = 0;
                 _g.label = 4;
             case 4:
-                if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 8];
+                if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 13];
                 cycles += 1;
                 wds = r.is(String, w) ? wd[w] : null;
-                if (wds) {
-                    if (typeof wds.def === 'function') {
-                        _c = wds.def(s, pl), s = _c[0], _d = _c[1], pl = _d === void 0 ? pl : _d;
-                    }
-                    else {
-                        pl.unshift.apply(pl, wds.def);
-                    }
-                }
-                else if (w !== undefined) {
-                    if (r.is(Array, w)) {
-                        s.push([].concat(w));
-                    }
-                    else {
-                        s.push(w);
-                    }
-                }
-                if (!((_f = opt) === null || _f === void 0 ? void 0 : _f.debug)) return [3 /*break*/, 6];
-                return [4 /*yield*/, [s, pl, true]];
+                if (!wds) return [3 /*break*/, 8];
+                if (!(opt.debug && !opt.yieldOnId)) return [3 /*break*/, 6];
+                return [4 /*yield*/, [s, [w].concat(pl), true]];
             case 5:
                 _b = _g.sent();
                 return [3 /*break*/, 7];
@@ -2798,15 +2813,40 @@ function purr(pl, wd, opt) {
                 _b = null;
                 _g.label = 7;
             case 7:
-                return [3 /*break*/, 4];
+                if (typeof wds.def === 'function') {
+                    _d = wds.def(s, pl), s = _d[0], _e = _d[1], pl = _e === void 0 ? pl : _e;
+                }
+                else {
+                    pl.unshift.apply(pl, wds.def);
+                }
+                return [3 /*break*/, 12];
             case 8:
-                if (!(cycles >= maxCycles)) return [3 /*break*/, 10];
-                return [4 /*yield*/, [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "]];
+                if (!(w !== undefined)) return [3 /*break*/, 12];
+                if (r.is(Array, w)) {
+                    s.push([].concat(w));
+                }
+                else {
+                    s.push(w);
+                }
+                if (!(opt.debug && opt.yieldOnId)) return [3 /*break*/, 10];
+                return [4 /*yield*/, [s, pl, true]];
             case 9:
-                _g.sent();
-                _g.label = 10;
-            case 10: return [4 /*yield*/, [s, pl, false]];
+                _c = _g.sent();
+                return [3 /*break*/, 11];
+            case 10:
+                _c = null;
+                _g.label = 11;
             case 11:
+                _g.label = 12;
+            case 12: return [3 /*break*/, 4];
+            case 13:
+                if (!(cycles >= maxCycles)) return [3 /*break*/, 15];
+                return [4 /*yield*/, [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "]];
+            case 14:
+                _g.sent();
+                _g.label = 15;
+            case 15: return [4 /*yield*/, [s, pl, false]];
+            case 16:
                 _g.sent();
                 return [2 /*return*/];
         }

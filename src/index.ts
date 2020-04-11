@@ -9,7 +9,8 @@ export const pinna = parser.parse;
 export function* purr(
   pl: ProgramList,
   wd: WordDictionary = coreWords,
-  opt: { debug: boolean, maxCycles?: number } = { debug: false }
+  opt: { debug: boolean, yieldOnId: boolean, maxCycles?: number } = 
+  { debug: false, yieldOnId: false }
   ) {
   let s: ValueStack = [];
   opt?.debug ? yield [s, pl, true] : null;
@@ -20,6 +21,7 @@ export function* purr(
     cycles += 1;
     let wds = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
+      opt.debug && !opt.yieldOnId ? yield [s, [w].concat(pl), true] : null;
       if (typeof wds.def === 'function') {
         [s, pl = pl] = wds.def(s, pl);
       }
@@ -34,8 +36,9 @@ export function* purr(
       else {
         s.push(w);
       }
+      opt.debug && opt.yieldOnId ? yield [s, pl, true] : null;
     }
-    opt?.debug ? yield [s, pl, true] : null;
+    
   }
   if (cycles >= maxCycles) {
     yield [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "];
