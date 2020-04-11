@@ -1,4 +1,5 @@
 import * as r from 'ramda';
+import { Word } from '../types';
 const pinnaParser = () => {
   const parser_actions = {
     make_pounce_empty: function (): any[] {
@@ -2449,5 +2450,47 @@ const pinnaParser = () => {
   extend(Parser.prototype, Grammar);
   return { Grammar: Grammar, Parser: Parser, parse: parse };
 };
+export const unParser = (pl: any[]) => {
+  let ps = '';
+  let spacer = '';
+  for (let i in pl) {
+      if (pl[i] && typeof pl[i] == "object") {
+          if (Array.isArray(pl[i])) {
+              ps += spacer + '[' + unParser(pl[i]) + ']';
+          }
+          else {
+              ps += spacer + '{' + unParseKeyValuePair(pl[i]) + '}';
+          }
+      }
+      else {
+          ps += spacer + pl[i];
+      }
+      spacer = ' ';
+  }
+  return ps;
+};
+
+const unParseKeyValuePair = (pl: any[]) => {
+  let ps = '';
+  let spacer = '';
+  for (let i in pl) {
+      if (pl.hasOwnProperty(i)) {
+          if (pl[i] && typeof pl[i] == "object") {
+              if (Array.isArray(pl[i])) {
+                  ps += spacer + i + ':[' + unParser(pl[i]) + ']';
+              }
+              else {
+                  ps += spacer + i + ':{' + unParseKeyValuePair(pl[i]) + '}';
+              }
+          }
+          else {
+              ps += spacer + i + ':' + pl[i];
+          }
+          spacer = ' ';
+      }
+  }
+  return ps;
+};
+
 const p = pinnaParser();
-export const pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
+export const parser = p.parse;

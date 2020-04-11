@@ -2773,10 +2773,51 @@ var pinnaParser = function () {
     extend(Parser.prototype, Grammar);
     return { Grammar: Grammar, Parser: Parser, parse: parse };
 };
+var unParser = function (pl) {
+    var ps = '';
+    var spacer = '';
+    for (var i in pl) {
+        if (pl[i] && typeof pl[i] == "object") {
+            if (Array.isArray(pl[i])) {
+                ps += spacer + '[' + unParser(pl[i]) + ']';
+            }
+            else {
+                ps += spacer + '{' + unParseKeyValuePair(pl[i]) + '}';
+            }
+        }
+        else {
+            ps += spacer + pl[i];
+        }
+        spacer = ' ';
+    }
+    return ps;
+};
+var unParseKeyValuePair = function (pl) {
+    var ps = '';
+    var spacer = '';
+    for (var i in pl) {
+        if (pl.hasOwnProperty(i)) {
+            if (pl[i] && typeof pl[i] == "object") {
+                if (Array.isArray(pl[i])) {
+                    ps += spacer + i + ':[' + unParser(pl[i]) + ']';
+                }
+                else {
+                    ps += spacer + i + ':{' + unParseKeyValuePair(pl[i]) + '}';
+                }
+            }
+            else {
+                ps += spacer + i + ':' + pl[i];
+            }
+            spacer = ' ';
+        }
+    }
+    return ps;
+};
 var p = pinnaParser();
-var pinna = { Grammar: p.Grammar, Parser: p.Parser, parse: p.parse };
+var parser = p.parse;
 
-var pinna$1 = pinna.parse;
+var parse = parser;
+var unParse = unParser;
 function purr(pl, wd, opt) {
     var s, _a, w, maxCycles, cycles, wds, _b, _c;
     var _d, _e;
@@ -2853,5 +2894,6 @@ function purr(pl, wd, opt) {
     });
 }
 
-exports.pinna = pinna$1;
+exports.parse = parse;
 exports.purr = purr;
+exports.unParse = unParse;

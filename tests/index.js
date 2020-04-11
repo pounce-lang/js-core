@@ -1,10 +1,10 @@
 const coreWords = require('../dist/index').coreWords;
-const pinna = require('../dist/index').pinna;
+const parse = require('../dist/index').parse;
 
 const purr = require('../dist/index').purr;
 
 const testIt = (p, expected_result, d) => {
-  const test = purr(pinna(p), d);
+  const test = purr(parse(p), d);
   result = test.next();
   while (result.value[2]) {
     result = test.next();
@@ -19,7 +19,7 @@ const testIt = (p, expected_result, d) => {
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
   console.error("Re running in debug mode:");
-  const test2 = purr(pinna(p), d, { debug: true });
+  const test2 = purr(parse(p), d, { debug: true });
   result2 = test2.next();
   console.error(result2.value);
   while (result2.value[2]) {
@@ -56,7 +56,7 @@ allPassing &= testIt("false [5] [7 3 [+] apply] if-else", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
-console.log("All Passing", allPassing === 1);
+console.log("Pounce Tests Pass:", allPassing === 1);
 
 // # 5 factorial
 // [5, [0, '='], [1, '+'],

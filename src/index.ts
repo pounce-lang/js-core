@@ -3,9 +3,11 @@ import * as r from 'ramda';
 import { ValueStack, ProgramList } from './types';
 import { WordDictionary } from "./WordDictionary";
 import { coreWords } from './words/core';
-import { pinna as parser } from './parser/Pinna';
+import { parser as pinna, unParser as unPinna } from './parser/Pinna';
 
-export const pinna = parser.parse;
+export const parse = pinna;
+export const unParse = unPinna;
+ 
 export function* purr(
   pl: ProgramList,
   wd: WordDictionary = coreWords,

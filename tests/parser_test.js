@@ -1,4 +1,4 @@
-const pinna = require('../dist/index').pinna;
+const pinna = require('../dist/index').parse;
 
 let parser_tests = [
     ['hello world', ['hello', 'world']],
@@ -23,10 +23,12 @@ let parser_tests = [
     [' { a:5.5  b:2.1 } .456 + { a:5.5  b:2.1 } ', [{ "a": 5.5, "b": 2.1 }, 0.456, '+', { "a": 5.5, "b": 2.1 }]],
     ['{a:[1 2 3] 3b_g:{a:1 y:3}}', [{ "a": [1, 2, 3], "3b_g": { "a": 1, "y": 3 } }]],
     ['[{a:[1 2 3] 3b_g:{a:1 y:3}} abc] cdef', [[{ "a": [1, 2, 3], "3b_g": { "a": 1, "y": 3 } }, 'abc'], 'cdef']],
-    ['.0', [0]],
+    ['.0 ', [0]],
     ['0.', [0]],
     ['5.', [5]],
-    ['.5', [0.5]],
+    ['.5 ', [0.5]],
+    [' .5', [0.5]],
+    [' .5 ', [0.5]],
     ['', []],
     ['a[abc]', ['a', ['abc']]],
     ['"1a1"', ["1a1"]],
@@ -76,11 +78,12 @@ parser_tests.forEach((test, i) => {
             parser_tests[i][2] = true;
         }
     }
-    catch(e) {
-        parser_tests[i][2] = false;
-        testsFailed += 1;
-        console.log(`parse error in: '${parser_tests[i][0]}'`);
-    
+    catch (e) {
+        if (parser_tests[i][1][0] !== "parse error") {
+            parser_tests[i][2] = false;
+            testsFailed += 1;
+            console.log(`Parse error in: '${parser_tests[i][0]}' Exception: ${e}`);
+        }
     }
 });
 
