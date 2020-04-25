@@ -97,6 +97,18 @@ export const coreWords: WordDictionary = {
         }
         return [s, pl];
     }},
+    'apply-with': { def: (s, pl) => {
+        const block = toPLOrNull(s.pop());
+        //        const argList = toPLOrNull(s.pop());
+        if (block !== null) {
+            // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
+            pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local", ...pl];
+        }
+        else {
+            // pl.unshift(block);
+        }
+        return [s, pl];
+    }},
     'dip': { def: (s, pl) => {
         const block = toPLOrNull(s.pop());
         const item = s.pop();
@@ -186,29 +198,13 @@ export const coreWords: WordDictionary = {
     }},
     'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip']},
     'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']},
-    // // 'if': {
-    // //     expects: [{ desc: 'conditional', ofType: 'boolean' }, { desc: 'then clause', ofType: 'list' }], effects: [-2], tests: [], desc: 'conditionally apply a quotation',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const then_block = s.pop();
-    // //         const expression = toBoolean(s.pop());
-    // //         if (expression) {
-    // //             if (isArray(then_block)) {
-    // //                 pl = then_block.concat(pl);
-    // //             }
-    // //             else {
-    // //                 pl.unshift(then_block);
-    // //             }
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
 
     // 'def': {
     //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a word',
     //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     //         const key = toString(s.pop());
     //         const definition = s.pop();
-    //         wordstack[0][key] = definition;
+    //         wordstack[1][key] = definition;
     //         return [s, pl];
     //     }
     // },
@@ -216,7 +212,7 @@ export const coreWords: WordDictionary = {
     // //     expects: [{ ofType: 'record', desc: 'definition of word' }, { ofType: 'string', desc: 'word name' }], effects: [-2], tests: [], desc: 'defines a word given a record',
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         const name = toString(s.pop());
-    // //         wordstack[0][name] = s.pop();
+    // //         wordstack[1][name] = s.pop();
     // //         return [s, pl];
     // //     }
     // // },
@@ -224,7 +220,7 @@ export const coreWords: WordDictionary = {
     // //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a local word',
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         const top = wordstack.length - 1;
-    // //         if (top > 0) {
+    // //         if (top > 1) {
     // //             const key = toString(s.pop());
     // //             const definition = s.pop();
     // //             wordstack[top][key] = definition;
@@ -246,7 +242,6 @@ export const coreWords: WordDictionary = {
     // //                 // already imported
     // //                 return [s, pl];
     // //             }
-
     // //             // given a path to a dictionary load it or fetch and load
     // //             // options are to extend the core dictionary or pushit on a stack
     // //             // 1. Object.assign(window[importable].words, wordstack[0]);
@@ -263,50 +258,6 @@ export const coreWords: WordDictionary = {
     // //         }
     // //         return [s, pl];
     // //     }
-    // // },
-    // // 'dip2': {
-    // //     expects: [{ desc: 'a', ofType: 'list' }, { desc: 'an item', ofType: 'any' }], effects: [-1], tests: [], desc: 'apply two under the top of the stack (see apply)',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         const item1 = s.pop();
-    // //         const item2 = s.pop();
-    // //         pl = [item1].concat(pl);
-    // //         pl = [item2].concat(pl);
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'drop': {
-    // //     expects: [{ desc: 'some value', ofType: 'any' }], effects: [-1], tests: [], desc: 'remove one element from the top of the stack',
-    // //     definition: function (s: Json[]) {
-    // //         s.pop();
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'dup': {
-    // //     expects: [{ desc: 'some item', ofType: 'any' }], effects: [1], tests: [], desc: 'duplicate the top element on the stack',
-    // //     definition: function (s: Json[]) {
-    // //         const top = s.length - 1;
-    // //         const a = cloneItem(s[top]);
-    // //         s.push(a);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'dup2': {
-    // //     expects: [{ desc: 'some item', ofType: 'any' }, { desc: 'another item', ofType: 'any' }], effects: [2], tests: [], desc: 'duplicate the top two elements on the stack',
-    // //     definition: [['dup'], 'dip', 'dup', ['swap'], 'dip']
-    // //     //function (s: Json[]) {
-    // //     //  const top = s.length - 1;
-    // //     //  const a = cloneItem(s[top]);
-    // //     //  const b = cloneItem(s[top - 1]);
-    // //     //  s.push(b, a);
-    // //     //  return [s, pl];
-    // //     //}
     // // },
     // // 'random': {
     // //     definition: function (s: Json[]) {
@@ -411,51 +362,6 @@ export const coreWords: WordDictionary = {
     // //         return [s, pl];
     // //     }
     // // },
-    // // '==': {
-    // //     expects: [{ desc: 'a', ofType: 'comparable' }, { desc: 'b', ofType: 'comparable' }], effects: [-1], tests: [], desc: 'compare for equality',
-    // //     definition: function (s: Json[]) {
-    // //         const b = s.pop();
-    // //         const a = s.pop();
-    // //         s.push(a === b);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // '>': {
-    // //     expects: [{ desc: 'a', ofType: 'comparable' }, { desc: 'b', ofType: 'comparable' }], effects: [-1], tests: [], desc: 'greater than',
-    // //     definition: function (s: Json[]) {
-    // //         const b = s.pop();
-    // //         const a = s.pop();
-    // //         s.push(a > b);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // '>=': {
-    // //     expects: [{ desc: 'a', ofType: 'comparable' }, { desc: 'b', ofType: 'comparable' }], effects: [-1], tests: [], desc: 'greater than or equal',
-    // //     definition: function (s: Json[]) {
-    // //         const b = s.pop();
-    // //         const a = s.pop();
-    // //         s.push(a >= b);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // '<': {
-    // //     expects: [{ desc: 'a', ofType: 'comparable' }, { desc: 'b', ofType: 'comparable' }], effects: [-1], tests: [], desc: 'less than',
-    // //     definition: function (s: Json[]) {
-    // //         const b = s.pop();
-    // //         const a = s.pop();
-    // //         s.push(a < b);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // '<=': {
-    // //     expects: [{ desc: 'a', ofType: 'comparable' }, { desc: 'b', ofType: 'comparable' }], effects: [-1], tests: [], desc: 'less than or equal',
-    // //     definition: function (s: Json[]) {
-    // //         const b = s.pop();
-    // //         const a = s.pop();
-    // //         s.push(a <= b);
-    // //         return [s, pl];
-    // //     }
-    // // },
     // // 'and': {
     // //     expects: [{ desc: 'a', ofType: 'boolean' }, { desc: 'b', ofType: 'boolean' }], effects: [-1], tests: [], desc: 'logical and',
     // //     definition: function (s: Json[]) {
@@ -511,31 +417,6 @@ export const coreWords: WordDictionary = {
     // //         }
     // //         else {
     // //             s.push(false);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'if-else': {
-    // //     expects: [{ desc: 'conditional', ofType: 'boolean' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const else_block = s.pop();
-    // //         const then_block = s.pop();
-    // //         const expression = toBoolean(s.pop());
-    // //         if (expression) {
-    // //             if (isArray(then_block)) {
-    // //                 pl = then_block.concat(pl);
-    // //             }
-    // //             else {
-    // //                 pl.unshift(then_block);
-    // //             }
-    // //         }
-    // //         else {
-    // //             if (isArray(else_block)) {
-    // //                 pl = else_block.concat(pl);
-    // //             }
-    // //             else {
-    // //                 pl.unshift(else_block);
-    // //             }
     // //         }
     // //         return [s, pl];
     // //     }

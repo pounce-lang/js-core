@@ -43,6 +43,14 @@ function __generator(thisArg, body) {
     }
 }
 
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
 var toNumOrNull = function (u) {
     return is(Number, u) ? u : null;
 };
@@ -137,6 +145,15 @@ var coreWords = {
             }
             else {
                 pl.unshift(block);
+            }
+            return [s, pl];
+        } },
+    'apply-with': { def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            //        const argList = toPLOrNull(s.pop());
+            if (block !== null) {
+                // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
+                pl = __spreadArrays(["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2"], block, ["drop-local"], pl);
             }
             return [s, pl];
         } },

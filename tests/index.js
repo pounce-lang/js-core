@@ -56,15 +56,43 @@ allPassing &= testIt("false [5] [7 3 [+] apply] if-else", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
+// [a b c] [a a * b b + + c -] apply-with 
+// [a b c] add-local [pop swap [[] cons def-local]] map dip2 [a a * b b + + c -] apply drop-local
+// allPassing &= testIt("3 4 17 [a b c] [a a * b b + + c -] apply-with", [0]);
+// [[[a b c] [a a * b b + + c -]] apply-with 
+// allPassing &= testIt("3 4 17 [a b c] [a a * b b + + c -] apply-with", [0]);
 console.log("Pounce Tests Pass:", allPassing === 1);
 
+//ToDo...
 // # 5 factorial
-// [5, [0, '='], [1, '+'],
-// ['dup', 1, '-'], ['*'],
-// 'linrec']
+// 5 [0 =] [1 +] [dup 1 -] [*] linrec
 
-// quicksort
+// # quicksort
+// [7 2 9 1 2 6 3 8]
 // [size 1 <=] []
 // [uncons [>] split]
 // [[swap] dip cons concat] 
 // binrec
+
+
+t =  `
+[size 1 <=] [t] def
+[uncons [>] split] [s] def
+[[swap] dip cons concat] [u] def
+[[test yes no after] test [yes test yes no after linrec] no if-else after] [linrec] def
+
+[6 3 5] [] [t] [] [s] [u] | binrec
+[6 3 5] | [t] [] [s] [u] linrec      [] [t] [] [s] [u] linrec binrec
+[6 3 5] | size 1 <= [] [s] if-else [u] apply    [] [t] [] [s] [u] linrec binrec
+[6 3 5] 3 1 | <= [] [s] if-else [u] apply  [] [t] [] [s] [u] linrec binrec
+[6 3 5] false | [] [s] if-else [u] apply   [] [t] [] [s] [u] linrec binrec
+[6 3 5] | uncons [>] split [u] apply       [] [t] [] [s] [u] linrec binrec
+6 [3 5] | [>] split [u] apply      [] [t] [] [s] [u] linrec binrec
+6 [3 5] [>] | split [u] apply      [] [t] [] [s] [u] linrec binrec
+6 [3 5] [] | [u] apply      [] [t] [] [s] [u] linrec binrec
+6 [3 5] [] | [swap] dip cons concat      [] [t] [] [s] [u] linrec binrec
+[3 5] 6 [] | cons concat      [] [t] [] [s] [u] linrec binrec
+[3 5] [6] | concat      [] [t] [] [s] [u] linrec binrec
+[3 5 6] | [] [t] [] [s] [u] linrec binrec
+
+`;
