@@ -2444,7 +2444,7 @@ const pinnaParser = () => {
 
   var parse = function (input: string, options: any) {
     options = options || {};
-    var parser: any = new Parser(input, options.actions, options.types);
+    var parser: any = new Parser(input+" ", options.actions, options.types);
     return cleanStrings(parser.parse());
   };
   extend(Parser.prototype, Grammar);

@@ -1,213 +1,280 @@
 import * as r from "ramda";
-import { WordDictionary } from "../WordDictionary";
-import { Word, ProgramList } from '../types';
+import { WordDictionary, WordValue } from "../WordDictionary.types";
+import { ProgramList } from '../types';
 
 const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
-const toArrOrNull = (u: any): [] | null =>
+export const toArrOrNull = (u: any): [] | null =>
     r.is(Array, u) ? u : null;
-const toPLOrNull = (u: any): ProgramList | null =>
+export const toStringOrNull = (u: any): string | null =>
+    r.is(String, u) ? u : null;
+export const toPLOrNull = (u: any): ProgramList | null =>
     r.is(Array, u) ? u : null;
 const toBoolOrNull = (u: any): boolean | null =>
     r.is(Boolean, u) ? u : null;
+const toWordDictionaryOrNull = (u: any): WordDictionary | null =>
+    r.is(Object, u) ? u : null;
 
 export const coreWords: WordDictionary = {
-    'dup': { def: s => { s.push(s[s.length - 1]); return [s]; }
-},
+    'dup': {
+        def: s => { s.push(s[s.length - 1]); return [s]; }
+    },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': { def: s => {
-        const arr = toArrOrNull(s[s.length - 1]);
-        s.push(arr ? arr.pop() : null);
-        return [s];
-    }},
-    'swap': { def: s => {
-        const top = s.pop();
-        const under = s.pop();
-        s.push(top);
-        s.push(under);
-        return [s];
-    }},
-    'drop': { def: s => { s.pop(); return [s]; }},
+    'pop': {
+        def: s => {
+            const arr = toArrOrNull(s[s.length - 1]);
+            s.push(arr ? arr.pop() : null);
+            return [s];
+        }
+    },
+    'swap': {
+        def: s => {
+            const top = s.pop();
+            const under = s.pop();
+            s.push(top);
+            s.push(under);
+            return [s];
+        }
+    },
+    'drop': { def: s => { s.pop(); return [s]; } },
 
-    '+': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a + b);
-            return [s];
-        }
-        return null;
-    }},
-    '-': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a - b);
-            return [s];
-        }
-        return null;
-    }},
-    '/': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null && b !== 0) {
-            s.push(a / b);
-            return [s];
-        }
-        return null;
-    }},
-    '%': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null && b !== 0) {
-            s.push(a % b);
-            return [s];
-        }
-        return null;
-    }},
-    '*': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        if (a !== null && b !== null) {
-            s.push(a * b);
-            return [s];
-        }
-        return null;
-    }},
-    // // 'apply': {
-    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    'apply': { def: (s, pl) => {
-        const block = toPLOrNull(s.pop());
-        if (block) {
-            pl = block.concat(pl);
-        }
-        else {
-            pl.unshift(block);
-        }
-        return [s, pl];
-    }},
-    'apply-with': { def: (s, pl) => {
-        const block = toPLOrNull(s.pop());
-        //        const argList = toPLOrNull(s.pop());
-        if (block !== null) {
-            // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
-            pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local", ...pl];
-        }
-        else {
-            // pl.unshift(block);
-        }
-        return [s, pl];
-    }},
-    'dip': { def: (s, pl) => {
-        const block = toPLOrNull(s.pop());
-        const item = s.pop();
-        pl = [item].concat(pl);
-        if (block) {
-            pl = block.concat(pl);
-        }
-        else {
-            pl.unshift(block);
-        }
-        return [s, pl];
-    }},
-    'dip2': { def: (s, pl) => {
-        const block = toPLOrNull(s.pop());
-        const item2 = s.pop();
-        pl = [item2].concat(pl);
-        const item1 = s.pop();
-        pl = [item1].concat(pl);
-        if (block) {
-            pl = block.concat(pl);
-        }
-        else {
-            pl.unshift(block);
-        }
-        return [s, pl];
-    }},
-    'if-else': { def: (s, pl) => {
-        const else_block = toPLOrNull(s.pop());
-        const then_block = toPLOrNull(s.pop());
-        const condition = toBoolOrNull(s.pop());
-        if (condition === null || then_block === null || else_block === null) {
+    '+': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a + b);
+                return [s];
+            }
             return null;
         }
-        if (condition) {
-            if (r.is(Array, then_block)) {
-                pl = then_block.concat(pl);
+    },
+    '-': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a - b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '/': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            if (a !== null && b !== null && b !== 0) {
+                s.push(a / b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '%': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            if (a !== null && b !== null && b !== 0) {
+                s.push(a % b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '*': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a * b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    'apply': {
+        sig: [{ type: 'list<words>', use: 'run!' }],
+        def: (s, pl) => {
+            const block = toPLOrNull(s.pop());
+            if (block) {
+                pl = block.concat(pl);
             }
             else {
-                pl.unshift(then_block);
+                pl.unshift(block);
             }
+            return [s, pl];
         }
-        else {
-            if (r.is(Array, else_block)) {
-                pl = else_block.concat(pl);
+    },
+    // // // // 'local-env-stack': [], // as WordDictionary[],
+    // // // // 'add-local-env': {
+    // // // //     sig: [],
+    // // // //     def: (s, pl, wd) => {
+    // // // //         const localStack: WordDictionary[] = toArrOrNull(wd['local-env-stack']);
+    // // // //         if (localStack) {
+    // // // //             localStack.push({});
+    // // // //         }
+    // // // //         return [s, pl, wd];
+    // // // //     }
+    // // // // },
+    // // // // 'drop-local-env': {
+    // // // //     sig: [{ type: 'string', use: 'consume' }],
+    // // // //     def: (s, pl, wd) => {
+    // // // //         const key = s.pop().toString();
+    // // // //         delete wd[key];
+    // // // //         return [s, pl, wd];
+    // // // //     }
+    // // // // },
+    // // // // 'apply-with': {
+    // // // //     sig: [{ type: 'list<keys>', use: 'consume' }, { type: 'list<words>', use: 'run!' }],
+    // // // //     def: (s, pl) => {
+    // // // //         const block = toPLOrNull(s.pop());
+    // // // //         //        const argList = toPLOrNull(s.pop());
+    // // // //         if (block !== null) {
+    // // // //             // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
+    // // // //             //                pl = ["add-local-env", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
+    // // // //             pl = ["add-local-env", "rollup", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
+    // // // //         }
+    // // // //         else {
+    // // // //             // pl.unshift(block);
+    // // // //         }
+    // // // //         return [s, pl];
+    // // // //     }
+    // // // //     // list_module import
+    // // // //     // 1 10 20 [a b] [a + b *]
+    // // // //     //  [code12] [top-env] def
+    // // // //     // swap pop [] cons rotate [
+    // // // //     // #top-env swap cons
+    // // // //     //  [[] cons] dip def] dip2 
+    // // // //     // swap pop [] cons rotate [[[] cons] dip def] dip2 
+    // // // //     // [drop] dip
+    // // // //     // apply
+    // // // // },
+    'dip': {
+        def: (s, pl) => {
+            const block = toPLOrNull(s.pop());
+            const item = s.pop();
+            pl = [item].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
             }
             else {
-                pl.unshift(else_block);
+                pl.unshift(block);
             }
+            return [s, pl];
         }
-        return [s, pl];
-    }},
-    '==': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        s.push(a === b);
-        return [s];
-    }},
-    '!=': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        s.push(a !== b);
-        return [s];
-    }},
-    '>': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        s.push(a > b);
-        return [s];
-    }},
-    '<': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        s.push(a < b);
-        return [s];
-    }},
-    '>=': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        s.push(a >= b);
-        return [s];
-    }},
-    '<=': { def: s => {
-        const b = toNumOrNull(s.pop());
-        const a = toNumOrNull(s.pop());
-        s.push(a <= b);
-        return [s];
-    }},
-    'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip']},
-    'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']},
+    },
+    'dip2': {
+        def: (s, pl) => {
+            const block = toPLOrNull(s.pop());
+            const item2 = s.pop();
+            pl = [item2].concat(pl);
+            const item1 = s.pop();
+            pl = [item1].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        }
+    },
+    'rotate': {
+        def: ['swap', ['swap'], 'dip', 'swap']
+    },
+    'if-else': {
+        def: (s, pl) => {
+            const else_block = toPLOrNull(s.pop());
+            const then_block = toPLOrNull(s.pop());
+            const condition = toBoolOrNull(s.pop());
+            if (condition === null || then_block === null || else_block === null) {
+                return null;
+            }
+            if (condition) {
+                if (r.is(Array, then_block)) {
+                    pl = then_block.concat(pl);
+                }
+                else {
+                    pl.unshift(then_block);
+                }
+            }
+            else {
+                if (r.is(Array, else_block)) {
+                    pl = else_block.concat(pl);
+                }
+                else {
+                    pl.unshift(else_block);
+                }
+            }
+            return [s, pl];
+        }
+    },
+    '==': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            s.push(a === b);
+            return [s];
+        }
+    },
+    '!=': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            s.push(a !== b);
+            return [s];
+        }
+    },
+    '>': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            s.push(a > b);
+            return [s];
+        }
+    },
+    '<': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            s.push(a < b);
+            return [s];
+        }
+    },
+    '>=': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            s.push(a >= b);
+            return [s];
+        }
+    },
+    '<=': {
+        def: s => {
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            s.push(a <= b);
+            return [s];
+        }
+    },
+    'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip'] },
+    'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'] },
 
-    // 'def': {
-    //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a word',
-    //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    //         const key = toString(s.pop());
-    //         const definition = s.pop();
-    //         wordstack[1][key] = definition;
-    //         return [s, pl];
-    //     }
-    // },
+    // note: 'def' has been moved to the preprocessing phase
+    'def-local': {
+        sig: [{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }],
+        def: (s, pl, wd) => {
+            const key = toPLOrNull(s.pop());
+            const definition = toPLOrNull(s.pop());
+            const localWdKey = toNumOrNull(s[s.length - 1]).toString();
+            const localWD = toWordDictionaryOrNull(wd[localWdKey]);
+            if (key && typeof key[0] === 'string' && definition && localWD) {
+                localWD[key[0]] = { def: definition };
+            }
+            return [s, pl, wd];
+        }
+    },
     // // 'define': {
     // //     expects: [{ ofType: 'record', desc: 'definition of word' }, { ofType: 'string', desc: 'word name' }], effects: [-2], tests: [], desc: 'defines a word given a record',
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {

@@ -1,4 +1,4 @@
-import { is } from 'ramda';
+import { is, findIndex, head, mergeRight } from 'ramda';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -57,30 +57,42 @@ var toNumOrNull = function (u) {
 var toArrOrNull = function (u) {
     return is(Array, u) ? u : null;
 };
+var toStringOrNull = function (u) {
+    return is(String, u) ? u : null;
+};
 var toPLOrNull = function (u) {
     return is(Array, u) ? u : null;
 };
 var toBoolOrNull = function (u) {
     return is(Boolean, u) ? u : null;
 };
+var toWordDictionaryOrNull = function (u) {
+    return is(Object, u) ? u : null;
+};
 var coreWords = {
-    'dup': { def: function (s) { s.push(s[s.length - 1]); return [s]; }
+    'dup': {
+        def: function (s) { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': { def: function (s) {
+    'pop': {
+        def: function (s) {
             var arr = toArrOrNull(s[s.length - 1]);
             s.push(arr ? arr.pop() : null);
             return [s];
-        } },
-    'swap': { def: function (s) {
+        }
+    },
+    'swap': {
+        def: function (s) {
             var top = s.pop();
             var under = s.pop();
             s.push(top);
             s.push(under);
             return [s];
-        } },
+        }
+    },
     'drop': { def: function (s) { s.pop(); return [s]; } },
-    '+': { def: function (s) {
+    '+': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -88,8 +100,10 @@ var coreWords = {
                 return [s];
             }
             return null;
-        } },
-    '-': { def: function (s) {
+        }
+    },
+    '-': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -97,8 +111,10 @@ var coreWords = {
                 return [s];
             }
             return null;
-        } },
-    '/': { def: function (s) {
+        }
+    },
+    '/': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null && b !== 0) {
@@ -106,8 +122,10 @@ var coreWords = {
                 return [s];
             }
             return null;
-        } },
-    '%': { def: function (s) {
+        }
+    },
+    '%': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null && b !== 0) {
@@ -115,8 +133,10 @@ var coreWords = {
                 return [s];
             }
             return null;
-        } },
-    '*': { def: function (s) {
+        }
+    },
+    '*': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -124,21 +144,11 @@ var coreWords = {
                 return [s];
             }
             return null;
-        } },
-    // // 'apply': {
-    // //     expects: [{ desc: 'a runable', ofType: 'list' }], effects: [-1], tests: [], desc: 'run the contents of a list',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const block = s.pop();
-    // //         if (isArray(block)) {
-    // //             pl = block.concat(pl);
-    // //         }
-    // //         else {
-    // //             pl.unshift(block);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    'apply': { def: function (s, pl) {
+        }
+    },
+    'apply': {
+        sig: [{ type: 'list<words>', use: 'run!' }],
+        def: function (s, pl) {
             var block = toPLOrNull(s.pop());
             if (block) {
                 pl = block.concat(pl);
@@ -147,17 +157,54 @@ var coreWords = {
                 pl.unshift(block);
             }
             return [s, pl];
-        } },
-    'apply-with': { def: function (s, pl) {
-            var block = toPLOrNull(s.pop());
-            //        const argList = toPLOrNull(s.pop());
-            if (block !== null) {
-                // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
-                pl = __spreadArrays(["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2"], block, ["drop-local"], pl);
-            }
-            return [s, pl];
-        } },
-    'dip': { def: function (s, pl) {
+        }
+    },
+    // // // // 'local-env-stack': [], // as WordDictionary[],
+    // // // // 'add-local-env': {
+    // // // //     sig: [],
+    // // // //     def: (s, pl, wd) => {
+    // // // //         const localStack: WordDictionary[] = toArrOrNull(wd['local-env-stack']);
+    // // // //         if (localStack) {
+    // // // //             localStack.push({});
+    // // // //         }
+    // // // //         return [s, pl, wd];
+    // // // //     }
+    // // // // },
+    // // // // 'drop-local-env': {
+    // // // //     sig: [{ type: 'string', use: 'consume' }],
+    // // // //     def: (s, pl, wd) => {
+    // // // //         const key = s.pop().toString();
+    // // // //         delete wd[key];
+    // // // //         return [s, pl, wd];
+    // // // //     }
+    // // // // },
+    // // // // 'apply-with': {
+    // // // //     sig: [{ type: 'list<keys>', use: 'consume' }, { type: 'list<words>', use: 'run!' }],
+    // // // //     def: (s, pl) => {
+    // // // //         const block = toPLOrNull(s.pop());
+    // // // //         //        const argList = toPLOrNull(s.pop());
+    // // // //         if (block !== null) {
+    // // // //             // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
+    // // // //             //                pl = ["add-local-env", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
+    // // // //             pl = ["add-local-env", "rollup", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
+    // // // //         }
+    // // // //         else {
+    // // // //             // pl.unshift(block);
+    // // // //         }
+    // // // //         return [s, pl];
+    // // // //     }
+    // // // //     // list_module import
+    // // // //     // 1 10 20 [a b] [a + b *]
+    // // // //     //  [code12] [top-env] def
+    // // // //     // swap pop [] cons rotate [
+    // // // //     // #top-env swap cons
+    // // // //     //  [[] cons] dip def] dip2 
+    // // // //     // swap pop [] cons rotate [[[] cons] dip def] dip2 
+    // // // //     // [drop] dip
+    // // // //     // apply
+    // // // // },
+    'dip': {
+        def: function (s, pl) {
             var block = toPLOrNull(s.pop());
             var item = s.pop();
             pl = [item].concat(pl);
@@ -168,8 +215,10 @@ var coreWords = {
                 pl.unshift(block);
             }
             return [s, pl];
-        } },
-    'dip2': { def: function (s, pl) {
+        }
+    },
+    'dip2': {
+        def: function (s, pl) {
             var block = toPLOrNull(s.pop());
             var item2 = s.pop();
             pl = [item2].concat(pl);
@@ -182,8 +231,13 @@ var coreWords = {
                 pl.unshift(block);
             }
             return [s, pl];
-        } },
-    'if-else': { def: function (s, pl) {
+        }
+    },
+    'rotate': {
+        def: ['swap', ['swap'], 'dip', 'swap']
+    },
+    'if-else': {
+        def: function (s, pl) {
             var else_block = toPLOrNull(s.pop());
             var then_block = toPLOrNull(s.pop());
             var condition = toBoolOrNull(s.pop());
@@ -207,45 +261,72 @@ var coreWords = {
                 }
             }
             return [s, pl];
-        } },
-    '==': { def: function (s) {
+        }
+    },
+    '==': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a === b);
             return [s];
-        } },
-    '!=': { def: function (s) {
+        }
+    },
+    '!=': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a !== b);
             return [s];
-        } },
-    '>': { def: function (s) {
+        }
+    },
+    '>': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a > b);
             return [s];
-        } },
-    '<': { def: function (s) {
+        }
+    },
+    '<': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a < b);
             return [s];
-        } },
-    '>=': { def: function (s) {
+        }
+    },
+    '>=': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a >= b);
             return [s];
-        } },
-    '<=': { def: function (s) {
+        }
+    },
+    '<=': {
+        def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a <= b);
             return [s];
-        } },
+        }
+    },
     'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip'] },
     'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'] },
+    // note: 'def' has been moved to the preprocessing phase
+    'def-local': {
+        sig: [{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }],
+        def: function (s, pl, wd) {
+            var key = toPLOrNull(s.pop());
+            var definition = toPLOrNull(s.pop());
+            var localWdKey = toNumOrNull(s[s.length - 1]).toString();
+            var localWD = toWordDictionaryOrNull(wd[localWdKey]);
+            if (key && typeof key[0] === 'string' && definition && localWD) {
+                localWD[key[0]] = { def: definition };
+            }
+            return [s, pl, wd];
+        }
+    },
 };
 
 var pinnaParser = function () {
@@ -2780,7 +2861,7 @@ var pinnaParser = function () {
     };
     var parse = function (input, options) {
         options = options || {};
-        var parser = new Parser(input, options.actions, options.types);
+        var parser = new Parser(input + " ", options.actions, options.types);
         return cleanStrings(parser.parse());
     };
     extend(Parser.prototype, Grammar);
@@ -2831,28 +2912,53 @@ var parser = p.parse;
 
 var parse = parser;
 var unParse = unParser;
-function purr(pl, wd, opt) {
-    var s, _a, w, maxCycles, cycles, wds, _b, _c;
-    var _d, _e;
-    if (wd === void 0) { wd = coreWords; }
+// insizer
+var preProcessDefs = function (pl) {
+    var defineWord = function (wd, key, val) {
+        var new_word = {};
+        new_word[key] = val;
+        // ToDo: implement a safe mode that would throw a preProcesser error if key is already defined.
+        return mergeRight(wd, new_word);
+    };
+    // non-FP section (candidate for refactor)
+    var next_pl = __spreadArrays(pl);
+    var next_wd = {};
+    var def_i = findIndex(function (word) { return word === 'def'; }, next_pl);
+    while (def_i !== -1) {
+        if (def_i >= 2) {
+            var word = toPLOrNull(next_pl[def_i - 2]);
+            var key = toStringOrNull(head(toArrOrNull(next_pl[def_i - 1])));
+            next_pl.splice(def_i - 2, 3); // splice is particularly mutant
+            next_wd = defineWord(next_wd, key, { "def": word });
+        }
+        def_i = findIndex(function (word) { return word === 'def'; }, next_pl);
+    }
+    return [next_pl, next_wd];
+};
+function purr(pl_in, wd_in, opt) {
+    var _a, pl, user_def_wd, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
+    var _e, _f, _g;
+    if (wd_in === void 0) { wd_in = coreWords; }
     if (opt === void 0) { opt = { debug: false, yieldOnId: false }; }
-    var _f;
-    return __generator(this, function (_g) {
-        switch (_g.label) {
+    var _h;
+    return __generator(this, function (_j) {
+        switch (_j.label) {
             case 0:
+                _a = preProcessDefs(pl_in), pl = _a[0], user_def_wd = _a[1];
+                wd = mergeRight(wd_in, user_def_wd);
                 s = [];
-                if (!((_f = opt) === null || _f === void 0 ? void 0 : _f.debug)) return [3 /*break*/, 2];
-                return [4 /*yield*/, [s, pl, true]];
+                if (!((_h = opt) === null || _h === void 0 ? void 0 : _h.debug)) return [3 /*break*/, 2];
+                return [4 /*yield*/, [s, pl, true, user_def_wd]];
             case 1:
-                _a = _g.sent();
+                _b = _j.sent();
                 return [3 /*break*/, 3];
             case 2:
-                _a = null;
-                _g.label = 3;
+                _b = null;
+                _j.label = 3;
             case 3:
-                maxCycles = opt.maxCycles || 10000;
+                maxCycles = opt.maxCycles || 1000000;
                 cycles = 0;
-                _g.label = 4;
+                _j.label = 4;
             case 4:
                 if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 13];
                 cycles += 1;
@@ -2861,17 +2967,20 @@ function purr(pl, wd, opt) {
                 if (!(opt.debug && !opt.yieldOnId)) return [3 /*break*/, 6];
                 return [4 /*yield*/, [s, [w].concat(pl), true]];
             case 5:
-                _b = _g.sent();
+                _c = _j.sent();
                 return [3 /*break*/, 7];
             case 6:
-                _b = null;
-                _g.label = 7;
+                _c = null;
+                _j.label = 7;
             case 7:
                 if (typeof wds.def === 'function') {
-                    _d = wds.def(s, pl), s = _d[0], _e = _d[1], pl = _e === void 0 ? pl : _e;
+                    _e = wds.def(s, pl, wd), s = _e[0], _f = _e[1], pl = _f === void 0 ? pl : _f, _g = _e[2], wd = _g === void 0 ? wd : _g;
                 }
                 else {
-                    pl.unshift.apply(pl, wds.def);
+                    plist = toPLOrNull(wds.def);
+                    if (plist) {
+                        pl.unshift.apply(pl, plist);
+                    }
                 }
                 return [3 /*break*/, 12];
             case 8:
@@ -2885,26 +2994,26 @@ function purr(pl, wd, opt) {
                 if (!(opt.debug && opt.yieldOnId)) return [3 /*break*/, 10];
                 return [4 /*yield*/, [s, pl, true]];
             case 9:
-                _c = _g.sent();
+                _d = _j.sent();
                 return [3 /*break*/, 11];
             case 10:
-                _c = null;
-                _g.label = 11;
+                _d = null;
+                _j.label = 11;
             case 11:
-                _g.label = 12;
+                _j.label = 12;
             case 12: return [3 /*break*/, 4];
             case 13:
                 if (!(cycles >= maxCycles)) return [3 /*break*/, 15];
                 return [4 /*yield*/, [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "]];
             case 14:
-                _g.sent();
-                _g.label = 15;
+                _j.sent();
+                _j.label = 15;
             case 15: return [4 /*yield*/, [s, pl, false]];
             case 16:
-                _g.sent();
+                _j.sent();
                 return [2 /*return*/];
         }
     });
 }
 
-export { parse, purr, unParse };
+export { parse, preProcessDefs, purr, unParse };
