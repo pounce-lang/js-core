@@ -9,7 +9,7 @@ export const parse = pinna;
 export const unParse = unPinna;
 
 // insizer
-export const preProcessDefs = (pl: ProgramList): [ProgramList, WordDictionary] => {
+const preProcessDefs = (pl: ProgramList): [ProgramList, WordDictionary] => {
   const defineWord = (wd: WordDictionary, key: string, val: WordValue): WordDictionary => {
     let new_word: WordDictionary = {};
     new_word[key] = val;

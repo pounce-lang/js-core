@@ -7,5 +7,5 @@ export declare type Signature = {
     type: string;
     gaurd?: Word[];
     use?: string;
-};
+}[];
 export declare type WordSignature = Signature[];

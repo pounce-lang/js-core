@@ -1,4 +1,4 @@
-import { is, findIndex, head, mergeRight } from 'ramda';
+import { is, mergeRight, findIndex, head } from 'ramda';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -71,10 +71,12 @@ var toWordDictionaryOrNull = function (u) {
 };
 var coreWords = {
     'dup': {
+        sig: [[{ type: 'a', use: 'observe' }], [{ type: 'a', use: 'produce' }]],
         def: function (s) { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'pop': {
+        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any', use: 'produce' }]],
         def: function (s) {
             var arr = toArrOrNull(s[s.length - 1]);
             s.push(arr ? arr.pop() : null);
@@ -82,6 +84,7 @@ var coreWords = {
         }
     },
     'swap': {
+        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }], [{ type: 'b', use: 'produce' }, { type: 'a', use: 'produce' }]],
         def: function (s) {
             var top = s.pop();
             var under = s.pop();
@@ -90,8 +93,12 @@ var coreWords = {
             return [s];
         }
     },
-    'drop': { def: function (s) { s.pop(); return [s]; } },
+    'drop': {
+        sig: [[{ type: 'any', use: 'consume' }], []],
+        def: function (s) { s.pop(); return [s]; }
+    },
     '+': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -103,6 +110,7 @@ var coreWords = {
         }
     },
     '-': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -114,6 +122,7 @@ var coreWords = {
         }
     },
     '/': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -125,6 +134,7 @@ var coreWords = {
         }
     },
     '%': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -136,6 +146,7 @@ var coreWords = {
         }
     },
     '*': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -147,7 +158,7 @@ var coreWords = {
         }
     },
     'apply': {
-        sig: [{ type: 'list<words>', use: 'run!' }],
+        sig: [[{ type: 'list<words>', use: 'run!' }], []],
         def: function (s, pl) {
             var block = toPLOrNull(s.pop());
             if (block) {
@@ -204,6 +215,7 @@ var coreWords = {
     // // // //     // apply
     // // // // },
     'dip': {
+        sig: [[{ type: 'a', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }]],
         def: function (s, pl) {
             var block = toPLOrNull(s.pop());
             var item = s.pop();
@@ -218,6 +230,7 @@ var coreWords = {
         }
     },
     'dip2': {
+        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }, { type: 'b', use: 'produce' }]],
         def: function (s, pl) {
             var block = toPLOrNull(s.pop());
             var item2 = s.pop();
@@ -315,7 +328,7 @@ var coreWords = {
     'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'] },
     // note: 'def' has been moved to the preprocessing phase
     'def-local': {
-        sig: [{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }],
+        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }], []],
         def: function (s, pl, wd) {
             var key = toPLOrNull(s.pop());
             var definition = toPLOrNull(s.pop());
@@ -3016,4 +3029,4 @@ function purr(pl_in, wd_in, opt) {
     });
 }
 
-export { parse, preProcessDefs, purr, unParse };
+export { parse, purr, unParse };

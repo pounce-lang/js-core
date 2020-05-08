@@ -17,10 +17,12 @@ const toWordDictionaryOrNull = (u: any): WordDictionary | null =>
 
 export const coreWords: WordDictionary = {
     'dup': {
+        sig: [[{ type: 'a', use: 'observe' }], [{ type: 'a', use: 'produce' }]],
         def: s => { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'pop': {
+        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any', use: 'produce' }]],
         def: s => {
             const arr = toArrOrNull(s[s.length - 1]);
             s.push(arr ? arr.pop() : null);
@@ -28,6 +30,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'swap': {
+        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }], [{ type: 'b', use: 'produce' }, { type: 'a', use: 'produce' }]],
         def: s => {
             const top = s.pop();
             const under = s.pop();
@@ -36,9 +39,13 @@ export const coreWords: WordDictionary = {
             return [s];
         }
     },
-    'drop': { def: s => { s.pop(); return [s]; } },
+    'drop': { 
+        sig: [[{ type: 'any', use: 'consume' }], []],
+        def: s => { s.pop(); return [s]; } 
+    },
 
     '+': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -50,6 +57,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '-': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -61,6 +69,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -72,6 +81,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '%': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -83,6 +93,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '*': {
+        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -94,7 +105,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'apply': {
-        sig: [{ type: 'list<words>', use: 'run!' }],
+        sig: [[{ type: 'list<words>', use: 'run!' }], []],
         def: (s, pl) => {
             const block = toPLOrNull(s.pop());
             if (block) {
@@ -151,6 +162,7 @@ export const coreWords: WordDictionary = {
     // // // //     // apply
     // // // // },
     'dip': {
+        sig: [[{ type: 'a', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }]],
         def: (s, pl) => {
             const block = toPLOrNull(s.pop());
             const item = s.pop();
@@ -165,6 +177,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'dip2': {
+        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }, { type: 'b', use: 'produce' }]],
         def: (s, pl) => {
             const block = toPLOrNull(s.pop());
             const item2 = s.pop();
@@ -263,7 +276,7 @@ export const coreWords: WordDictionary = {
 
     // note: 'def' has been moved to the preprocessing phase
     'def-local': {
-        sig: [{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }],
+        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }], []],
         def: (s, pl, wd) => {
             const key = toPLOrNull(s.pop());
             const definition = toPLOrNull(s.pop());
