@@ -1,4 +1,3 @@
-// purr is the core interpreter for Pounce, thanks EL for naming that.
 import * as r from 'ramda';
 import { ValueStack, ProgramList } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
@@ -25,14 +24,14 @@ const preProcessDefs = (pl: ProgramList): [ProgramList, WordDictionary] => {
       const word = toPLOrNull(next_pl[def_i - 2]);
       const key = toStringOrNull(r.head(toArrOrNull(next_pl[def_i - 1])));
       next_pl.splice(def_i - 2, 3); // splice is particularly mutant
-      next_wd = defineWord(next_wd, key, { "def":word} );
+      next_wd = defineWord(next_wd, key, { "def": word });
     }
     def_i = r.findIndex(word => word === 'def', next_pl);
   }
   return [next_pl, next_wd];
 };
 
-export function* purr(
+export function* interpreter(
   pl_in: ProgramList,
   wd_in: WordDictionary = coreWords,
   opt: { debug: boolean, yieldOnId: boolean, maxCycles?: number } =
@@ -41,7 +40,7 @@ export function* purr(
   let [pl, user_def_wd] = preProcessDefs(pl_in);
   let wd = r.mergeRight(wd_in, user_def_wd);
   let s: ValueStack = [];
-  opt?.debug ? yield [s, pl, true, user_def_wd] : null;
+  opt?.debug ? yield {stack:s, prog:pl, active:true, dictionary:user_def_wd} : null;
   let w;
   const maxCycles = opt.maxCycles || 1000000;
   let cycles = 0;
@@ -49,7 +48,7 @@ export function* purr(
     cycles += 1;
     let wds = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
-      opt.debug && !opt.yieldOnId ? yield [s, [w].concat(pl), true] : null;
+      opt.debug && !opt.yieldOnId ? yield {stack:s, prog:[w].concat(pl), active:true} : null;
       if (typeof wds.def === 'function') {
         [s, pl = pl, wd = wd] = wds.def(s, pl, wd);
       }
@@ -67,11 +66,11 @@ export function* purr(
       else {
         s.push(w);
       }
-      opt.debug && opt.yieldOnId ? yield [s, pl, true] : null;
+      opt.debug && opt.yieldOnId ? yield {stack:s, prog:pl, active:true} : null;
     }
   }
   if (cycles >= maxCycles) {
-    yield [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "];
+    yield [{stack:s, prog:pl, active:false}, "maxCycles exceeded: this may be an infinite loop "];
   }
-  yield [s, pl, false];
+  yield {stack:s, prog:pl, active:false};
 }

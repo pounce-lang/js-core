@@ -1,6 +1,6 @@
 # Pounce-lang/core
 Pounce is a small concatenative language that runs in Javascript.
-The core of the language includes a parser and an interpreter called "purr". 
+The core of the language includes a parser and an interpreter. 
 A core dictionary of Pounce words is included, but can be overridden with a custom, perhaps more efficient, dictionary of words.
 
 ## about Pounce
@@ -18,10 +18,10 @@ To start Pounce programming in the browser, you can try this simple demonstratio
 ``` Javascript
 // https://runkit.com/embed/iu9bh0yzz0ig
 var core = require("@pounce-lang/core")
-var interp = core.purr([21, "dup", "+"]);
-var resp = interp.next();
-while (!resp.done) {
-  console.log(resp.value)
-  resp = interp.next();
+var interp = core.interpreter([21, "dup", "+"]);
+var pounceState = interp.next();
+while (!pounceState.done) {
+  console.log(pounceState.value)
+  pounceState = interp.next();
 }
 ```

@@ -2952,7 +2952,7 @@ var preProcessDefs = function (pl) {
     }
     return [next_pl, next_wd];
 };
-function purr(pl_in, wd_in, opt) {
+function interpreter(pl_in, wd_in, opt) {
     var _a, pl, user_def_wd, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
     var _e, _f, _g;
     if (wd_in === void 0) { wd_in = coreWords; }
@@ -2965,7 +2965,7 @@ function purr(pl_in, wd_in, opt) {
                 wd = r.mergeRight(wd_in, user_def_wd);
                 s = [];
                 if (!((_h = opt) === null || _h === void 0 ? void 0 : _h.debug)) return [3 /*break*/, 2];
-                return [4 /*yield*/, [s, pl, true, user_def_wd]];
+                return [4 /*yield*/, { stack: s, prog: pl, active: true, dictionary: user_def_wd }];
             case 1:
                 _b = _j.sent();
                 return [3 /*break*/, 3];
@@ -2982,7 +2982,7 @@ function purr(pl_in, wd_in, opt) {
                 wds = r.is(String, w) ? wd[w] : null;
                 if (!wds) return [3 /*break*/, 8];
                 if (!(opt.debug && !opt.yieldOnId)) return [3 /*break*/, 6];
-                return [4 /*yield*/, [s, [w].concat(pl), true]];
+                return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true }];
             case 5:
                 _c = _j.sent();
                 return [3 /*break*/, 7];
@@ -3009,7 +3009,7 @@ function purr(pl_in, wd_in, opt) {
                     s.push(w);
                 }
                 if (!(opt.debug && opt.yieldOnId)) return [3 /*break*/, 10];
-                return [4 /*yield*/, [s, pl, true]];
+                return [4 /*yield*/, { stack: s, prog: pl, active: true }];
             case 9:
                 _d = _j.sent();
                 return [3 /*break*/, 11];
@@ -3021,11 +3021,11 @@ function purr(pl_in, wd_in, opt) {
             case 12: return [3 /*break*/, 4];
             case 13:
                 if (!(cycles >= maxCycles)) return [3 /*break*/, 15];
-                return [4 /*yield*/, [[s, pl, false], "maxCycles exceeded: this may be an infinite loop "]];
+                return [4 /*yield*/, [{ stack: s, prog: pl, active: false }, "maxCycles exceeded: this may be an infinite loop "]];
             case 14:
                 _j.sent();
                 _j.label = 15;
-            case 15: return [4 /*yield*/, [s, pl, false]];
+            case 15: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
             case 16:
                 _j.sent();
                 return [2 /*return*/];
@@ -3033,6 +3033,6 @@ function purr(pl_in, wd_in, opt) {
     });
 }
 
+exports.interpreter = interpreter;
 exports.parse = parse;
-exports.purr = purr;
 exports.unParse = unParse;

@@ -1,32 +1,29 @@
-const coreWords = require('../dist/index').coreWords;
 const parse = require('../dist/index').parse;
-
-const purr = require('../dist/index').purr;
+const interpreter = require('../dist/index').interpreter;
 
 const testIt = (p, expected_result, d) => {
-  const test = purr(parse(p), d);
+  const test = interpreter(parse(p), d);
   result = test.next();
-  while (result.value[2]) {
+  while (result.value && result.value.active) {
     result = test.next();
   }
   const str_exp = JSON.stringify(expected_result);
-  const str_res = JSON.stringify(result.value[0]);
+  const str_res = JSON.stringify(result.value ? result.value.stack : "error");
   if (str_exp === str_res) {
-    // console.log(result.value[0], "<-", p);
     return true;
   }
   console.error("failed test for:", p);
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
   console.error("Re running in debug mode:");
-  const test2 = purr(parse(p), d, { debug: true });
+  const test2 = interpreter(parse(p), d, { debug: true });
   result2 = test2.next();
   console.error(result2.value);
-  while (result2.value[2]) {
+  while (result2.value && result2.value.active) {
     result2 = test2.next();
     console.error(result2.value);
   }
-  console.error(result2.value[0], "!=", expected_result);
+  console.error(result2.value ? result2.value.stack : "error", "!=", expected_result);
   return false;
 };
 
