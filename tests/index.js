@@ -48,9 +48,14 @@ allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
 allPassing &= testIt("3 2 7 [+] dip -", [-2]);
 allPassing &= testIt("3 2 7 rotate", [7, 2, 3]);
+allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
+allPassing &= testIt('A B C rolldown', ['B', 'C', 'A']);
 allPassing &= testIt("true [5] [7] if-else", [5]);
 allPassing &= testIt("false [5] [7] if-else", [7]);
 allPassing &= testIt("false [5] [7 3 [+] apply] if-else", [10]);
+allPassing &= testIt("2 1 [>] [5] [7] ifte", [5]);
+allPassing &= testIt("2 1 [==] [5] [7] ifte", [7]);
+allPassing &= testIt("2 1[<] [5] [7 3 [+] apply] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
@@ -66,12 +71,27 @@ allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 allPassing &= testIt("[1 +] [add-one] def 22 add-one", [23]);
 allPassing &= testIt("[dup2 +] [fib] def 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
+//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] def 5 [1 swap] apply fac
+allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] def 5 [1 swap] apply fac", [120]);
+//# initial  increment condition recurse   finally
+//# [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] linrec
+// allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] linrec ", [120]);
+allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] linrec ", [120]);
+
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
 //ToDo...
+// [[init test recurse lastly] [init apply test [recurse apply loc-rec lastly] if] apply-with] [linrec] def
 // # 5 factorial
-// 5 [0 =] [1 +] [dup 1 -] [*] linrec
+// 5 [dup] [dup 1 >] [dup 1 -] [dup [*] dip] linrec # <<
+//        5 | [dup] apply [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
+//      5 5 | [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
+//      5 5 | dup 0 == [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
+// 5 5 true | [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
+//      5 5 | dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec [dup [*] dip] apply
+//    5 5 4 | [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec [dup [*] dip] apply
+
 
 // # quicksort
 // [7 2 9 1 2 6 3 8]
@@ -81,24 +101,24 @@ console.log("Pounce Tests Pass:", allPassing === 1);
 // binrec
 
 
-t =  `
-[size 1 <=] [t] def
-[uncons [>] split] [s] def
-[[swap] dip cons concat] [u] def
-[[test yes no after] test [yes test yes no after linrec] no if-else after] [linrec] def
+// t =  `
+// [size 1 <=] [t] def
+// [uncons [>] split] [s] def
+// [[swap] dip cons concat] [u] def
+// [[test yes no after] test [yes test yes no after linrec] no if-else after] [linrec] def
 
-[6 3 5] [] [t] [] [s] [u] | binrec
-[6 3 5] | [t] [] [s] [u] linrec      [] [t] [] [s] [u] linrec binrec
-[6 3 5] | size 1 <= [] [s] if-else [u] apply    [] [t] [] [s] [u] linrec binrec
-[6 3 5] 3 1 | <= [] [s] if-else [u] apply  [] [t] [] [s] [u] linrec binrec
-[6 3 5] false | [] [s] if-else [u] apply   [] [t] [] [s] [u] linrec binrec
-[6 3 5] | uncons [>] split [u] apply       [] [t] [] [s] [u] linrec binrec
-6 [3 5] | [>] split [u] apply      [] [t] [] [s] [u] linrec binrec
-6 [3 5] [>] | split [u] apply      [] [t] [] [s] [u] linrec binrec
-6 [3 5] [] | [u] apply      [] [t] [] [s] [u] linrec binrec
-6 [3 5] [] | [swap] dip cons concat      [] [t] [] [s] [u] linrec binrec
-[3 5] 6 [] | cons concat      [] [t] [] [s] [u] linrec binrec
-[3 5] [6] | concat      [] [t] [] [s] [u] linrec binrec
-[3 5 6] | [] [t] [] [s] [u] linrec binrec
+// [6 3 5] [] [t] [] [s] [u] | binrec
+// [6 3 5] | [t] [] [s] [u] linrec      [] [t] [] [s] [u] linrec binrec
+// [6 3 5] | size 1 <= [] [s] if-else [u] apply    [] [t] [] [s] [u] linrec binrec
+// [6 3 5] 3 1 | <= [] [s] if-else [u] apply  [] [t] [] [s] [u] linrec binrec
+// [6 3 5] false | [] [s] if-else [u] apply   [] [t] [] [s] [u] linrec binrec
+// [6 3 5] | uncons [>] split [u] apply       [] [t] [] [s] [u] linrec binrec
+// 6 [3 5] | [>] split [u] apply      [] [t] [] [s] [u] linrec binrec
+// 6 [3 5] [>] | split [u] apply      [] [t] [] [s] [u] linrec binrec
+// 6 [3 5] [] | [u] apply      [] [t] [] [s] [u] linrec binrec
+// 6 [3 5] [] | [swap] dip cons concat      [] [t] [] [s] [u] linrec binrec
+// [3 5] 6 [] | cons concat      [] [t] [] [s] [u] linrec binrec
+// [3 5] [6] | concat      [] [t] [] [s] [u] linrec binrec
+// [3 5 6] | [] [t] [] [s] [u] linrec binrec
 
-`;
+// `;

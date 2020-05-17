@@ -2,7 +2,7 @@ import * as r from "ramda";
 import { WordDictionary, WordValue } from "../WordDictionary.types";
 import { ProgramList } from '../types';
 
-const toNumOrNull = (u: any): number | null =>
+export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
 export const toArrOrNull = (u: any): [] | null =>
     r.is(Array, u) ? u : null;
@@ -17,12 +17,12 @@ const toWordDictionaryOrNull = (u: any): WordDictionary | null =>
 
 export const coreWords: WordDictionary = {
     'dup': {
-        sig: [[{ type: 'a', use: 'observe' }], [{ type: 'a', use: 'produce' }]],
+        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
         def: s => { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'pop': {
-        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any', use: 'produce' }]],
+        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any' }]],
         def: s => {
             const arr = toArrOrNull(s[s.length - 1]);
             s.push(arr ? arr.pop() : null);
@@ -30,23 +30,24 @@ export const coreWords: WordDictionary = {
         }
     },
     'swap': {
-        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }], [{ type: 'b', use: 'produce' }, { type: 'a', use: 'produce' }]],
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
         def: s => {
             const top = s.pop();
             const under = s.pop();
-            s.push(top);
-            s.push(under);
+                s.push(top);
+                s.push(under);
             return [s];
         }
     },
-    'drop': { 
-        sig: [[{ type: 'any', use: 'consume' }], []],
-        def: s => { s.pop(); return [s]; } 
+    'drop': {
+        sig: [[{ type: 'any' }], []],
+        def: s => { s.pop(); return [s]; }
     },
 
     '+': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         def: s => {
+            // const b = <number | null>toTypeOrNull<number | null>(s.pop(), '(int | float)');
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -57,7 +58,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '-': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -69,7 +70,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
+        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -81,7 +82,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '%': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
+        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -93,7 +94,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '*': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
@@ -105,7 +106,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'apply': {
-        sig: [[{ type: 'list<words>', use: 'run!' }], []],
+        sig: [[{ type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
         def: (s, pl) => {
             const block = toPLOrNull(s.pop());
             if (block) {
@@ -129,7 +130,7 @@ export const coreWords: WordDictionary = {
     // // // //     }
     // // // // },
     // // // // 'drop-local-env': {
-    // // // //     sig: [{ type: 'string', use: 'consume' }],
+    // // // //     sig: [{ type: 'string' }],
     // // // //     def: (s, pl, wd) => {
     // // // //         const key = s.pop().toString();
     // // // //         delete wd[key];
@@ -137,7 +138,7 @@ export const coreWords: WordDictionary = {
     // // // //     }
     // // // // },
     // // // // 'apply-with': {
-    // // // //     sig: [{ type: 'list<keys>', use: 'consume' }, { type: 'list<words>', use: 'run!' }],
+    // // // //     sig: [{ type: 'list<keys>' }, { type: 'list<words>', use: 'run!' }],
     // // // //     def: (s, pl) => {
     // // // //         const block = toPLOrNull(s.pop());
     // // // //         //        const argList = toPLOrNull(s.pop());
@@ -162,7 +163,7 @@ export const coreWords: WordDictionary = {
     // // // //     // apply
     // // // // },
     'dip': {
-        sig: [[{ type: 'a', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }]],
+        sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
         def: (s, pl) => {
             const block = toPLOrNull(s.pop());
             const item = s.pop();
@@ -177,7 +178,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'dip2': {
-        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }, { type: 'b', use: 'produce' }]],
+        sig: [[{ type: 'a' }, { type: 'b' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'a' }, { type: 'b' }]],
         def: (s, pl) => {
             const block = toPLOrNull(s.pop());
             const item2 = s.pop();
@@ -194,7 +195,16 @@ export const coreWords: WordDictionary = {
         }
     },
     'rotate': {
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'C' }, { type: 'B' }, { type: 'A' }]],
         def: ['swap', ['swap'], 'dip', 'swap']
+    },
+    'rollup': {
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'C' }, { type: 'A' }, { type: 'B' }]],
+        def: ['swap', ['swap'], 'dip']
+    },
+    'rolldown': {
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'B' }, { type: 'C' }, { type: 'A' }]],
+        def: [['swap'], 'dip', 'swap']
     },
     'if-else': {
         def: (s, pl) => {
@@ -222,6 +232,10 @@ export const coreWords: WordDictionary = {
             }
             return [s, pl];
         }
+    },
+    'ifte': {
+        // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
+        def: [['apply'], 'dip2', 'if-else']
     },
     '==': {
         def: s => {
@@ -271,12 +285,43 @@ export const coreWords: WordDictionary = {
             return [s];
         }
     },
-    'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip'] },
-    'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'] },
+    'linrec': {
+        sig: [[
+            { type: 'Initial extends (list<words>)' },
+            { type: 'Increment extends (list<words>)' },
+            { type: 'Condition extends (list<words>)' },
+            { type: 'Recurse extends (list<words>)' },
+            { type: 'Final extends (list<words>)' }
+        ], []],
+        def: (s, pl) => {
+            // initial increment condition recurse final linrec 
+            const final = toPLOrNull(s.pop());
+            const recurse = toPLOrNull(s.pop());
+            const condition = toPLOrNull(s.pop());
+            const increment = toPLOrNull(s.pop());
+            const initial = toPLOrNull(s.pop());
+            if (initial && increment && condition && recurse && final) {
+                const nextRec = [[], increment, condition, recurse, final, 'linrec'];
+                pl = [...initial, ...increment, ...condition, [...recurse, ...nextRec], final, 'if-else'].concat(pl);
+            }
+            else {
+                // throw("stack value(s) not found");
+            }
+            return [s, pl];
+        }
+    },
+    'dup2': {
+        sig: [[{ type: 'A', use: 'observe' }, { type: 'B', use: 'observe' }], [{ type: 'A' }, { type: 'B' }]],
+        def: [['dup'], 'dip', 'dup', ['swap'], 'dip']
+    },
+    'times': {
+        sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
+        def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
+    },
 
     // note: 'def' has been moved to the preprocessing phase
     'def-local': {
-        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }], []],
+        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>' }, { type: 'list<string>' }], []],
         def: (s, pl, wd) => {
             const key = toPLOrNull(s.pop());
             const definition = toPLOrNull(s.pop());
@@ -475,10 +520,6 @@ export const coreWords: WordDictionary = {
     // //     },
     // //     'definition': [[], ['cons'], 'c', 'repeat', 'swap', [['uncons'], 'c', 'repeat', 'drop'], 'dip']
     // // },
-    // // 'repeat': {
-    // //     // 'requires':'list_module',
-    // //     'definition': ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'repeat'], ['drop', 'drop'], 'if-else']
-    // // },
     // // 'case': {
     // //     expects: [{ desc: 'key', ofType: 'word' }, { desc: 'a', ofType: 'record' }], effects: [-2], tests: [], desc: 'apply a matching case',
     // //     definition: function (s: Json[], pl: PL) {
@@ -501,23 +542,7 @@ export const coreWords: WordDictionary = {
     // //         return [s, pl];
     // //     }
     // // },
-    // // 'ifte': {
-    // //     expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
-    // //     definition: [['apply'], 'dip2', 'if-else']
-    // // },
     // // 'floor': ['dup', 1, '%', '-'],
-    // // 'rollup': {
-    // //     expects: [{ desc: 'a', ofType: 'any' }, { desc: 'b', ofType: 'any' }, { desc: 'c', ofType: 'any' }], effects: [0], tests: ['A B C rollup', ['C', 'A', 'B']], desc: 'roll up 3 elements on the stack, the top item ends up under the other two',
-    // //     definition: ['swap', ['swap'], 'dip']
-    // // },
-    // // 'rolldown': {
-    // //     expects: [{ desc: 'a', ofType: 'any' }, { desc: 'b', ofType: 'any' }, { desc: 'c', ofType: 'any' }], effects: [0], tests: ['A B C rolldown', ['B', 'C', 'A']], desc: 'roll down 3 elements in the stack, the bottom item ends up at the top',
-    // //     definition: [['swap'], 'dip', 'swap']
-    // // },
-    // // 'rotate': {
-    // //     expects: [{ desc: 'a', ofType: 'any' }, { desc: 'b', ofType: 'any' }, { desc: 'c', ofType: 'any' }], effects: [0], tests: ['A B C rotate', ['C', 'B', 'A']], desc: 'inverts the order of the top three elements',
-    // //     definition: ['swap', ['swap'], 'dip', 'swap']
-    // // },
     // // 'map-under': {
     // //     'requires': 'list_module',
     // //     'named-args': ['c', 'q'],

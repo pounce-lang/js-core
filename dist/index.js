@@ -3,348 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var r = require('ramda');
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-***************************************************************************** */
-
-function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-}
-
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}
-
-var toNumOrNull = function (u) {
-    return r.is(Number, u) ? u : null;
-};
-var toArrOrNull = function (u) {
-    return r.is(Array, u) ? u : null;
-};
-var toStringOrNull = function (u) {
-    return r.is(String, u) ? u : null;
-};
-var toPLOrNull = function (u) {
-    return r.is(Array, u) ? u : null;
-};
-var toBoolOrNull = function (u) {
-    return r.is(Boolean, u) ? u : null;
-};
-var toWordDictionaryOrNull = function (u) {
-    return r.is(Object, u) ? u : null;
-};
-var coreWords = {
-    'dup': {
-        sig: [[{ type: 'a', use: 'observe' }], [{ type: 'a', use: 'produce' }]],
-        def: function (s) { s.push(s[s.length - 1]); return [s]; }
-    },
-    //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': {
-        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any', use: 'produce' }]],
-        def: function (s) {
-            var arr = toArrOrNull(s[s.length - 1]);
-            s.push(arr ? arr.pop() : null);
-            return [s];
-        }
-    },
-    'swap': {
-        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }], [{ type: 'b', use: 'produce' }, { type: 'a', use: 'produce' }]],
-        def: function (s) {
-            var top = s.pop();
-            var under = s.pop();
-            s.push(top);
-            s.push(under);
-            return [s];
-        }
-    },
-    'drop': {
-        sig: [[{ type: 'any', use: 'consume' }], []],
-        def: function (s) { s.pop(); return [s]; }
-    },
-    '+': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            if (a !== null && b !== null) {
-                s.push(a + b);
-                return [s];
-            }
-            return null;
-        }
-    },
-    '-': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            if (a !== null && b !== null) {
-                s.push(a - b);
-                return [s];
-            }
-            return null;
-        }
-    },
-    '/': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            if (a !== null && b !== null && b !== 0) {
-                s.push(a / b);
-                return [s];
-            }
-            return null;
-        }
-    },
-    '%': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', gaurd: [0, '!='], use: 'consume' }], [{ type: 'number', use: 'produce' }]],
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            if (a !== null && b !== null && b !== 0) {
-                s.push(a % b);
-                return [s];
-            }
-            return null;
-        }
-    },
-    '*': {
-        sig: [[{ type: 'number', use: 'consume' }, { type: 'number', use: 'consume' }], [{ type: 'number', use: 'produce' }]],
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            if (a !== null && b !== null) {
-                s.push(a * b);
-                return [s];
-            }
-            return null;
-        }
-    },
-    'apply': {
-        sig: [[{ type: 'list<words>', use: 'run!' }], []],
-        def: function (s, pl) {
-            var block = toPLOrNull(s.pop());
-            if (block) {
-                pl = block.concat(pl);
-            }
-            else {
-                pl.unshift(block);
-            }
-            return [s, pl];
-        }
-    },
-    // // // // 'local-env-stack': [], // as WordDictionary[],
-    // // // // 'add-local-env': {
-    // // // //     sig: [],
-    // // // //     def: (s, pl, wd) => {
-    // // // //         const localStack: WordDictionary[] = toArrOrNull(wd['local-env-stack']);
-    // // // //         if (localStack) {
-    // // // //             localStack.push({});
-    // // // //         }
-    // // // //         return [s, pl, wd];
-    // // // //     }
-    // // // // },
-    // // // // 'drop-local-env': {
-    // // // //     sig: [{ type: 'string', use: 'consume' }],
-    // // // //     def: (s, pl, wd) => {
-    // // // //         const key = s.pop().toString();
-    // // // //         delete wd[key];
-    // // // //         return [s, pl, wd];
-    // // // //     }
-    // // // // },
-    // // // // 'apply-with': {
-    // // // //     sig: [{ type: 'list<keys>', use: 'consume' }, { type: 'list<words>', use: 'run!' }],
-    // // // //     def: (s, pl) => {
-    // // // //         const block = toPLOrNull(s.pop());
-    // // // //         //        const argList = toPLOrNull(s.pop());
-    // // // //         if (block !== null) {
-    // // // //             // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
-    // // // //             //                pl = ["add-local-env", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
-    // // // //             pl = ["add-local-env", "rollup", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
-    // // // //         }
-    // // // //         else {
-    // // // //             // pl.unshift(block);
-    // // // //         }
-    // // // //         return [s, pl];
-    // // // //     }
-    // // // //     // list_module import
-    // // // //     // 1 10 20 [a b] [a + b *]
-    // // // //     //  [code12] [top-env] def
-    // // // //     // swap pop [] cons rotate [
-    // // // //     // #top-env swap cons
-    // // // //     //  [[] cons] dip def] dip2 
-    // // // //     // swap pop [] cons rotate [[[] cons] dip def] dip2 
-    // // // //     // [drop] dip
-    // // // //     // apply
-    // // // // },
-    'dip': {
-        sig: [[{ type: 'a', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }]],
-        def: function (s, pl) {
-            var block = toPLOrNull(s.pop());
-            var item = s.pop();
-            pl = [item].concat(pl);
-            if (block) {
-                pl = block.concat(pl);
-            }
-            else {
-                pl.unshift(block);
-            }
-            return [s, pl];
-        }
-    },
-    'dip2': {
-        sig: [[{ type: 'a', use: 'consume' }, { type: 'b', use: 'consume' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result', use: 'produce' }, { type: 'a', use: 'produce' }, { type: 'b', use: 'produce' }]],
-        def: function (s, pl) {
-            var block = toPLOrNull(s.pop());
-            var item2 = s.pop();
-            pl = [item2].concat(pl);
-            var item1 = s.pop();
-            pl = [item1].concat(pl);
-            if (block) {
-                pl = block.concat(pl);
-            }
-            else {
-                pl.unshift(block);
-            }
-            return [s, pl];
-        }
-    },
-    'rotate': {
-        def: ['swap', ['swap'], 'dip', 'swap']
-    },
-    'if-else': {
-        def: function (s, pl) {
-            var else_block = toPLOrNull(s.pop());
-            var then_block = toPLOrNull(s.pop());
-            var condition = toBoolOrNull(s.pop());
-            if (condition === null || then_block === null || else_block === null) {
-                return null;
-            }
-            if (condition) {
-                if (r.is(Array, then_block)) {
-                    pl = then_block.concat(pl);
-                }
-                else {
-                    pl.unshift(then_block);
-                }
-            }
-            else {
-                if (r.is(Array, else_block)) {
-                    pl = else_block.concat(pl);
-                }
-                else {
-                    pl.unshift(else_block);
-                }
-            }
-            return [s, pl];
-        }
-    },
-    '==': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            s.push(a === b);
-            return [s];
-        }
-    },
-    '!=': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            s.push(a !== b);
-            return [s];
-        }
-    },
-    '>': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            s.push(a > b);
-            return [s];
-        }
-    },
-    '<': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            s.push(a < b);
-            return [s];
-        }
-    },
-    '>=': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            s.push(a >= b);
-            return [s];
-        }
-    },
-    '<=': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            s.push(a <= b);
-            return [s];
-        }
-    },
-    'dup2': { def: [['dup'], 'dip', 'dup', ['swap'], 'dip'] },
-    'times': { def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else'] },
-    // note: 'def' has been moved to the preprocessing phase
-    'def-local': {
-        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>', use: 'consume' }, { type: 'list<string>', use: 'consume' }], []],
-        def: function (s, pl, wd) {
-            var key = toPLOrNull(s.pop());
-            var definition = toPLOrNull(s.pop());
-            var localWdKey = toNumOrNull(s[s.length - 1]).toString();
-            var localWD = toWordDictionaryOrNull(wd[localWdKey]);
-            if (key && typeof key[0] === 'string' && definition && localWD) {
-                localWD[key[0]] = { def: definition };
-            }
-            return [s, pl, wd];
-        }
-    },
-};
+require('fbp-types');
 
 var pinnaParser = function () {
     var parser_actions = {
@@ -2927,9 +2586,390 @@ var unParseKeyValuePair = function (pl) {
 var p = pinnaParser();
 var parser = p.parse;
 
-var parse = parser;
-var unParse = unParser;
-// insizer
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
+var toNumOrNull = function (u) {
+    return r.is(Number, u) ? u : null;
+};
+var toArrOrNull = function (u) {
+    return r.is(Array, u) ? u : null;
+};
+var toStringOrNull = function (u) {
+    return r.is(String, u) ? u : null;
+};
+var toPLOrNull = function (u) {
+    return r.is(Array, u) ? u : null;
+};
+var toBoolOrNull = function (u) {
+    return r.is(Boolean, u) ? u : null;
+};
+var toWordDictionaryOrNull = function (u) {
+    return r.is(Object, u) ? u : null;
+};
+var coreWords = {
+    'dup': {
+        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
+        def: function (s) { s.push(s[s.length - 1]); return [s]; }
+    },
+    //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
+    'pop': {
+        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any' }]],
+        def: function (s) {
+            var arr = toArrOrNull(s[s.length - 1]);
+            s.push(arr ? arr.pop() : null);
+            return [s];
+        }
+    },
+    'swap': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
+        def: function (s) {
+            var top = s.pop();
+            var under = s.pop();
+            s.push(top);
+            s.push(under);
+            return [s];
+        }
+    },
+    'drop': {
+        sig: [[{ type: 'any' }], []],
+        def: function (s) { s.pop(); return [s]; }
+    },
+    '+': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        def: function (s) {
+            // const b = <number | null>toTypeOrNull<number | null>(s.pop(), '(int | float)');
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a + b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '-': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a - b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '/': {
+        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null && b !== 0) {
+                s.push(a / b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '%': {
+        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null && b !== 0) {
+                s.push(a % b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    '*': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(a * b);
+                return [s];
+            }
+            return null;
+        }
+    },
+    'apply': {
+        sig: [[{ type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
+        def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        }
+    },
+    // // // // 'local-env-stack': [], // as WordDictionary[],
+    // // // // 'add-local-env': {
+    // // // //     sig: [],
+    // // // //     def: (s, pl, wd) => {
+    // // // //         const localStack: WordDictionary[] = toArrOrNull(wd['local-env-stack']);
+    // // // //         if (localStack) {
+    // // // //             localStack.push({});
+    // // // //         }
+    // // // //         return [s, pl, wd];
+    // // // //     }
+    // // // // },
+    // // // // 'drop-local-env': {
+    // // // //     sig: [{ type: 'string' }],
+    // // // //     def: (s, pl, wd) => {
+    // // // //         const key = s.pop().toString();
+    // // // //         delete wd[key];
+    // // // //         return [s, pl, wd];
+    // // // //     }
+    // // // // },
+    // // // // 'apply-with': {
+    // // // //     sig: [{ type: 'list<keys>' }, { type: 'list<words>', use: 'run!' }],
+    // // // //     def: (s, pl) => {
+    // // // //         const block = toPLOrNull(s.pop());
+    // // // //         //        const argList = toPLOrNull(s.pop());
+    // // // //         if (block !== null) {
+    // // // //             // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
+    // // // //             //                pl = ["add-local-env", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
+    // // // //             pl = ["add-local-env", "rollup", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
+    // // // //         }
+    // // // //         else {
+    // // // //             // pl.unshift(block);
+    // // // //         }
+    // // // //         return [s, pl];
+    // // // //     }
+    // // // //     // list_module import
+    // // // //     // 1 10 20 [a b] [a + b *]
+    // // // //     //  [code12] [top-env] def
+    // // // //     // swap pop [] cons rotate [
+    // // // //     // #top-env swap cons
+    // // // //     //  [[] cons] dip def] dip2 
+    // // // //     // swap pop [] cons rotate [[[] cons] dip def] dip2 
+    // // // //     // [drop] dip
+    // // // //     // apply
+    // // // // },
+    'dip': {
+        sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
+        def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            var item = s.pop();
+            pl = [item].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        }
+    },
+    'dip2': {
+        sig: [[{ type: 'a' }, { type: 'b' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'a' }, { type: 'b' }]],
+        def: function (s, pl) {
+            var block = toPLOrNull(s.pop());
+            var item2 = s.pop();
+            pl = [item2].concat(pl);
+            var item1 = s.pop();
+            pl = [item1].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        }
+    },
+    'rotate': {
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'C' }, { type: 'B' }, { type: 'A' }]],
+        def: ['swap', ['swap'], 'dip', 'swap']
+    },
+    'rollup': {
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'C' }, { type: 'A' }, { type: 'B' }]],
+        def: ['swap', ['swap'], 'dip']
+    },
+    'rolldown': {
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'B' }, { type: 'C' }, { type: 'A' }]],
+        def: [['swap'], 'dip', 'swap']
+    },
+    'if-else': {
+        def: function (s, pl) {
+            var else_block = toPLOrNull(s.pop());
+            var then_block = toPLOrNull(s.pop());
+            var condition = toBoolOrNull(s.pop());
+            if (condition === null || then_block === null || else_block === null) {
+                return null;
+            }
+            if (condition) {
+                if (r.is(Array, then_block)) {
+                    pl = then_block.concat(pl);
+                }
+                else {
+                    pl.unshift(then_block);
+                }
+            }
+            else {
+                if (r.is(Array, else_block)) {
+                    pl = else_block.concat(pl);
+                }
+                else {
+                    pl.unshift(else_block);
+                }
+            }
+            return [s, pl];
+        }
+    },
+    'ifte': {
+        // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
+        def: [['apply'], 'dip2', 'if-else']
+    },
+    '==': {
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a === b);
+            return [s];
+        }
+    },
+    '!=': {
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a !== b);
+            return [s];
+        }
+    },
+    '>': {
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a > b);
+            return [s];
+        }
+    },
+    '<': {
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a < b);
+            return [s];
+        }
+    },
+    '>=': {
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a >= b);
+            return [s];
+        }
+    },
+    '<=': {
+        def: function (s) {
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            s.push(a <= b);
+            return [s];
+        }
+    },
+    'linrec': {
+        sig: [[
+                { type: 'Initial extends (list<words>)' },
+                { type: 'Increment extends (list<words>)' },
+                { type: 'Condition extends (list<words>)' },
+                { type: 'Recurse extends (list<words>)' },
+                { type: 'Final extends (list<words>)' }
+            ], []],
+        def: function (s, pl) {
+            // initial increment condition recurse final linrec 
+            var final = toPLOrNull(s.pop());
+            var recurse = toPLOrNull(s.pop());
+            var condition = toPLOrNull(s.pop());
+            var increment = toPLOrNull(s.pop());
+            var initial = toPLOrNull(s.pop());
+            if (initial && increment && condition && recurse && final) {
+                var nextRec = [[], increment, condition, recurse, final, 'linrec'];
+                pl = __spreadArrays(initial, increment, condition, [__spreadArrays(recurse, nextRec), final, 'if-else']).concat(pl);
+            }
+            return [s, pl];
+        }
+    },
+    'dup2': {
+        sig: [[{ type: 'A', use: 'observe' }, { type: 'B', use: 'observe' }], [{ type: 'A' }, { type: 'B' }]],
+        def: [['dup'], 'dip', 'dup', ['swap'], 'dip']
+    },
+    'times': {
+        sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
+        def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
+    },
+    // note: 'def' has been moved to the preprocessing phase
+    'def-local': {
+        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>' }, { type: 'list<string>' }], []],
+        def: function (s, pl, wd) {
+            var key = toPLOrNull(s.pop());
+            var definition = toPLOrNull(s.pop());
+            var localWdKey = toNumOrNull(s[s.length - 1]).toString();
+            var localWD = toWordDictionaryOrNull(wd[localWdKey]);
+            if (key && typeof key[0] === 'string' && definition && localWD) {
+                localWD[key[0]] = { def: definition };
+            }
+            return [s, pl, wd];
+        }
+    },
+};
+
 var preProcessDefs = function (pl) {
     var defineWord = function (wd, key, val) {
         var new_word = {};
@@ -2952,6 +2992,8 @@ var preProcessDefs = function (pl) {
     }
     return [next_pl, next_wd];
 };
+
+// purr
 function interpreter(pl_in, wd_in, opt) {
     var _a, pl, user_def_wd, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
     var _e, _f, _g;
@@ -3033,6 +3075,11 @@ function interpreter(pl_in, wd_in, opt) {
     });
 }
 
-exports.interpreter = interpreter;
+// the Pounce language core module exposes these function
+var parse = parser;
+var unParse = unParser;
+var interpreter$1 = interpreter;
+
+exports.interpreter = interpreter$1;
 exports.parse = parse;
 exports.unParse = unParse;
