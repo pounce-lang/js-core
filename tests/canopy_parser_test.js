@@ -194,7 +194,7 @@
   
     if (arguments.length < 1) {
       return true; //Die silently? Don't know how to handle such case, please help...
-      // throw "Need two or more arguments to compare";
+      // throw new Error("Need two or more arguments to compare");
     }
   
     for (i = 1, l = arguments.length; i < l; i++) {

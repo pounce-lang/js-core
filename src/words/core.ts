@@ -285,7 +285,7 @@ export const coreWords: WordDictionary = {
             return [s];
         }
     },
-    'linrec': {
+    'constrec': {
         sig: [[
             { type: 'Initial extends (list<words>)' },
             { type: 'Increment extends (list<words>)' },
@@ -294,19 +294,44 @@ export const coreWords: WordDictionary = {
             { type: 'Final extends (list<words>)' }
         ], []],
         def: (s, pl) => {
-            // initial increment condition recurse final linrec 
+            // initial increment condition recurse final constrec
             const final = toPLOrNull(s.pop());
             const recurse = toPLOrNull(s.pop());
             const condition = toPLOrNull(s.pop());
             const increment = toPLOrNull(s.pop());
             const initial = toPLOrNull(s.pop());
             if (initial && increment && condition && recurse && final) {
-                const nextRec = [[], increment, condition, recurse, final, 'linrec'];
+                const nextRec = [[], increment, condition, recurse, final, 'constrec'];
                 pl = [...initial, ...increment, ...condition, [...recurse, ...nextRec], final, 'if-else'].concat(pl);
             }
             else {
-                // throw("stack value(s) not found");
+                // throw new Error("stack value(s) not found");
             }
+            return [s, pl];
+        }
+    },
+    'linrec': {
+        sig: [[
+            { type: 'TermTest extends (list<words>)' },
+            { type: 'Terminal extends (list<words>)' },
+            { type: 'Recurse extends (list<words>)' },
+            { type: 'Final extends (list<words>)' }
+        ], []],
+        def: (s, pl) => {
+            // termtest && terminal && recurse && final linrec 
+            const final = toPLOrNull(s.pop());
+            const recurse = toPLOrNull(s.pop());
+            const terminal = toPLOrNull(s.pop());
+            const termtest = toPLOrNull(s.pop());
+            if (termtest && terminal && recurse && final) {
+                const nextRec = [termtest, terminal, recurse, final, 'linrec', ...final];
+                pl = [...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
+            }
+            else {
+                console.log("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+            }
+            // console.log('*** s pl ***', s, pl);
             return [s, pl];
         }
     },

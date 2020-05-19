@@ -1,8 +1,32 @@
 const parse = require('../dist/index').parse;
 const interpreter = require('../dist/index').interpreter;
 
+const runDebug = (p, d) => {
+  const test2 = interpreter(parse(p), d, { debug: true });
+  result2 = test2.next();
+  console.error(result2.value);
+  while (result2.value && result2.value.active) {
+    result2 = test2.next();
+    console.error(result2.value);
+  }
+  return result2.value.stack;
+};
+
 const testIt = (p, expected_result, d) => {
-  const test = interpreter(parse(p), d);
+  let pp;
+  try {
+    pp = parse(p);
+  }
+  catch (e) {
+    console.error("parse error:", p);
+    return false;
+  }
+  // console.log("parser result:", pp);
+  if (!pp) {
+    console.error("no parse result:", p);
+    return false;
+  }
+  const test = interpreter(pp, d);
   result = test.next();
   while (result.value && result.value.active) {
     result = test.next();
@@ -16,14 +40,9 @@ const testIt = (p, expected_result, d) => {
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
   console.error("Re running in debug mode:");
-  const test2 = interpreter(parse(p), d, { debug: true });
-  result2 = test2.next();
-  console.error(result2.value);
-  while (result2.value && result2.value.active) {
-    result2 = test2.next();
-    console.error(result2.value);
-  }
-  console.error(result2.value ? result2.value.stack : "error", "!=", expected_result);
+  const result2 = runDebug(p, d);
+  console.error(result2 ? result2 : "error", "!=", expected_result);
+
   return false;
 };
 
@@ -73,24 +92,24 @@ allPassing &= testIt("[dup2 +] [fib] def 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 
 
 //# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] def 5 [1 swap] apply fac
 allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] def 5 [1 swap] apply fac", [120]);
-//# initial  increment condition recurse   finally
-//# [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] linrec
-// allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] linrec ", [120]);
-allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] linrec ", [120]);
-
+allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] constrec", [120]);
+allPassing &= testIt("5 [dup 0 ==] [1 +] [dup 1 -] [*] linrec", [120]);
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
+
+// runDebug("2 [dup 0 ==] [1 +] [dup 1 -] [*] linrec");
+
 //ToDo...
-// [[init test recurse lastly] [init apply test [recurse apply loc-rec lastly] if] apply-with] [linrec] def
+// [[init test recurse lastly] [init apply test [recurse apply loc-rec lastly] if] apply-with] [constrec] def
 // # 5 factorial
-// 5 [dup] [dup 1 >] [dup 1 -] [dup [*] dip] linrec # <<
-//        5 | [dup] apply [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
-//      5 5 | [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
-//      5 5 | dup 0 == [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
-// 5 5 true | [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec ] if [dup [*] dip] apply
-//      5 5 | dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec [dup [*] dip] apply
-//    5 5 4 | [noop] [dup 1 >] [dup 1 -] [dup [*] dip] linrec [dup [*] dip] apply
+// 5 [dup] [dup 1 >] [dup 1 -] [dup [*] dip] constrec # <<
+//        5 | [dup] apply [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
+//      5 5 | [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
+//      5 5 | dup 0 == [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
+// 5 5 true | [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
+//      5 5 | dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec [dup [*] dip] apply
+//    5 5 4 | [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec [dup [*] dip] apply
 
 
 // # quicksort
@@ -105,20 +124,20 @@ console.log("Pounce Tests Pass:", allPassing === 1);
 // [size 1 <=] [t] def
 // [uncons [>] split] [s] def
 // [[swap] dip cons concat] [u] def
-// [[test yes no after] test [yes test yes no after linrec] no if-else after] [linrec] def
+// [[test yes no after] test [yes test yes no after constrec] no if-else after] [constrec] def
 
 // [6 3 5] [] [t] [] [s] [u] | binrec
-// [6 3 5] | [t] [] [s] [u] linrec      [] [t] [] [s] [u] linrec binrec
-// [6 3 5] | size 1 <= [] [s] if-else [u] apply    [] [t] [] [s] [u] linrec binrec
-// [6 3 5] 3 1 | <= [] [s] if-else [u] apply  [] [t] [] [s] [u] linrec binrec
-// [6 3 5] false | [] [s] if-else [u] apply   [] [t] [] [s] [u] linrec binrec
-// [6 3 5] | uncons [>] split [u] apply       [] [t] [] [s] [u] linrec binrec
-// 6 [3 5] | [>] split [u] apply      [] [t] [] [s] [u] linrec binrec
-// 6 [3 5] [>] | split [u] apply      [] [t] [] [s] [u] linrec binrec
-// 6 [3 5] [] | [u] apply      [] [t] [] [s] [u] linrec binrec
-// 6 [3 5] [] | [swap] dip cons concat      [] [t] [] [s] [u] linrec binrec
-// [3 5] 6 [] | cons concat      [] [t] [] [s] [u] linrec binrec
-// [3 5] [6] | concat      [] [t] [] [s] [u] linrec binrec
-// [3 5 6] | [] [t] [] [s] [u] linrec binrec
+// [6 3 5] | [t] [] [s] [u] constrec      [] [t] [] [s] [u] constrec binrec
+// [6 3 5] | size 1 <= [] [s] if-else [u] apply    [] [t] [] [s] [u] constrec binrec
+// [6 3 5] 3 1 | <= [] [s] if-else [u] apply  [] [t] [] [s] [u] constrec binrec
+// [6 3 5] false | [] [s] if-else [u] apply   [] [t] [] [s] [u] constrec binrec
+// [6 3 5] | uncons [>] split [u] apply       [] [t] [] [s] [u] constrec binrec
+// 6 [3 5] | [>] split [u] apply      [] [t] [] [s] [u] constrec binrec
+// 6 [3 5] [>] | split [u] apply      [] [t] [] [s] [u] constrec binrec
+// 6 [3 5] [] | [u] apply      [] [t] [] [s] [u] constrec binrec
+// 6 [3 5] [] | [swap] dip cons concat      [] [t] [] [s] [u] constrec binrec
+// [3 5] 6 [] | cons concat      [] [t] [] [s] [u] constrec binrec
+// [3 5] [6] | concat      [] [t] [] [s] [u] constrec binrec
+// [3 5 6] | [] [t] [] [s] [u] constrec binrec
 
 // `;

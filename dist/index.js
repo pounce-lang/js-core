@@ -2924,7 +2924,7 @@ var coreWords = {
             return [s];
         }
     },
-    'linrec': {
+    'constrec': {
         sig: [[
                 { type: 'Initial extends (list<words>)' },
                 { type: 'Increment extends (list<words>)' },
@@ -2933,16 +2933,41 @@ var coreWords = {
                 { type: 'Final extends (list<words>)' }
             ], []],
         def: function (s, pl) {
-            // initial increment condition recurse final linrec 
+            // initial increment condition recurse final constrec
             var final = toPLOrNull(s.pop());
             var recurse = toPLOrNull(s.pop());
             var condition = toPLOrNull(s.pop());
             var increment = toPLOrNull(s.pop());
             var initial = toPLOrNull(s.pop());
             if (initial && increment && condition && recurse && final) {
-                var nextRec = [[], increment, condition, recurse, final, 'linrec'];
+                var nextRec = [[], increment, condition, recurse, final, 'constrec'];
                 pl = __spreadArrays(initial, increment, condition, [__spreadArrays(recurse, nextRec), final, 'if-else']).concat(pl);
             }
+            return [s, pl];
+        }
+    },
+    'linrec': {
+        sig: [[
+                { type: 'TermTest extends (list<words>)' },
+                { type: 'Terminal extends (list<words>)' },
+                { type: 'Recurse extends (list<words>)' },
+                { type: 'Final extends (list<words>)' }
+            ], []],
+        def: function (s, pl) {
+            // termtest && terminal && recurse && final linrec 
+            var final = toPLOrNull(s.pop());
+            var recurse = toPLOrNull(s.pop());
+            var terminal = toPLOrNull(s.pop());
+            var termtest = toPLOrNull(s.pop());
+            if (termtest && terminal && recurse && final) {
+                var nextRec = __spreadArrays([termtest, terminal, recurse, final, 'linrec'], final);
+                pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
+            }
+            else {
+                console.log("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+            }
+            // console.log('*** s pl ***', s, pl);
             return [s, pl];
         }
     },
