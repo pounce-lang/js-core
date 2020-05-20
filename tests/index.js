@@ -107,12 +107,16 @@ allPassing &= testIt("[1 2] pop push", [[1,2]]);
 
 allPassing &= testIt("[1 2] list-length", [2]);
 
-allPassing &= testIt("6 [3 8 5 7 10 2 9 1] split<", [[3,5,2,1], 6, [8,7,10,9]]);
+allPassing &= testIt("[1 2] [3] concat", [[1, 2, 3]]);
+
+allPassing &= testIt("6 [3 8 5 7 10 2 9 1] split<", [[3,5,2,1, 6], [8,7,10,9]]);
+allPassing &= testIt("[6 3 8 4 5 7 2 9 1] [dup list-length 1 <=] [] [uncons split<] [concat] binrec", [[1,2,3,4,5,6,7,8,9]]);
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
 
-//runDebug("6 [3 8 5 7 10 2 9 1] split<");
+// runDebug(`[6 3 8 4 5 7 2 9 1 0] [dup list-length 1 <=] [] [uncons split<] [concat] binrec`);
+//[swap] dip cons concat
 
 //ToDo...
 // [[init test recurse lastly] [init apply test [recurse apply loc-rec lastly] if] apply-with] [constrec] def

@@ -2924,6 +2924,16 @@ var coreWords = {
             return [s];
         }
     },
+    'concat': {
+        def: function (s) {
+            var b = toArrOrNull(s.pop());
+            var a = toArrOrNull(s.pop());
+            if (a && b) {
+                s.push(__spreadArrays(a, b));
+            }
+            return [s];
+        }
+    },
     'cons': {
         def: function (s) {
             var b = toArrOrNull(s.pop());
@@ -3009,6 +3019,31 @@ var coreWords = {
             return [s, pl];
         }
     },
+    'binrec': {
+        sig: [[
+                { type: 'TermTest extends (list<words>)' },
+                { type: 'Terminal extends (list<words>)' },
+                { type: 'Recurse extends (list<words>)' },
+                { type: 'Final extends (list<words>)' }
+            ], []],
+        def: function (s, pl) {
+            // termtest && terminal && recurse && final binrec 
+            var final = toPLOrNull(s.pop());
+            var recurse = toPLOrNull(s.pop());
+            var terminal = toPLOrNull(s.pop());
+            var termtest = toPLOrNull(s.pop());
+            if (termtest && terminal && recurse && final) {
+                var nextRec = [termtest, terminal, recurse, final, 'binrec'];
+                pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, [__spreadArrays(nextRec), 'dip'], nextRec, final), 'if-else']).concat(pl);
+            }
+            else {
+                console.log("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+            }
+            // console.log('*** s pl ***', s, pl);
+            return [s, pl];
+        }
+    },
     'dup2': {
         sig: [[{ type: 'A', use: 'observe' }, { type: 'B', use: 'observe' }], [{ type: 'A' }, { type: 'B' }]],
         def: [['dup'], 'dip', 'dup', ['swap'], 'dip']
@@ -3022,7 +3057,7 @@ var coreWords = {
             'dup', 'list-length',
             ['uncons',
                 ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
-            ], 'swap', 'times', 'drop', 'swap'
+            ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
         ]
     },
     'list-length': {
