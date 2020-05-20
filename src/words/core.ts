@@ -21,21 +21,13 @@ export const coreWords: WordDictionary = {
         def: s => { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': {
-        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any' }]],
-        def: s => {
-            const arr = toArrOrNull(s[s.length - 1]);
-            s.push(arr ? arr.pop() : null);
-            return [s];
-        }
-    },
     'swap': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
         def: s => {
             const top = s.pop();
             const under = s.pop();
-                s.push(top);
-                s.push(under);
+            s.push(top);
+            s.push(under);
             return [s];
         }
     },
@@ -237,6 +229,14 @@ export const coreWords: WordDictionary = {
         // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
         def: [['apply'], 'dip2', 'if-else']
     },
+    '=': {
+        def: s => {
+            const b = toNumOrNull(s[s.length - 1]);
+            const a = toNumOrNull(s[s.length - 2]);
+            s.push(a === b);
+            return [s];
+        }
+    },
     '==': {
         def: s => {
             const b = toNumOrNull(s.pop());
@@ -282,6 +282,44 @@ export const coreWords: WordDictionary = {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
             s.push(a <= b);
+            return [s];
+        }
+    },
+    'cons': {
+        def: s => {
+            const b = toArrOrNull(s.pop());
+            const a = s.pop();
+            if (b) {
+                s.push([a, ...b]);
+            }
+            return [s];
+        }
+    },
+    'uncons': {
+        def: s => {
+            const arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(r.head(arr), r.tail(arr));
+            }
+            return [s];
+        }
+    },
+    'push': {
+        def: s => {
+            const item = s.pop();
+            const arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push([...arr, item]);
+            }
+            return [s];
+        }
+    },
+    'pop': {
+        def: s => {
+            const arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(r.init(arr), r.last(arr));
+            }
             return [s];
         }
     },
@@ -342,6 +380,23 @@ export const coreWords: WordDictionary = {
     'times': {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
         def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
+    },
+    'split<': {
+        def: [[[], []], 'dip2',
+            'dup', 'list-length',
+        ['uncons',
+            ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
+        ], 'swap', 'times', 'drop', 'swap'
+        ]
+    },
+    'list-length': {
+        def: s => {
+            const arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(arr.length);
+            }
+            return [s];
+        }
     },
 
     // note: 'def' has been moved to the preprocessing phase

@@ -2661,14 +2661,6 @@ var coreWords = {
         def: function (s) { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
-    'pop': {
-        sig: [[{ type: 'list', use: 'observe' }], [{ type: 'any' }]],
-        def: function (s) {
-            var arr = toArrOrNull(s[s.length - 1]);
-            s.push(arr ? arr.pop() : null);
-            return [s];
-        }
-    },
     'swap': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
         def: function (s) {
@@ -2876,6 +2868,14 @@ var coreWords = {
         // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
         def: [['apply'], 'dip2', 'if-else']
     },
+    '=': {
+        def: function (s) {
+            var b = toNumOrNull(s[s.length - 1]);
+            var a = toNumOrNull(s[s.length - 2]);
+            s.push(a === b);
+            return [s];
+        }
+    },
     '==': {
         def: function (s) {
             var b = toNumOrNull(s.pop());
@@ -2921,6 +2921,44 @@ var coreWords = {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             s.push(a <= b);
+            return [s];
+        }
+    },
+    'cons': {
+        def: function (s) {
+            var b = toArrOrNull(s.pop());
+            var a = s.pop();
+            if (b) {
+                s.push(__spreadArrays([a], b));
+            }
+            return [s];
+        }
+    },
+    'uncons': {
+        def: function (s) {
+            var arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(r.head(arr), r.tail(arr));
+            }
+            return [s];
+        }
+    },
+    'push': {
+        def: function (s) {
+            var item = s.pop();
+            var arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(__spreadArrays(arr, [item]));
+            }
+            return [s];
+        }
+    },
+    'pop': {
+        def: function (s) {
+            var arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(r.init(arr), r.last(arr));
+            }
             return [s];
         }
     },
@@ -2978,6 +3016,23 @@ var coreWords = {
     'times': {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
         def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
+    },
+    'split<': {
+        def: [[[], []], 'dip2',
+            'dup', 'list-length',
+            ['uncons',
+                ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
+            ], 'swap', 'times', 'drop', 'swap'
+        ]
+    },
+    'list-length': {
+        def: function (s) {
+            var arr = toArrOrNull(s.pop());
+            if (arr) {
+                s.push(arr.length);
+            }
+            return [s];
+        }
     },
     // note: 'def' has been moved to the preprocessing phase
     'def-local': {
