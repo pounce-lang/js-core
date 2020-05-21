@@ -50,7 +50,7 @@ export function* interpreter(
     if (wds) {
       opt.debug && !opt.yieldOnId ? yield {stack:s, prog:[w].concat(pl), active:true} : null;
       if (typeof wds.def === 'function') {
-        [s, pl = pl, wd = wd] = wds.def(s, pl, wd);
+        [s, pl = pl] = wds.def(s, pl);
       }
       else {
         const plist = toPLOrNull(wds.def);

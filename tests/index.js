@@ -73,8 +73,8 @@ allPassing &= testIt("true [5] [7] if-else", [5]);
 allPassing &= testIt("false [5] [7] if-else", [7]);
 allPassing &= testIt("false [5] [7 3 [+] apply] if-else", [10]);
 allPassing &= testIt("2 1 [>] [5] [7] ifte", [5]);
-allPassing &= testIt("2 1 [=] [5] [7] ifte", [2, 1, 7]);
-allPassing &= testIt("0 0 [=] [5] [7] ifte", [0, 0, 5]);
+allPassing &= testIt("2 1 [=] [5] [7] ifte", [2, 7]);
+allPassing &= testIt("0 0 [=] [5] [7] ifte", [0, 5]);
 allPassing &= testIt("2 1 [==] [5] [7] ifte", [7]);
 allPassing &= testIt("2 1[<] [5] [7 3 [+] apply] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
@@ -95,7 +95,7 @@ allPassing &= testIt("[dup2 +] [fib] def 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 
 //# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] def 5 [1 swap] apply fac
 allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] def 5 [1 swap] apply fac", [120]);
 allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] constrec", [120]);
-allPassing &= testIt("5 [dup 0 ==] [1 +] [dup 1 -] [*] linrec", [120]);
+allPassing &= testIt("5 [0 =] [1 +] [dup 1 -] [*] linrec", [120]);
 
 allPassing &= testIt("A [B] cons", [['A', 'B']]);
 allPassing &= testIt("[A B] uncons", ['A', ['B']]);
@@ -104,18 +104,27 @@ allPassing &= testIt("[1 2] uncons cons", [[1,2]]);
 allPassing &= testIt("[A] B push", [['A', 'B']]);
 allPassing &= testIt("[A B] pop", [['A'], 'B']);
 allPassing &= testIt("[1 2] pop push", [[1,2]]);
+allPassing &= testIt("[1 2] pop swap cons", [[2,1]]);
 
-allPassing &= testIt("[1 2] list-length", [2]);
+allPassing &= testIt("[1 2] size", [[1, 2], 2]);
 
 allPassing &= testIt("[1 2] [3] concat", [[1, 2, 3]]);
 
 allPassing &= testIt("6 [3 8 5 7 10 2 9 1] split<", [[3,5,2,1, 6], [8,7,10,9]]);
-allPassing &= testIt("[6 3 8 4 5 7 2 9 1] [dup list-length 1 <=] [] [uncons split<] [concat] binrec", [[1,2,3,4,5,6,7,8,9]]);
+
+allPassing &= testIt(`
+[6 3 8 4 5 7 2 9 1] 
+[size 1 <=] [] [uncons split<] [concat] binrec
+`, [[1,2,3,4,5,6,7,8,9]]);
+
+allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with", [27]);
+allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] apply-with", [11]);
+
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
-
-// runDebug(`[6 3 8 4 5 7 2 9 1 0] [dup list-length 1 <=] [] [uncons split<] [concat] binrec`);
+// runDebug("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with");
+// runDebug(`[6 3 8 4 5 7 2 9 1 0] [size 1 <=] [] [uncons split<] [concat] binrec`);
 //[swap] dip cons concat
 
 //ToDo...

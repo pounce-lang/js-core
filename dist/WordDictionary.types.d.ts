@@ -4,5 +4,5 @@ export declare type WordValue = {
     def: ProgramList | ((s: ValueStack, pl: ProgramList, wd?: WordDictionary) => [ValueStack, ProgramList?, WordDictionary?]);
 };
 export declare type WordDictionary = {
-    [key in string | number]: (WordValue | WordDictionary);
+    [index: string]: WordValue;
 };

@@ -1,10 +1,12 @@
 import * as r from "ramda";
 import { WordDictionary, WordValue } from "../WordDictionary.types";
-import { ProgramList } from '../types';
+import { ProgramList, Word } from '../types';
 
 export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
 export const toArrOrNull = (u: any): [] | null =>
+    r.is(Array, u) ? u : null;
+const toArrOfStrOrNull = (u: any): string[] | null =>
     r.is(Array, u) ? u : null;
 export const toStringOrNull = (u: any): string | null =>
     r.is(String, u) ? u : null;
@@ -110,50 +112,29 @@ export const coreWords: WordDictionary = {
             return [s, pl];
         }
     },
-    // // // // 'local-env-stack': [], // as WordDictionary[],
-    // // // // 'add-local-env': {
-    // // // //     sig: [],
-    // // // //     def: (s, pl, wd) => {
-    // // // //         const localStack: WordDictionary[] = toArrOrNull(wd['local-env-stack']);
-    // // // //         if (localStack) {
-    // // // //             localStack.push({});
-    // // // //         }
-    // // // //         return [s, pl, wd];
-    // // // //     }
-    // // // // },
-    // // // // 'drop-local-env': {
-    // // // //     sig: [{ type: 'string' }],
-    // // // //     def: (s, pl, wd) => {
-    // // // //         const key = s.pop().toString();
-    // // // //         delete wd[key];
-    // // // //         return [s, pl, wd];
-    // // // //     }
-    // // // // },
-    // // // // 'apply-with': {
-    // // // //     sig: [{ type: 'list<keys>' }, { type: 'list<words>', use: 'run!' }],
-    // // // //     def: (s, pl) => {
-    // // // //         const block = toPLOrNull(s.pop());
-    // // // //         //        const argList = toPLOrNull(s.pop());
-    // // // //         if (block !== null) {
-    // // // //             // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
-    // // // //             //                pl = ["add-local-env", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
-    // // // //             pl = ["add-local-env", "rollup", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
-    // // // //         }
-    // // // //         else {
-    // // // //             // pl.unshift(block);
-    // // // //         }
-    // // // //         return [s, pl];
-    // // // //     }
-    // // // //     // list_module import
-    // // // //     // 1 10 20 [a b] [a + b *]
-    // // // //     //  [code12] [top-env] def
-    // // // //     // swap pop [] cons rotate [
-    // // // //     // #top-env swap cons
-    // // // //     //  [[] cons] dip def] dip2 
-    // // // //     // swap pop [] cons rotate [[[] cons] dip def] dip2 
-    // // // //     // [drop] dip
-    // // // //     // apply
-    // // // // },
+    'apply-with': {
+        sig: [[{ type: 'Args extends (list<string>)', use: 'pop-each!' }, { type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
+        def: (s, pl) => {
+            const words = toPLOrNull(s.pop());
+            const argList = toArrOfStrOrNull(s.pop());
+            if (words !== null && argList) {
+                const values: Word[] = r.map(() => s.pop(), argList);
+                const localWD: { [index: string]: Word } =
+                    r.zipObj(r.reverse(argList), values);
+                const newWords: ProgramList =
+                    toPLOrNull(r.map((i: Word) =>
+                        (r.is(String, i) ? r.propOr(i, i as string, localWD) : i), 
+                        words));
+                if (newWords) {
+                    pl = newWords.concat(pl);
+                }
+            }
+            else {
+                // pl.unshift(block);
+            }
+            return [s, pl];
+        }
+    },
     'dip': {
         sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
         def: (s, pl) => {
@@ -231,8 +212,8 @@ export const coreWords: WordDictionary = {
     },
     '=': {
         def: s => {
-            const b = toNumOrNull(s[s.length - 1]);
-            const a = toNumOrNull(s[s.length - 2]);
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s[s.length - 1]);
             s.push(a === b);
             return [s];
         }
@@ -418,62 +399,21 @@ export const coreWords: WordDictionary = {
     },
     'split<': {
         def: [[[], []], 'dip2',
-            'dup', 'list-length',
+            'size',
         ['uncons',
             ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
         ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
         ]
     },
-    'list-length': {
+    'size': {
         def: s => {
-            const arr = toArrOrNull(s.pop());
+            const arr = toArrOrNull(s[s.length - 1]);
             if (arr) {
                 s.push(arr.length);
             }
             return [s];
         }
     },
-
-    // note: 'def' has been moved to the preprocessing phase
-    'def-local': {
-        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>' }, { type: 'list<string>' }], []],
-        def: (s, pl, wd) => {
-            const key = toPLOrNull(s.pop());
-            const definition = toPLOrNull(s.pop());
-            const localWdKey = toNumOrNull(s[s.length - 1]).toString();
-            const localWD = toWordDictionaryOrNull(wd[localWdKey]);
-            if (key && typeof key[0] === 'string' && definition && localWD) {
-                localWD[key[0]] = { def: definition };
-            }
-            return [s, pl, wd];
-        }
-    },
-    // // 'define': {
-    // //     expects: [{ ofType: 'record', desc: 'definition of word' }, { ofType: 'string', desc: 'word name' }], effects: [-2], tests: [], desc: 'defines a word given a record',
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         const name = toString(s.pop());
-    // //         wordstack[1][name] = s.pop();
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'local-def': {
-    // //     expects: [{ ofType: 'list', desc: 'composition of words' }, { ofType: 'list', desc: 'name of this new word' }], effects: [-2], tests: [], desc: 'defines a local word',
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         const top = wordstack.length - 1;
-    // //         if (top > 1) {
-    // //             const key = toString(s.pop());
-    // //             const definition = s.pop();
-    // //             wordstack[top][key] = definition;
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'internal=>drop-local-words': {
-    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
-    // //         wordstack.pop();
-    // //         return [s, pl];
-    // //     }
-    // // },
     // // 'import': {
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         const importable = toString(s.pop());
@@ -665,7 +605,7 @@ export const coreWords: WordDictionary = {
     // //         'init-a': [[[]], ['a'], 'local-def'],
     // //         'update-a': ['a', 'cons', [], 'cons', ['a'], 'local-def'],
     // //         'destructive-first': ['c', 'pop', 'swap', [], 'cons', ['c'], 'local-def'],
-    // //         'maping': ['c', 'list-length', 0, '>',
+    // //         'maping': ['c', '_list-length', 0, '>',
     // //             ['destructive-first', 'q', 'apply', 'update-a', 'maping'],
     // //             [], 'if-else']
     // //     },
@@ -675,7 +615,7 @@ export const coreWords: WordDictionary = {
     // //     'local-words': {
     // //         'setup-map': [[]],
     // //         'process-map': [
-    // //             ['dup', 'list-length'], 'dip2', 'rolldown', 0, '>',
+    // //             ['size'], 'dip2', 'rolldown', 0, '>',
     // //             ['rotate', 'pop', 'rolldown', 'dup', ['apply'], 'dip', ['swap'], 'dip2', ['prepend'], 'dip', 'swap', 'process-map'],
     // //             [['drop', 'drop'], 'dip'], 'if-else']
     // //     },
@@ -686,7 +626,7 @@ export const coreWords: WordDictionary = {
     // //     'local-words': {
     // //         'setup-filter': [[]],
     // //         'process-filter': [
-    // //             ["dup", "list-length"], "dip2", "rolldown", 0, ">",
+    // //             ["size"], "dip2", "rolldown", 0, ">",
     // //             ["rotate", "pop", "rolldown", ["dup"], "dip", "dup", ["apply"], "dip", "swap",
     // //                 [["swap"], "dip2", ["prepend"], "dip"],
     // //                 [["swap"], "dip2", ["drop"], "dip"], "if-else", "swap", "process-filter"],
@@ -697,7 +637,7 @@ export const coreWords: WordDictionary = {
     // // 'reduce': {
     // //     'requires': 'list_module',
     // //     'local-words': {
-    // //         'more?': ['rolldown', 'dup', 'list-length', 0, '>', ['rollup'], 'dip'],
+    // //         'more?': ['rolldown', 'size', 0, '>', ['rollup'], 'dip'],
     // //         'process-reduce': ['more?', ['reduce-step', 'process-reduce'], 'if'],
     // //         'reduce-step': [['pop'], 'dip2', 'dup', [['swap'], 'dip', 'apply'], 'dip'],
     // //         'teardown-reduce': ['drop', ['drop'], 'dip'],

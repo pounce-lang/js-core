@@ -1,4 +1,4 @@
-import { ProgramList, ValueStack, WordSignature } from "./types";
+import { ProgramList, ValueStack, WordSignature, Word } from "./types";
 
 export type WordValue = {
     sig?: WordSignature;
@@ -6,7 +6,5 @@ export type WordValue = {
         [ValueStack, ProgramList?, WordDictionary?]);
 };
 export type WordDictionary = {
-    [key in string | number]: (WordValue | WordDictionary)
+    [index: string]: WordValue //(WordValue | WordDictionary)
 };
-// v0 used a stack of dictionaries, v1 to use namespaces
-// export type StackOfDictionaries = WordDictionary[];

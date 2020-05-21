@@ -2643,6 +2643,9 @@ var toNumOrNull = function (u) {
 var toArrOrNull = function (u) {
     return r.is(Array, u) ? u : null;
 };
+var toArrOfStrOrNull = function (u) {
+    return r.is(Array, u) ? u : null;
+};
 var toStringOrNull = function (u) {
     return r.is(String, u) ? u : null;
 };
@@ -2651,9 +2654,6 @@ var toPLOrNull = function (u) {
 };
 var toBoolOrNull = function (u) {
     return r.is(Boolean, u) ? u : null;
-};
-var toWordDictionaryOrNull = function (u) {
-    return r.is(Object, u) ? u : null;
 };
 var coreWords = {
     'dup': {
@@ -2749,50 +2749,24 @@ var coreWords = {
             return [s, pl];
         }
     },
-    // // // // 'local-env-stack': [], // as WordDictionary[],
-    // // // // 'add-local-env': {
-    // // // //     sig: [],
-    // // // //     def: (s, pl, wd) => {
-    // // // //         const localStack: WordDictionary[] = toArrOrNull(wd['local-env-stack']);
-    // // // //         if (localStack) {
-    // // // //             localStack.push({});
-    // // // //         }
-    // // // //         return [s, pl, wd];
-    // // // //     }
-    // // // // },
-    // // // // 'drop-local-env': {
-    // // // //     sig: [{ type: 'string' }],
-    // // // //     def: (s, pl, wd) => {
-    // // // //         const key = s.pop().toString();
-    // // // //         delete wd[key];
-    // // // //         return [s, pl, wd];
-    // // // //     }
-    // // // // },
-    // // // // 'apply-with': {
-    // // // //     sig: [{ type: 'list<keys>' }, { type: 'list<words>', use: 'run!' }],
-    // // // //     def: (s, pl) => {
-    // // // //         const block = toPLOrNull(s.pop());
-    // // // //         //        const argList = toPLOrNull(s.pop());
-    // // // //         if (block !== null) {
-    // // // //             // pl = ["add-local", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", [...block], "apply", "drop-local", ...pl];
-    // // // //             //                pl = ["add-local-env", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
-    // // // //             pl = ["add-local-env", "rollup", ["pop", "swap", [[], "cons", "def-local"]], "map", "dip2", ...block, "drop-local-env", ...pl];
-    // // // //         }
-    // // // //         else {
-    // // // //             // pl.unshift(block);
-    // // // //         }
-    // // // //         return [s, pl];
-    // // // //     }
-    // // // //     // list_module import
-    // // // //     // 1 10 20 [a b] [a + b *]
-    // // // //     //  [code12] [top-env] def
-    // // // //     // swap pop [] cons rotate [
-    // // // //     // #top-env swap cons
-    // // // //     //  [[] cons] dip def] dip2 
-    // // // //     // swap pop [] cons rotate [[[] cons] dip def] dip2 
-    // // // //     // [drop] dip
-    // // // //     // apply
-    // // // // },
+    'apply-with': {
+        sig: [[{ type: 'Args extends (list<string>)', use: 'pop-each!' }, { type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
+        def: function (s, pl) {
+            var words = toPLOrNull(s.pop());
+            var argList = toArrOfStrOrNull(s.pop());
+            if (words !== null && argList) {
+                var values = r.map(function () { return s.pop(); }, argList);
+                var localWD_1 = r.zipObj(r.reverse(argList), values);
+                var newWords = toPLOrNull(r.map(function (i) {
+                    return (r.is(String, i) ? r.propOr(i, i, localWD_1) : i);
+                }, words));
+                if (newWords) {
+                    pl = newWords.concat(pl);
+                }
+            }
+            return [s, pl];
+        }
+    },
     'dip': {
         sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
         def: function (s, pl) {
@@ -2870,8 +2844,8 @@ var coreWords = {
     },
     '=': {
         def: function (s) {
-            var b = toNumOrNull(s[s.length - 1]);
-            var a = toNumOrNull(s[s.length - 2]);
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s[s.length - 1]);
             s.push(a === b);
             return [s];
         }
@@ -3054,33 +3028,19 @@ var coreWords = {
     },
     'split<': {
         def: [[[], []], 'dip2',
-            'dup', 'list-length',
+            'size',
             ['uncons',
                 ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
             ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
         ]
     },
-    'list-length': {
+    'size': {
         def: function (s) {
-            var arr = toArrOrNull(s.pop());
+            var arr = toArrOrNull(s[s.length - 1]);
             if (arr) {
                 s.push(arr.length);
             }
             return [s];
-        }
-    },
-    // note: 'def' has been moved to the preprocessing phase
-    'def-local': {
-        sig: [[{ type: 'number', use: 'observe' }, { type: 'list<words>' }, { type: 'list<string>' }], []],
-        def: function (s, pl, wd) {
-            var key = toPLOrNull(s.pop());
-            var definition = toPLOrNull(s.pop());
-            var localWdKey = toNumOrNull(s[s.length - 1]).toString();
-            var localWD = toWordDictionaryOrNull(wd[localWdKey]);
-            if (key && typeof key[0] === 'string' && definition && localWD) {
-                localWD[key[0]] = { def: definition };
-            }
-            return [s, pl, wd];
         }
     },
 };
@@ -3111,28 +3071,28 @@ var preProcessDefs = function (pl) {
 // purr
 function interpreter(pl_in, wd_in, opt) {
     var _a, pl, user_def_wd, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
-    var _e, _f, _g;
+    var _e, _f;
     if (wd_in === void 0) { wd_in = coreWords; }
     if (opt === void 0) { opt = { debug: false, yieldOnId: false }; }
-    var _h;
-    return __generator(this, function (_j) {
-        switch (_j.label) {
+    var _g;
+    return __generator(this, function (_h) {
+        switch (_h.label) {
             case 0:
                 _a = preProcessDefs(pl_in), pl = _a[0], user_def_wd = _a[1];
                 wd = r.mergeRight(wd_in, user_def_wd);
                 s = [];
-                if (!((_h = opt) === null || _h === void 0 ? void 0 : _h.debug)) return [3 /*break*/, 2];
+                if (!((_g = opt) === null || _g === void 0 ? void 0 : _g.debug)) return [3 /*break*/, 2];
                 return [4 /*yield*/, { stack: s, prog: pl, active: true, dictionary: user_def_wd }];
             case 1:
-                _b = _j.sent();
+                _b = _h.sent();
                 return [3 /*break*/, 3];
             case 2:
                 _b = null;
-                _j.label = 3;
+                _h.label = 3;
             case 3:
                 maxCycles = opt.maxCycles || 1000000;
                 cycles = 0;
-                _j.label = 4;
+                _h.label = 4;
             case 4:
                 if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 13];
                 cycles += 1;
@@ -3141,14 +3101,14 @@ function interpreter(pl_in, wd_in, opt) {
                 if (!(opt.debug && !opt.yieldOnId)) return [3 /*break*/, 6];
                 return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true }];
             case 5:
-                _c = _j.sent();
+                _c = _h.sent();
                 return [3 /*break*/, 7];
             case 6:
                 _c = null;
-                _j.label = 7;
+                _h.label = 7;
             case 7:
                 if (typeof wds.def === 'function') {
-                    _e = wds.def(s, pl, wd), s = _e[0], _f = _e[1], pl = _f === void 0 ? pl : _f, _g = _e[2], wd = _g === void 0 ? wd : _g;
+                    _e = wds.def(s, pl), s = _e[0], _f = _e[1], pl = _f === void 0 ? pl : _f;
                 }
                 else {
                     plist = toPLOrNull(wds.def);
@@ -3168,23 +3128,23 @@ function interpreter(pl_in, wd_in, opt) {
                 if (!(opt.debug && opt.yieldOnId)) return [3 /*break*/, 10];
                 return [4 /*yield*/, { stack: s, prog: pl, active: true }];
             case 9:
-                _d = _j.sent();
+                _d = _h.sent();
                 return [3 /*break*/, 11];
             case 10:
                 _d = null;
-                _j.label = 11;
+                _h.label = 11;
             case 11:
-                _j.label = 12;
+                _h.label = 12;
             case 12: return [3 /*break*/, 4];
             case 13:
                 if (!(cycles >= maxCycles)) return [3 /*break*/, 15];
                 return [4 /*yield*/, [{ stack: s, prog: pl, active: false }, "maxCycles exceeded: this may be an infinite loop "]];
             case 14:
-                _j.sent();
-                _j.label = 15;
+                _h.sent();
+                _h.label = 15;
             case 15: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
             case 16:
-                _j.sent();
+                _h.sent();
                 return [2 /*return*/];
         }
     });
