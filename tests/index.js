@@ -120,6 +120,24 @@ allPassing &= testIt(`
 allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with", [27]);
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] apply-with", [11]);
 
+allPassing &= testIt(`
+210 2 [] 
+[[p n fs] [p n fs p 1 <=] apply-with]
+[[p n fs] [fs] apply-with]
+[[p n fs] 
+[p n fs p n % 0 ==] apply-with 
+[[p n fs] [p n / n n fs cons] apply-with] [[p n fs] [p n 1 + fs] apply-with] if-else]
+[] linrec
+`, [[7,5,3,2]]);
+allPassing &= testIt(`
+3599 [2 []] 
+[[p n fs] [p n fs p 1 <=] apply-with]
+[[p n fs] [fs] apply-with]
+[[p n fs] 
+[p n fs p n % 0 ==] apply-with 
+[[p n fs] [p n / n n fs cons] apply-with] [[p n fs] [p n 1 + fs] apply-with] if-else]
+[] linrec5
+`, [[61, 59]]);
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
@@ -146,25 +164,36 @@ console.log("Pounce Tests Pass:", allPassing === 1);
 // [[swap] dip cons concat] 
 // binrec
 
+t =  `
 
-// t =  `
-// [size 1 <=] [t] def
-// [uncons [>] split] [s] def
-// [[swap] dip cons concat] [u] def
-// [[test yes no after] test [yes test yes no after constrec] no if-else after] [constrec] def
+210 2 [] 
+[[p n fs] [p n fs p 1 <=] apply-with]
+[[p n fs] [fs] apply-with]
+[[p n fs] 
+[p n % 0 == p n / n n fs cons p n 1 + fs  ] apply-with 
+[c p1 n1 fs1 p2 n2 fs2] [p1 n1 fs1 p2 n2 fs2 c [drop drop 
+drop] [[_ _ _ p n fs] [p n fs] apply-with] if-else] apply-with]
+[] linrec
 
-// [6 3 5] [] [t] [] [s] [u] | binrec
-// [6 3 5] | [t] [] [s] [u] constrec      [] [t] [] [s] [u] constrec binrec
-// [6 3 5] | size 1 <= [] [s] if-else [u] apply    [] [t] [] [s] [u] constrec binrec
-// [6 3 5] 3 1 | <= [] [s] if-else [u] apply  [] [t] [] [s] [u] constrec binrec
-// [6 3 5] false | [] [s] if-else [u] apply   [] [t] [] [s] [u] constrec binrec
-// [6 3 5] | uncons [>] split [u] apply       [] [t] [] [s] [u] constrec binrec
-// 6 [3 5] | [>] split [u] apply      [] [t] [] [s] [u] constrec binrec
-// 6 [3 5] [>] | split [u] apply      [] [t] [] [s] [u] constrec binrec
-// 6 [3 5] [] | [u] apply      [] [t] [] [s] [u] constrec binrec
-// 6 [3 5] [] | [swap] dip cons concat      [] [t] [] [s] [u] constrec binrec
-// [3 5] 6 [] | cons concat      [] [t] [] [s] [u] constrec binrec
-// [3 5] [6] | concat      [] [t] [] [s] [u] constrec binrec
-// [3 5 6] | [] [t] [] [s] [u] constrec binrec
+210 2 [] 
+[[p n fs] [p n fs p 1 <=] apply-with]
+[[p n fs] [fs] apply-with]
+[[p n fs] 
+[p n / n n fs cons p n 1 + fs p n % 0 ==] apply-with 
+ [drop drop drop] [[_ _ _ p n fs] [p n fs] apply-with] if-else]
+[] linrec
 
-// `;
+# vvv untested vvv
+210 2 [] 
+[[p n fs] [p n fs p 1 <=] apply-with]
+[[p n fs] [fs] apply-with]
+[[p n fs] 
+[p n fs p n % 0 ==] apply-with 
+[[p n fs] [p n / n n fs cons] apply-with] [[p n fs] [p n 1 + fs] apply-with] if-else]
+[] linrec
+
+# [teminalPredicate terminalPhrase recursePhrase tailPhrase] 
+
+
+
+`;

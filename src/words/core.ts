@@ -364,6 +364,33 @@ export const coreWords: WordDictionary = {
             return [s, pl];
         }
     },
+    'linrec5': {
+        sig: [[
+            { type: 'Init extends (list<words>)' },
+            { type: 'TermTest extends (list<words>)' },
+            { type: 'Terminal extends (list<words>)' },
+            { type: 'Recurse extends (list<words>)' },
+            { type: 'Final extends (list<words>)' }
+        ], []],
+        def: (s, pl) => {
+            // termtest && terminal && recurse && final linrec 
+            const final = toPLOrNull(s.pop());
+            const recurse = toPLOrNull(s.pop());
+            const terminal = toPLOrNull(s.pop());
+            const termtest = toPLOrNull(s.pop());
+            const init = toPLOrNull(s.pop());
+            if (init && termtest && terminal && recurse && final) {
+                const nextRec = [termtest, terminal, recurse, final, 'linrec', ...final];
+                pl = [...init, ...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
+            }
+            else {
+                console.log("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+            }
+            // console.log('*** s pl ***', s, pl);
+            return [s, pl];
+        }
+    },
     'binrec': {
         sig: [[
             { type: 'TermTest extends (list<words>)' },

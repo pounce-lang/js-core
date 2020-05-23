@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "The Pounce programming language core: a parser and interpreter, written in Javascript. Pounce is a concatenative programming language infulenced by Forth, Joy, Factor, Cat and Kitten.",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
@@ -15,7 +15,7 @@
     "test": "node ./tests/index.js ; node ./tests/parser_test.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
-  "author": "Nate Morse <morse.nate@gmail.com>",
+  "author": "Nate Morse",
   "license": "MIT",
   "devDependencies": {
     "@types/ramda": "^0.26.38",

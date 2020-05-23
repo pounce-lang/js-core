@@ -2989,6 +2989,33 @@ var coreWords = {
             return [s, pl];
         }
     },
+    'linrec5': {
+        sig: [[
+                { type: 'Init extends (list<words>)' },
+                { type: 'TermTest extends (list<words>)' },
+                { type: 'Terminal extends (list<words>)' },
+                { type: 'Recurse extends (list<words>)' },
+                { type: 'Final extends (list<words>)' }
+            ], []],
+        def: function (s, pl) {
+            // termtest && terminal && recurse && final linrec 
+            var final = toPLOrNull(s.pop());
+            var recurse = toPLOrNull(s.pop());
+            var terminal = toPLOrNull(s.pop());
+            var termtest = toPLOrNull(s.pop());
+            var init = toPLOrNull(s.pop());
+            if (init && termtest && terminal && recurse && final) {
+                var nextRec = __spreadArrays([termtest, terminal, recurse, final, 'linrec'], final);
+                pl = __spreadArrays(init, termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
+            }
+            else {
+                console.log("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+            }
+            // console.log('*** s pl ***', s, pl);
+            return [s, pl];
+        }
+    },
     'binrec': {
         sig: [[
                 { type: 'TermTest extends (list<words>)' },
@@ -3150,5 +3177,6 @@ function interpreter(pl_in, wd_in, opt) {
 var parse = parser;
 var unParse = unParser;
 var interpreter$1 = interpreter;
+var coreWordDictionary = coreWords;
 
-export { interpreter$1 as interpreter, parse, unParse };
+export { coreWordDictionary, interpreter$1 as interpreter, parse, unParse };

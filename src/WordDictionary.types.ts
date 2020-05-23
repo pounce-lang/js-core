@@ -6,5 +6,5 @@ export type WordValue = {
         [ValueStack, ProgramList?, WordDictionary?]);
 };
 export type WordDictionary = {
-    [index: string]: WordValue //(WordValue | WordDictionary)
+    [index: string]: WordValue
 };
