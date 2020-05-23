@@ -1,8 +1,13 @@
+const r = require('ramda');
 const parse = require('../dist/index').parse;
 const interpreter = require('../dist/index').interpreter;
+const preProcessDefs = require('../dist/index').preProcessDefines;
+const purr = require('../dist/index').purr;
+const coreWords = require('../dist/index').coreWordDictionary;
 
-const runDebug = (p, d) => {
-  const test2 = interpreter(parse(p), d, { debug: true });
+
+const runDebug = (p) => {
+  const test2 = interpreter(parse(p), { debug: true });
   result2 = test2.next();
   console.error(result2.value);
   while (result2.value && result2.value.active) {
@@ -12,7 +17,7 @@ const runDebug = (p, d) => {
   return result2.value.stack;
 };
 
-const testIt = (p, expected_result, d) => {
+const testIt = (p, expected_result) => {
   let pp;
   try {
     pp = parse(p);
@@ -26,7 +31,7 @@ const testIt = (p, expected_result, d) => {
     console.error("no parse result:", p);
     return false;
   }
-  const test = interpreter(pp, d);
+  const test = interpreter(p);
   result = test.next();
   while (result.value && result.value.active) {
     result = test.next();
@@ -40,7 +45,7 @@ const testIt = (p, expected_result, d) => {
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
   console.error("Re running in debug mode:");
-  const result2 = runDebug(p, d);
+  const result2 = runDebug(p);
   console.error(result2 ? result2 : "error", "!=", expected_result);
 
   return false;
@@ -48,21 +53,6 @@ const testIt = (p, expected_result, d) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("a dup concat b c 1 3 concat", ['a',
-  'dup', 'concat',
-  'cc',
-  'DDD',
-  'dup',
-  ['b9'],
-  'cat',
-  'c',
-  1,
-  3,
-  'concat'],
-  {
-    b: { def: ["cc", "d", "cat"] },
-    d: { def: ["DDD", "dup", ["b9"]] }
-  });
 allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
 allPassing &= testIt("3 2 7 [+] dip -", [-2]);
@@ -139,61 +129,15 @@ allPassing &= testIt(`
 [] linrec5
 `, [[61, 59]]);
 
+
+// set up a production configuration and test purr
+const program1 = "0 increment increment decrement [1 +] [increment] def [1 -] [decrement] def";
+const parsedProgram1 = parse(program1);
+const [preProcessedProgram1, corePlusUserDefinedWords1] = preProcessDefs(parsedProgram1, coreWords);
+const runner1 = purr(preProcessedProgram1, corePlusUserDefinedWords1);
+const result1 = runner1.next();
+allPassing &= (result1.value.active === false && result1.value.stack[0] === 1);
+
 console.log("Pounce Tests Pass:", allPassing === 1);
 
 // runDebug("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with");
-// runDebug(`[6 3 8 4 5 7 2 9 1 0] [size 1 <=] [] [uncons split<] [concat] binrec`);
-//[swap] dip cons concat
-
-//ToDo...
-// [[init test recurse lastly] [init apply test [recurse apply loc-rec lastly] if] apply-with] [constrec] def
-// # 5 factorial
-// 5 [dup] [dup 1 >] [dup 1 -] [dup [*] dip] constrec # <<
-//        5 | [dup] apply [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
-//      5 5 | [dup 1 >] apply [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
-//      5 5 | dup 0 == [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
-// 5 5 true | [dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec ] if [dup [*] dip] apply
-//      5 5 | dup 1 - [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec [dup [*] dip] apply
-//    5 5 4 | [noop] [dup 1 >] [dup 1 -] [dup [*] dip] constrec [dup [*] dip] apply
-
-
-// # quicksort
-// [7 2 9 1 2 6 3 8]
-// [size 1 <=] []
-// [uncons [>] split]
-// [[swap] dip cons concat] 
-// binrec
-
-t =  `
-
-210 2 [] 
-[[p n fs] [p n fs p 1 <=] apply-with]
-[[p n fs] [fs] apply-with]
-[[p n fs] 
-[p n % 0 == p n / n n fs cons p n 1 + fs  ] apply-with 
-[c p1 n1 fs1 p2 n2 fs2] [p1 n1 fs1 p2 n2 fs2 c [drop drop 
-drop] [[_ _ _ p n fs] [p n fs] apply-with] if-else] apply-with]
-[] linrec
-
-210 2 [] 
-[[p n fs] [p n fs p 1 <=] apply-with]
-[[p n fs] [fs] apply-with]
-[[p n fs] 
-[p n / n n fs cons p n 1 + fs p n % 0 ==] apply-with 
- [drop drop drop] [[_ _ _ p n fs] [p n fs] apply-with] if-else]
-[] linrec
-
-# vvv untested vvv
-210 2 [] 
-[[p n fs] [p n fs p 1 <=] apply-with]
-[[p n fs] [fs] apply-with]
-[[p n fs] 
-[p n fs p n % 0 ==] apply-with 
-[[p n fs] [p n / n n fs cons] apply-with] [[p n fs] [p n 1 + fs] apply-with] if-else]
-[] linrec
-
-# [teminalPredicate terminalPhrase recursePhrase tailPhrase] 
-
-
-
-`;

@@ -1,23 +1,30 @@
 import { ValueStack, ProgramList } from './types';
 import { WordDictionary } from "./WordDictionary.types";
-export declare const parse: (input: string, options: any) => any;
-export declare const unParse: (pl: any[]) => string;
-export declare function interpreter(pl_in: ProgramList, wd_in?: WordDictionary, opt?: {
+export declare function interpreter(pl_in: ProgramList | string, opt?: {
     debug: boolean;
     yieldOnId: boolean;
+    preProcessed: boolean;
     maxCycles?: number;
+    wd: WordDictionary;
 }): Generator<{
     stack: ValueStack;
     prog: ProgramList;
     active: boolean;
-    dictionary: WordDictionary;
+    error?: undefined;
 } | {
-    stack: ValueStack;
-    prog: import("./types").Word[];
-    active: boolean;
-    dictionary?: undefined;
-} | (string | {
     stack: ValueStack;
     prog: ProgramList;
     active: boolean;
-})[], void, unknown>;
+    error: string;
+}, void, unknown>;
+export declare function purr(pl: ProgramList, wd: WordDictionary): Generator<{
+    stack: ValueStack;
+    prog: ProgramList;
+    active: boolean;
+    error: string;
+} | {
+    stack: ValueStack;
+    prog: ProgramList;
+    active: boolean;
+    error?: undefined;
+}, void, unknown>;

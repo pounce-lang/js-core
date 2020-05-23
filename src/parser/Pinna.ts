@@ -2355,7 +2355,7 @@ const pinnaParser = () => {
     }
   };
 
-  var Parser: any = function (input: string, actions: any = parser_actions, types: any) {
+  var Parser: any = function (input: string, actions: any = parser_actions, types?: any) {
     this._input = input;
     this._inputSize = input.length;
     this._actions = actions;
@@ -2442,7 +2442,7 @@ const pinnaParser = () => {
   }
 
 
-  var parse = function (input: string, options: any) {
+  var parse = function (input: string, options?: any) {
     options = options || {};
     var parser: any = new Parser(input+" ", options.actions, options.types);
     return cleanStrings(parser.parse());

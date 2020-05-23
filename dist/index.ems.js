@@ -3068,7 +3068,7 @@ var coreWords = {
     },
 };
 
-var preProcessDefs = function (pl) {
+var preProcessDefs = function (pl, coreWords) {
     var defineWord = function (wd, key, val) {
         var new_word = {};
         new_word[key] = val;
@@ -3088,24 +3088,23 @@ var preProcessDefs = function (pl) {
         }
         def_i = findIndex(function (word) { return word === 'def'; }, next_pl);
     }
-    return [next_pl, next_wd];
+    return [next_pl, mergeRight(coreWords, next_wd)];
 };
 
+var parse = parser;
 // purr
-function interpreter(pl_in, wd_in, opt) {
-    var _a, pl, user_def_wd, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
+function interpreter(pl_in, opt) {
+    var _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
     var _e, _f;
-    if (wd_in === void 0) { wd_in = coreWords; }
-    if (opt === void 0) { opt = { debug: false, yieldOnId: false }; }
+    if (opt === void 0) { opt = { debug: false, yieldOnId: false, preProcessed: false, wd: coreWords }; }
     var _g;
     return __generator(this, function (_h) {
         switch (_h.label) {
             case 0:
-                _a = preProcessDefs(pl_in), pl = _a[0], user_def_wd = _a[1];
-                wd = mergeRight(wd_in, user_def_wd);
+                _a = opt.preProcessed ? [toPLOrNull(pl_in), {}] : preProcessDefs(is(String, pl_in) ? parse(pl_in.toString()) : pl_in, opt.wd), pl = _a[0], wd = _a[1];
                 s = [];
                 if (!((_g = opt) === null || _g === void 0 ? void 0 : _g.debug)) return [3 /*break*/, 2];
-                return [4 /*yield*/, { stack: s, prog: pl, active: true, dictionary: user_def_wd }];
+                return [4 /*yield*/, { stack: s, prog: pl, active: true }];
             case 1:
                 _b = _h.sent();
                 return [3 /*break*/, 3];
@@ -3161,7 +3160,7 @@ function interpreter(pl_in, wd_in, opt) {
             case 12: return [3 /*break*/, 4];
             case 13:
                 if (!(cycles >= maxCycles)) return [3 /*break*/, 15];
-                return [4 /*yield*/, [{ stack: s, prog: pl, active: false }, "maxCycles exceeded: this may be an infinite loop "]];
+                return [4 /*yield*/, { stack: s, prog: pl, active: false, error: "maxCycles exceeded: this may be an infinite loop" }];
             case 14:
                 _h.sent();
                 _h.label = 15;
@@ -3172,11 +3171,61 @@ function interpreter(pl_in, wd_in, opt) {
         }
     });
 }
+// (more closer to a) production version interpreter
+// Assumes that you have run and tested the interpreter with parsed pre processed input 
+// opt:{ debug: false, yieldOnId: false, preProcessed: true, wd: coreWords_merged_with_preProcessedDefs }
+//
+function purr(pl, wd) {
+    var s, w, maxCycles, cycles, wds, plist;
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                s = [];
+                maxCycles = 1000000000;
+                cycles = 0;
+                while (cycles < maxCycles && (w = pl.shift()) !== undefined) {
+                    cycles += 1;
+                    wds = is(String, w) ? wd[w] : null;
+                    if (wds) {
+                        if (typeof wds.def === 'function') {
+                            _a = wds.def(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
+                        }
+                        else {
+                            plist = toPLOrNull(wds.def);
+                            if (plist) {
+                                pl.unshift.apply(pl, plist);
+                            }
+                        }
+                    }
+                    else if (w !== undefined) {
+                        if (is(Array, w)) {
+                            s.push([].concat(w));
+                        }
+                        else {
+                            s.push(w);
+                        }
+                    }
+                }
+                if (!(cycles >= maxCycles)) return [3 /*break*/, 2];
+                return [4 /*yield*/, { stack: s, prog: pl, active: false, error: "maxCycles exceeded: this may be an infinite loop" }];
+            case 1:
+                _c.sent();
+                _c.label = 2;
+            case 2: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
+            case 3:
+                _c.sent();
+                return [2 /*return*/];
+        }
+    });
+}
 
 // the Pounce language core module exposes these function
-var parse = parser;
+var parse$1 = parser;
 var unParse = unParser;
 var interpreter$1 = interpreter;
 var coreWordDictionary = coreWords;
+var purr$1 = purr;
+var preProcessDefines = preProcessDefs;
 
-export { coreWordDictionary, interpreter$1 as interpreter, parse, unParse };
+export { coreWordDictionary, interpreter$1 as interpreter, parse$1 as parse, preProcessDefines, purr$1 as purr, unParse };

@@ -5,7 +5,8 @@ import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { coreWords, toPLOrNull, toStringOrNull, toArrOrNull } from './words/core';
 import { parser as pinna, unParser as unPinna } from './parser/Pinna';
 
-export const preProcessDefs = (pl: ProgramList): [ProgramList, WordDictionary] => {
+export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [ProgramList, WordDictionary] => {
+
     const defineWord = (wd: WordDictionary, key: string, val: WordValue): WordDictionary => {
       let new_word: WordDictionary = {};
       new_word[key] = val;
@@ -25,6 +26,6 @@ export const preProcessDefs = (pl: ProgramList): [ProgramList, WordDictionary] =
       }
       def_i = r.findIndex(word => word === 'def', next_pl);
     }
-    return [next_pl, next_wd];
+    return [next_pl, r.mergeRight(coreWords, next_wd)];
   };
   

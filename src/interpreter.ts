@@ -26,21 +26,20 @@ const toTypeOrNull = <T extends unknown>(val: any, type: string) => {
     return null;
 }
 
-export const parse = pinna;
-export const unParse = unPinna;
+const parse = pinna;
+const unParse = unPinna;
 
 
 // purr
 export function* interpreter(
-  pl_in: ProgramList,
-  wd_in: WordDictionary = coreWords,
-  opt: { debug: boolean, yieldOnId: boolean, maxCycles?: number } =
-    { debug: false, yieldOnId: false }
+  pl_in: ProgramList | string,
+  opt: { debug: boolean, yieldOnId: boolean, preProcessed: boolean, maxCycles?: number, wd: WordDictionary } =
+    { debug: false, yieldOnId: false, preProcessed: false, wd: coreWords }
 ) {
-  let [pl, user_def_wd] = preProcessDefs(pl_in);
-  let wd = r.mergeRight(wd_in, user_def_wd);
+  // preProcess if needed
+  let [pl, wd] = opt.preProcessed? [toPLOrNull(pl_in), {}]: preProcessDefs(r.is(String, pl_in)? parse(pl_in.toString()): pl_in, opt.wd);
   let s: ValueStack = [];
-  opt?.debug ? yield {stack:s, prog:pl, active:true, dictionary:user_def_wd} : null;
+  opt?.debug ? yield {stack:s, prog:pl, active:true} : null;
   let w;
   const maxCycles = opt.maxCycles || 1000000;
   let cycles = 0;
@@ -70,7 +69,48 @@ export function* interpreter(
     }
   }
   if (cycles >= maxCycles) {
-    yield [{stack:s, prog:pl, active:false}, "maxCycles exceeded: this may be an infinite loop "];
+    yield {stack:s, prog:pl, active:false, error: "maxCycles exceeded: this may be an infinite loop"};
+  }
+  yield {stack:s, prog:pl, active:false};
+}
+
+// (more closer to a) production version interpreter
+// Assumes that you have run and tested the interpreter with parsed pre processed input 
+// opt:{ debug: false, yieldOnId: false, preProcessed: true, wd: coreWords_merged_with_preProcessedDefs }
+//
+export function* purr(
+  pl: ProgramList,
+  wd: WordDictionary
+) {
+  let s: ValueStack = [];
+  let w;
+  const maxCycles = 1000000000;
+  let cycles = 0;
+  while (cycles < maxCycles && (w = pl.shift()) !== undefined) {
+    cycles += 1;
+    let wds: WordDictionary | WordValue = r.is(String, w) ? wd[w as string] : null;
+    if (wds) {
+      if (typeof wds.def === 'function') {
+        [s, pl = pl] = wds.def(s, pl);
+      }
+      else {
+        const plist = toPLOrNull(wds.def);
+        if (plist) {
+          pl.unshift(...plist);
+        }
+      }
+    }
+    else if (w !== undefined) {
+      if (r.is(Array, w)) {
+        s.push([].concat(w));
+      }
+      else {
+        s.push(w);
+      }
+    }
+  }
+  if (cycles >= maxCycles) {
+    yield {stack:s, prog:pl, active:false, error: "maxCycles exceeded: this may be an infinite loop"};
   }
   yield {stack:s, prog:pl, active:false};
 }
