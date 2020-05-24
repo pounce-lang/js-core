@@ -17,10 +17,12 @@ Pounce is inspired by Joy, Factor, Cat and Kitten, in that it is, [Concatenative
 To start Pounce programming in the browser, you can [try this demonstration](https://nmorse.github.io/pounce/js/try_pounce.html). You may also clone this [starter project template](https://github.com/pounce-lang/simple-example-app) and extend it how ever you see fix.
 
 ## Try it in RunKit
+[RunKit https://runkit.com/embed/i6tu1bf90mz6](https://runkit.com/embed/i6tu1bf90mz6)
 ``` Javascript
-// https://runkit.com/embed/y85aio9m2g1j
+// Run a small Pounce program that doubles 21.
+// In debug mode, we can log intermediate states of the stack and program. 
 var core = require("@pounce-lang/core")
-var interp = core.interpreter(core.parse("21 dup +"), undefined, {debug:true});
+var interp = core.interpreter(core.parse("21 dup +"), {debug:true});
 var pounceState = interp.next();
 while (pounceState.value.active) {
 const stack = core.unParse(pounceState.value.stack);
