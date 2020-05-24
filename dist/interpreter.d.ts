@@ -3,9 +3,8 @@ import { WordDictionary } from "./WordDictionary.types";
 export declare function interpreter(pl_in: ProgramList | string, opt?: {
     debug: boolean;
     yieldOnId: boolean;
-    preProcessed: boolean;
     maxCycles?: number;
-    wd: WordDictionary;
+    wd?: WordDictionary;
 }): Generator<{
     stack: ValueStack;
     prog: ProgramList;

@@ -3094,14 +3094,15 @@ var preProcessDefs = function (pl, coreWords) {
 var parse = parser;
 // purr
 function interpreter(pl_in, opt) {
-    var _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
+    var wd_in, _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
     var _e, _f;
-    if (opt === void 0) { opt = { debug: false, yieldOnId: false, preProcessed: false, wd: coreWords }; }
+    if (opt === void 0) { opt = { debug: false, yieldOnId: false }; }
     var _g;
     return __generator(this, function (_h) {
         switch (_h.label) {
             case 0:
-                _a = opt.preProcessed ? [toPLOrNull(pl_in), {}] : preProcessDefs(is(String, pl_in) ? parse(pl_in.toString()) : pl_in, opt.wd), pl = _a[0], wd = _a[1];
+                wd_in = opt.wd ? opt.wd : coreWords;
+                _a = is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(is(String, pl_in) ? parse(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
                 s = [];
                 if (!((_g = opt) === null || _g === void 0 ? void 0 : _g.debug)) return [3 /*break*/, 2];
                 return [4 /*yield*/, { stack: s, prog: pl, active: true }];
