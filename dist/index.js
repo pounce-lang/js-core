@@ -3329,9 +3329,12 @@ var preProcessDefs = function (pl, coreWords) {
 };
 
 var parse = parser;
+var debugLevel = function (ics, logLevel) { return (ics.length <= logLevel); };
+// user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
+var debugCleanPL = function (pl) { return r.filter(function (w) { return (w !== "popInternalCallStack"); }, pl); };
 // purr
 function interpreter(pl_in, opt) {
-    var wd_in, internalCallStack, debugLevel, _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _d, plist, _f;
+    var wd_in, internalCallStack, _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _d, plist, _f;
     var _g, _h;
     if (opt === void 0) { opt = { logLevel: 0, yieldOnId: false }; }
     var _j;
@@ -3340,7 +3343,6 @@ function interpreter(pl_in, opt) {
             case 0:
                 wd_in = opt.wd ? opt.wd : coreWords;
                 internalCallStack = [];
-                debugLevel = function () { return (internalCallStack.length <= opt.logLevel); };
                 _a = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parse(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
                 s = [];
                 if (!((_j = opt) === null || _j === void 0 ? void 0 : _j.logLevel)) return [3 /*break*/, 2];
@@ -3361,8 +3363,8 @@ function interpreter(pl_in, opt) {
                 wds = r.is(String, w) ? wd[w] : null;
                 if (!wds) return [3 /*break*/, 10];
                 if (!(opt.logLevel && !opt.yieldOnId)) return [3 /*break*/, 8];
-                if (!(debugLevel())) return [3 /*break*/, 6];
-                return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
+                if (!debugLevel(internalCallStack, opt.logLevel)) return [3 /*break*/, 6];
+                return [4 /*yield*/, { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
             case 5:
                 _d = _k.sent();
                 return [3 /*break*/, 7];
@@ -3384,7 +3386,7 @@ function interpreter(pl_in, opt) {
                     else {
                         plist = toPLOrNull(wds.def);
                         if (plist) {
-                            internalCallStack.push(w);
+                            internalCallStack.push(toStringOrNull(w));
                             pl = __spreadArrays(plist, ["popInternalCallStack"], pl);
                         }
                     }
@@ -3399,8 +3401,8 @@ function interpreter(pl_in, opt) {
                     s.push(w);
                 }
                 if (!(opt.logLevel && opt.yieldOnId)) return [3 /*break*/, 14];
-                if (!(debugLevel())) return [3 /*break*/, 12];
-                return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
+                if (!(debugLevel(internalCallStack, opt.logLevel))) return [3 /*break*/, 12];
+                return [4 /*yield*/, { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
             case 11:
                 _f = _k.sent();
                 return [3 /*break*/, 13];

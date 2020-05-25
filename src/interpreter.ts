@@ -29,6 +29,10 @@ const toTypeOrNull = <T extends unknown>(val: any, type: string) => {
 
 const parse = pinna;
 
+const debugLevel = (ics: string[], logLevel: number) => (ics.length <= logLevel);
+// user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
+const debugCleanPL = (pl: ProgramList) => r.filter((w) => (w !== "popInternalCallStack"), pl);
+
 // purr
 export function* interpreter(
   pl_in: ProgramList | string,
@@ -38,7 +42,6 @@ export function* interpreter(
   // preProcess if needed 
   const wd_in = opt.wd ? opt.wd : coreWords;
   let internalCallStack = [];
-  const debugLevel = () => (internalCallStack.length <= opt.logLevel);
   let [pl, wd] = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parse(pl_in.toString()) : pl_in, wd_in);
   let s: ValueStack = [];
   opt?.logLevel ? yield { stack: s, prog: pl, active: true } : null;
@@ -49,7 +52,7 @@ export function* interpreter(
     cycles += 1;
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
-      opt.logLevel && !opt.yieldOnId ? (debugLevel()) ? yield { stack: s, prog: [w].concat(pl), active: true, internalCallStack: [...internalCallStack] } : null : null;
+      opt.logLevel && !opt.yieldOnId ? debugLevel(internalCallStack, opt.logLevel) ? yield { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: [...internalCallStack] } : null : null;
       if (typeof wds.def === 'function') {
         [s, pl = pl] = wds.def(s, pl);
       }
@@ -60,8 +63,8 @@ export function* interpreter(
         else {
           let plist = toPLOrNull(wds.def);
           if (plist) {
-            internalCallStack.push(w);
-            pl =  [...plist, "popInternalCallStack", ...pl];
+            internalCallStack.push(toStringOrNull(w));
+            pl = [...plist, "popInternalCallStack", ...pl];
           }
         }
       }
@@ -73,7 +76,7 @@ export function* interpreter(
       else {
         s.push(w);
       }
-      opt.logLevel && opt.yieldOnId ? (debugLevel()) ? yield { stack: s, prog: [w].concat(pl), active: true, internalCallStack: [...internalCallStack] } : null : null;
+      opt.logLevel && opt.yieldOnId ? (debugLevel(internalCallStack, opt.logLevel)) ? yield { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: [...internalCallStack] } : null : null;
     }
   }
   if (cycles >= maxCycles || internalCallStack.length >= 1000) {

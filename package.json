@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "The Pounce programming language core: a parser and interpreter, written in Javascript. Pounce is a concatenative programming language infulenced by Forth, Joy, Factor, Cat and Kitten.",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",

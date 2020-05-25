@@ -7,7 +7,7 @@ const coreWords = require('../dist/index').coreWordDictionary;
 
 
 const runDebug = (p, debugLevel = 10) => {
-  const test2 = interpreter(p, { debug: debugLevel });
+  const test2 = interpreter(p, { logLevel: debugLevel });
   result2 = test2.next();
   console.error(result2.value);
   while (result2.value && result2.value.active) {
@@ -45,7 +45,7 @@ const testIt = (p, expected_result) => {
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
   console.error("Re running in debug mode:");
-  const result2 = runDebug(p);
+  const result2 = runDebug(p, 10);
   console.error(result2 ? result2 : "error", "!=", expected_result);
 
   return false;
@@ -140,7 +140,7 @@ allPassing &= (result1.value.active === false && result1.value.stack[0] === 1);
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
-runDebug(`
-[6 3 8 4 5 7 2 9 1] 
-[size 1 <=] [] [uncons split<] [concat] binrec
-`, 0);
+// runDebug(`
+// [6 3 8 4 5 7 2 9 1] 
+// [size 1 <=] [] [uncons split<] [concat] binrec
+// `, 1);

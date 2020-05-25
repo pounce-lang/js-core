@@ -15,13 +15,13 @@ export declare function interpreter(pl_in: ProgramList | string, opt?: {
     stack: ValueStack;
     prog: import("./types").Word[];
     active: boolean;
-    internalCallStack: import("./types").Word[];
+    internalCallStack: string[];
     error?: undefined;
 } | {
     stack: ValueStack;
     prog: ProgramList;
     active: boolean;
-    internalCallStack: import("./types").Word[];
+    internalCallStack: string[];
     error: string;
 }, void, unknown>;
 export declare function purr(pl: ProgramList, wd: WordDictionary): Generator<{
