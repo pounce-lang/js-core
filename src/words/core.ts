@@ -441,6 +441,9 @@ export const coreWords: WordDictionary = {
             return [s];
         }
     },
+    'popInternalCallStack': {
+        def: []
+    }
     // // 'import': {
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         const importable = toString(s.pop());

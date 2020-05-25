@@ -20,9 +20,9 @@ To start Pounce programming in the browser, you can [try this demonstration](htt
 [RunKit https://runkit.com/embed/i6tu1bf90mz6](https://runkit.com/embed/i6tu1bf90mz6)
 ``` Javascript
 // Run a small Pounce program that doubles 21.
-// In debug mode, we can log intermediate states of the stack and program. 
+// When logLevel > 0, intermediate states of the stack and program are displayed. 
 var core = require("@pounce-lang/core")
-var interp = core.interpreter(core.parse("21 dup +"), {debug:true});
+var interp = core.interpreter(core.parse("21 dup +"), {logLevel:1});
 var pounceState = interp.next();
 while (pounceState.value.active) {
 const stack = core.unParse(pounceState.value.stack);

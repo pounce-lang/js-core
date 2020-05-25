@@ -6,8 +6,8 @@ const purr = require('../dist/index').purr;
 const coreWords = require('../dist/index').coreWordDictionary;
 
 
-const runDebug = (p) => {
-  const test2 = interpreter(parse(p), { debug: true });
+const runDebug = (p, debugLevel = 10) => {
+  const test2 = interpreter(p, { debug: debugLevel });
   result2 = test2.next();
   console.error(result2.value);
   while (result2.value && result2.value.active) {
@@ -140,4 +140,7 @@ allPassing &= (result1.value.active === false && result1.value.stack[0] === 1);
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 
-// runDebug("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with");
+runDebug(`
+[6 3 8 4 5 7 2 9 1] 
+[size 1 <=] [] [uncons split<] [concat] binrec
+`, 0);

@@ -3070,6 +3070,239 @@ var coreWords = {
             return [s];
         }
     },
+    'popInternalCallStack': {
+        def: []
+    }
+    // // 'import': {
+    // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
+    // //         const importable = toString(s.pop());
+    // //         if (typeof importable === 'string') {
+    // //             if (imported[importable]) {
+    // //                 // already imported
+    // //                 return [s, pl];
+    // //             }
+    // //             // given a path to a dictionary load it or fetch and load
+    // //             // options are to extend the core dictionary or pushit on a stack
+    // //             // 1. Object.assign(window[importable].words, wordstack[0]);
+    // //             // 2. wordstack.push(window[importable].words);
+    // //             if (window[importable]) {
+    // //                 imported[importable] = true;
+    // //                 wordstack.push(window[importable].words);
+    // //             } else {
+    // //                 console.log('TBD: code to load resourse:', importable)
+    // //             }
+    // //         } else {
+    // //             // given a dictionary
+    // //             wordstack.push(importable);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'random': {
+    // //     definition: function (s: Json[]) {
+    // //         s.push(Math.random());
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'round': {
+    // //     definition: function (s: Json[]) {
+    // //         const pres = s.pop();
+    // //         const n = s.pop();
+    // //         s.push(Math.round(n / pres) * pres);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'abs': {
+    // //     definition: function (s: Json[]) {
+    // //         const n = s.pop();
+    // //         s.push(Math.abs(n));
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 's2int': {
+    // //     expects: [{ desc: 'a number in a string', ofType: 'string' }, { desc: 'radix', ofType: 'integer' }],
+    // //     definition: function (s: Json[]) {
+    // //         const radix = s.pop();
+    // //         const str = toString(s.pop());
+    // //         s.push(Number.parseInt(str, radix));
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'int2s': {
+    // //     expects: [{ desc: 'number', ofType: 'integer' }, { desc: 'radix', ofType: 'integer' }],
+    // //     definition: function (s: Json[]) {
+    // //         const radix = s.pop();
+    // //         const n = s.pop();
+    // //         s.push(n.toString(radix));
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // '<<': {
+    // //     expects: [{ desc: 'number', ofType: 'integer' }, { desc: 'shift', ofType: 'integer' }],
+    // //     definition: function (s: Json[]) {
+    // //         const shift = s.pop();
+    // //         const n = s.pop();
+    // //         s.push(n << shift);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // '>>': {
+    // //     expects: [{ desc: 'number', ofType: 'integer' }, { desc: 'shift', ofType: 'integer' }],
+    // //     definition: function (s: Json[]) {
+    // //         const shift = s.pop();
+    // //         const n = s.pop();
+    // //         s.push(n >> shift);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'XOR': {
+    // //     expects: [{ desc: 'number', ofType: 'integer' }, { desc: 'shift', ofType: 'integer' }],
+    // //     definition: function (s: Json[]) {
+    // //         const shift = s.pop();
+    // //         const n = s.pop();
+    // //         s.push(n ^ shift);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'AND': {
+    // //     expects: [{ desc: 'number', ofType: 'integer' }, { desc: 'shift', ofType: 'integer' }],
+    // //     definition: function (s: Json[]) {
+    // //         const shift = s.pop();
+    // //         const n = s.pop();
+    // //         s.push(n & shift);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'store.set': {
+    // //     definition: function (s: Json[]) {
+    // //         const name = toString(s.pop());
+    // //         localStorage.setItem(name, JSON.stringify(s.pop()));
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'store.get': {
+    // //     definition: function (s: Json[]) {
+    // //         const name = toString(s.pop());
+    // //         s.push(JSON.parse(localStorage.getItem(name)));
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'store.remove': {
+    // //     definition: function (s: Json[]) {
+    // //         const name = toString(s.pop());
+    // //         localStorage.removeItem(name);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'depth': {
+    // //     expects: [], effects: [1], tests: [], desc: 'stack depth',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         s.push(s.length);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'and': {
+    // //     expects: [{ desc: 'a', ofType: 'boolean' }, { desc: 'b', ofType: 'boolean' }], effects: [-1], tests: [], desc: 'logical and',
+    // //     definition: function (s: Json[]) {
+    // //         const b = toBoolean(s.pop());
+    // //         const a = toBoolean(s.pop());
+    // //         s.push(a && b);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'or': {
+    // //     expects: [{ desc: 'a', ofType: 'boolean' }, { desc: 'b', ofType: 'boolean' }], effects: [-1], tests: [], desc: 'logical or',
+    // //     definition: function (s: Json[]) {
+    // //         const b = toBoolean(s.pop());
+    // //         const a = toBoolean(s.pop());
+    // //         s.push(a || b);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'not': {
+    // //     expects: [{ desc: 'a', ofType: 'boolean' }], effects: [0], tests: [], desc: 'logical not',
+    // //     definition: function (s: Json[]) {
+    // //         const a = toBoolean(s.pop());
+    // //         s.push(!a);
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'bubble-up': {
+    // //     'requires': 'list_module',
+    // //     'named-args': ['c'],
+    // //     'local-words': {
+    // //     },
+    // //     'definition': [[], ['cons'], 'c', 'repeat', 'swap', [['uncons'], 'c', 'repeat', 'drop'], 'dip']
+    // // },
+    // // 'case': {
+    // //     expects: [{ desc: 'key', ofType: 'word' }, { desc: 'a', ofType: 'record' }], effects: [-2], tests: [], desc: 'apply a matching case',
+    // //     definition: function (s: Json[], pl: PL) {
+    // //         const case_record = s.pop();
+    // //         let key = s.pop();
+    // //         if (key === " ") {
+    // //             key = "' '";
+    // //         }
+    // //         if (case_record[key]) {
+    // //             if (isArray(case_record[key])) {
+    // //                 pl = [case_record[key]].concat(pl);
+    // //             }
+    // //             else {
+    // //                 pl.unshift(case_record[key]);
+    // //             }
+    // //         }
+    // //         else {
+    // //             s.push(false);
+    // //         }
+    // //         return [s, pl];
+    // //     }
+    // // },
+    // // 'floor': ['dup', 1, '%', '-'],
+    // // 'map-under': {
+    // //     'requires': 'list_module',
+    // //     'named-args': ['c', 'q'],
+    // //     'local-words': {
+    // //         'init-a': [[[]], ['a'], 'local-def'],
+    // //         'update-a': ['a', 'cons', [], 'cons', ['a'], 'local-def'],
+    // //         'destructive-first': ['c', 'pop', 'swap', [], 'cons', ['c'], 'local-def'],
+    // //         'maping': ['c', '_list-length', 0, '>',
+    // //             ['destructive-first', 'q', 'apply', 'update-a', 'maping'],
+    // //             [], 'if-else']
+    // //     },
+    // //     'definition': ['init-a', 'maping', 'a']
+    // // },
+    // // 'map': {
+    // //     'local-words': {
+    // //         'setup-map': [[]],
+    // //         'process-map': [
+    // //             ['size'], 'dip2', 'rolldown', 0, '>',
+    // //             ['rotate', 'pop', 'rolldown', 'dup', ['apply'], 'dip', ['swap'], 'dip2', ['prepend'], 'dip', 'swap', 'process-map'],
+    // //             [['drop', 'drop'], 'dip'], 'if-else']
+    // //     },
+    // //     'definition': ['list_module', 'import', 'setup-map', 'process-map']
+    // // },
+    // // 'filter': {
+    // //     'requires': 'list_module',
+    // //     'local-words': {
+    // //         'setup-filter': [[]],
+    // //         'process-filter': [
+    // //             ["size"], "dip2", "rolldown", 0, ">",
+    // //             ["rotate", "pop", "rolldown", ["dup"], "dip", "dup", ["apply"], "dip", "swap",
+    // //                 [["swap"], "dip2", ["prepend"], "dip"],
+    // //                 [["swap"], "dip2", ["drop"], "dip"], "if-else", "swap", "process-filter"],
+    // //             [["drop", "drop"], "dip"], "if-else"]
+    // //     },
+    // //     'definition': ['setup-filter', 'process-filter']
+    // // },
+    // // 'reduce': {
+    // //     'requires': 'list_module',
+    // //     'local-words': {
+    // //         'more?': ['rolldown', 'size', 0, '>', ['rollup'], 'dip'],
+    // //         'process-reduce': ['more?', ['reduce-step', 'process-reduce'], 'if'],
+    // //         'reduce-step': [['pop'], 'dip2', 'dup', [['swap'], 'dip', 'apply'], 'dip'],
+    // //         'teardown-reduce': ['drop', ['drop'], 'dip'],
+    // //     },
+    // //     'definition': ['process-reduce', 'teardown-reduce']
+    // // }
 };
 
 var preProcessDefs = function (pl, coreWords) {
@@ -3098,99 +3331,114 @@ var preProcessDefs = function (pl, coreWords) {
 var parse = parser;
 // purr
 function interpreter(pl_in, opt) {
-    var wd_in, _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _c, plist, _d;
-    var _e, _f;
-    if (opt === void 0) { opt = { debug: false, yieldOnId: false }; }
-    var _g;
-    return __generator(this, function (_h) {
-        switch (_h.label) {
+    var wd_in, internalCallStack, debugLevel, _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _d, plist, _f;
+    var _g, _h;
+    if (opt === void 0) { opt = { logLevel: 0, yieldOnId: false }; }
+    var _j;
+    return __generator(this, function (_k) {
+        switch (_k.label) {
             case 0:
                 wd_in = opt.wd ? opt.wd : coreWords;
+                internalCallStack = [];
+                debugLevel = function () { return (internalCallStack.length <= opt.logLevel); };
                 _a = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parse(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
                 s = [];
-                if (!((_g = opt) === null || _g === void 0 ? void 0 : _g.debug)) return [3 /*break*/, 2];
+                if (!((_j = opt) === null || _j === void 0 ? void 0 : _j.logLevel)) return [3 /*break*/, 2];
                 return [4 /*yield*/, { stack: s, prog: pl, active: true }];
             case 1:
-                _b = _h.sent();
+                _b = _k.sent();
                 return [3 /*break*/, 3];
             case 2:
                 _b = null;
-                _h.label = 3;
+                _k.label = 3;
             case 3:
                 maxCycles = opt.maxCycles || 1000000;
                 cycles = 0;
-                _h.label = 4;
+                _k.label = 4;
             case 4:
-                if (!(cycles < maxCycles && (w = pl.shift()) !== undefined)) return [3 /*break*/, 13];
+                if (!(cycles < maxCycles && internalCallStack.length < 1000 && (w = pl.shift()) !== undefined)) return [3 /*break*/, 17];
                 cycles += 1;
                 wds = r.is(String, w) ? wd[w] : null;
-                if (!wds) return [3 /*break*/, 8];
-                if (!(opt.debug && !opt.yieldOnId)) return [3 /*break*/, 6];
-                return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true }];
+                if (!wds) return [3 /*break*/, 10];
+                if (!(opt.logLevel && !opt.yieldOnId)) return [3 /*break*/, 8];
+                if (!(debugLevel())) return [3 /*break*/, 6];
+                return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
             case 5:
-                _c = _h.sent();
+                _d = _k.sent();
                 return [3 /*break*/, 7];
             case 6:
-                _c = null;
-                _h.label = 7;
+                _d = null;
+                _k.label = 7;
             case 7:
+                return [3 /*break*/, 9];
+            case 8:
+                _k.label = 9;
+            case 9:
                 if (typeof wds.def === 'function') {
-                    _e = wds.def(s, pl), s = _e[0], _f = _e[1], pl = _f === void 0 ? pl : _f;
+                    _g = wds.def(s, pl), s = _g[0], _h = _g[1], pl = _h === void 0 ? pl : _h;
                 }
                 else {
-                    plist = toPLOrNull(wds.def);
-                    if (plist) {
-                        pl.unshift.apply(pl, plist);
+                    if (w === "popInternalCallStack") {
+                        internalCallStack.pop();
+                    }
+                    else {
+                        plist = toPLOrNull(wds.def);
+                        if (plist) {
+                            internalCallStack.push(w);
+                            pl = __spreadArrays(plist, ["popInternalCallStack"], pl);
+                        }
                     }
                 }
-                return [3 /*break*/, 12];
-            case 8:
-                if (!(w !== undefined)) return [3 /*break*/, 12];
+                return [3 /*break*/, 16];
+            case 10:
+                if (!(w !== undefined)) return [3 /*break*/, 16];
                 if (r.is(Array, w)) {
                     s.push([].concat(w));
                 }
                 else {
                     s.push(w);
                 }
-                if (!(opt.debug && opt.yieldOnId)) return [3 /*break*/, 10];
-                return [4 /*yield*/, { stack: s, prog: pl, active: true }];
-            case 9:
-                _d = _h.sent();
-                return [3 /*break*/, 11];
-            case 10:
-                _d = null;
-                _h.label = 11;
+                if (!(opt.logLevel && opt.yieldOnId)) return [3 /*break*/, 14];
+                if (!(debugLevel())) return [3 /*break*/, 12];
+                return [4 /*yield*/, { stack: s, prog: [w].concat(pl), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
             case 11:
-                _h.label = 12;
-            case 12: return [3 /*break*/, 4];
+                _f = _k.sent();
+                return [3 /*break*/, 13];
+            case 12:
+                _f = null;
+                _k.label = 13;
             case 13:
-                if (!(cycles >= maxCycles)) return [3 /*break*/, 15];
-                return [4 /*yield*/, { stack: s, prog: pl, active: false, error: "maxCycles exceeded: this may be an infinite loop" }];
+                return [3 /*break*/, 15];
             case 14:
-                _h.sent();
-                _h.label = 15;
-            case 15: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
-            case 16:
-                _h.sent();
+                _k.label = 15;
+            case 15:
+                _k.label = 16;
+            case 16: return [3 /*break*/, 4];
+            case 17:
+                if (!(cycles >= maxCycles || internalCallStack.length >= 1000)) return [3 /*break*/, 19];
+                return [4 /*yield*/, { stack: s, prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "maxCycles or callStack size exceeded: this may be an infinite loop" }];
+            case 18:
+                _k.sent();
+                _k.label = 19;
+            case 19: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
+            case 20:
+                _k.sent();
                 return [2 /*return*/];
         }
     });
 }
 // (more closer to a) production version interpreter
 // Assumes that you have run and tested the interpreter with parsed pre processed input 
-// opt:{ debug: false, yieldOnId: false, preProcessed: true, wd: coreWords_merged_with_preProcessedDefs }
+// opt:{ logLevel: 0, yieldOnId: false, preProcessed: true, wd: coreWords_merged_with_preProcessedDefs }
 //
 function purr(pl, wd) {
-    var s, w, maxCycles, cycles, wds, plist;
+    var s, w, wds, plist;
     var _a, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
                 s = [];
-                maxCycles = 1000000000;
-                cycles = 0;
-                while (cycles < maxCycles && (w = pl.shift()) !== undefined) {
-                    cycles += 1;
+                while ((w = pl.shift()) !== undefined) {
                     wds = r.is(String, w) ? wd[w] : null;
                     if (wds) {
                         if (typeof wds.def === 'function') {
@@ -3212,13 +3460,8 @@ function purr(pl, wd) {
                         }
                     }
                 }
-                if (!(cycles >= maxCycles)) return [3 /*break*/, 2];
-                return [4 /*yield*/, { stack: s, prog: pl, active: false, error: "maxCycles exceeded: this may be an infinite loop" }];
+                return [4 /*yield*/, { stack: s, prog: pl, active: false }];
             case 1:
-                _c.sent();
-                _c.label = 2;
-            case 2: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
-            case 3:
                 _c.sent();
                 return [2 /*return*/];
         }
