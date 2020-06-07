@@ -1,6 +1,7 @@
 import * as r from "ramda";
 import { WordDictionary, WordValue } from "../WordDictionary.types";
 import { ProgramList, Word } from '../types';
+import NP from 'number-precision';
 
 export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
@@ -14,8 +15,51 @@ export const toPLOrNull = (u: any): ProgramList | null =>
     r.is(Array, u) ? u : null;
 const toBoolOrNull = (u: any): boolean | null =>
     r.is(Boolean, u) ? u : null;
-const toWordDictionaryOrNull = (u: any): WordDictionary | null =>
-    r.is(Object, u) ? u : null;
+const toWordOrNull = (u: any): Word | null => {
+    //string | number | Word[] | boolean | { [index: string]: Word }
+    if (toStringOrNull(u)) {
+        return u;
+    }
+    if (toNumOrNull(u)) {
+        return u;
+    }
+    if (toArrOrNull(u)) {
+        return u;
+    }
+    if (toBoolOrNull(u)) {
+        return u;
+    }
+    if (r.is(Object, u)) {
+        return u;
+    }
+    return null;
+}
+// const toWordDictionaryOrNull = (u: any): WordDictionary | null =>
+//     r.is(Object, u) ? u : null;
+
+// const fetchProp = (wd: { [index: string]: Word }) => (w: Word, s: string | null) => {
+//     const res = r.prop(s, wd);
+//     if (!res) {
+//         return res;
+//     }
+//     return w;
+// };
+const consReslover = (localWD: { [index: string]: Word }) => (w: Word): Word => {
+    if (r.is(String, w)) {
+        const newW = toWordOrNull(r.propOr(w, w as string, localWD));
+        return newW ? newW : w;
+    }
+    const subList = toPLOrNull(w);
+    if (r.is(Array, subList)) {
+        return subInWD(localWD, [...subList]);
+    }
+    return w;
+};
+
+const subInWD = (localWD: { [index: string]: Word }, words: Word[]): Word[] => {
+    const resolveWord = consReslover(localWD);
+    return r.map(resolveWord, words);
+}
 
 export const coreWords: WordDictionary = {
     'dup': {
@@ -45,7 +89,7 @@ export const coreWords: WordDictionary = {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
-                s.push(a + b);
+                s.push(NP.plus(a, b));
                 return [s];
             }
             return null;
@@ -57,7 +101,7 @@ export const coreWords: WordDictionary = {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
-                s.push(a - b);
+                s.push(NP.minus(a, b));
                 return [s];
             }
             return null;
@@ -69,7 +113,7 @@ export const coreWords: WordDictionary = {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
             if (a !== null && b !== null && b !== 0) {
-                s.push(a / b);
+                s.push(NP.divide(a, b));
                 return [s];
             }
             return null;
@@ -93,7 +137,7 @@ export const coreWords: WordDictionary = {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
-                s.push(a * b);
+                s.push(NP.times(a, b));
                 return [s];
             }
             return null;
@@ -122,9 +166,8 @@ export const coreWords: WordDictionary = {
                 const localWD: { [index: string]: Word } =
                     r.zipObj(r.reverse(argList), values);
                 const newWords: ProgramList =
-                    toPLOrNull(r.map((i: Word) =>
-                        (r.is(String, i) ? r.propOr(i, i as string, localWD) : i), 
-                        words));
+                    toPLOrNull(subInWD(localWD, words));
+
                 if (newWords) {
                     pl = newWords.concat(pl);
                 }
@@ -424,13 +467,16 @@ export const coreWords: WordDictionary = {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
         def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
     },
-    'split<': {
-        def: [[[], []], 'dip2',
+    'split': {
+        def: [["cutVal", "theList", "operator"], [
+            [], [], "cutVal", "theList",
             'size',
-        ['uncons',
-            ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
-        ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
-        ]
+            ['uncons',
+                ['dup2', "operator", "apply",
+                    ['swap', ['swap', ['push'], 'dip'], 'dip'],
+                    ['swap', ['push'], 'dip'], 'if-else'], 'dip',
+            ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
+        ], "apply-with"]
     },
     'size': {
         def: s => {

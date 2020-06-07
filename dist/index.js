@@ -2,7 +2,10 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
 var r = require('ramda');
+var NP = _interopDefault(require('number-precision'));
 require('fbp-types');
 
 var pinnaParser = function () {
@@ -2655,6 +2658,49 @@ var toPLOrNull = function (u) {
 var toBoolOrNull = function (u) {
     return r.is(Boolean, u) ? u : null;
 };
+var toWordOrNull = function (u) {
+    //string | number | Word[] | boolean | { [index: string]: Word }
+    if (toStringOrNull(u)) {
+        return u;
+    }
+    if (toNumOrNull(u)) {
+        return u;
+    }
+    if (toArrOrNull(u)) {
+        return u;
+    }
+    if (toBoolOrNull(u)) {
+        return u;
+    }
+    if (r.is(Object, u)) {
+        return u;
+    }
+    return null;
+};
+// const toWordDictionaryOrNull = (u: any): WordDictionary | null =>
+//     r.is(Object, u) ? u : null;
+// const fetchProp = (wd: { [index: string]: Word }) => (w: Word, s: string | null) => {
+//     const res = r.prop(s, wd);
+//     if (!res) {
+//         return res;
+//     }
+//     return w;
+// };
+var consReslover = function (localWD) { return function (w) {
+    if (r.is(String, w)) {
+        var newW = toWordOrNull(r.propOr(w, w, localWD));
+        return newW ? newW : w;
+    }
+    var subList = toPLOrNull(w);
+    if (r.is(Array, subList)) {
+        return subInWD(localWD, __spreadArrays(subList));
+    }
+    return w;
+}; };
+var subInWD = function (localWD, words) {
+    var resolveWord = consReslover(localWD);
+    return r.map(resolveWord, words);
+};
 var coreWords = {
     'dup': {
         sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
@@ -2682,7 +2728,7 @@ var coreWords = {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
-                s.push(a + b);
+                s.push(NP.plus(a, b));
                 return [s];
             }
             return null;
@@ -2694,7 +2740,7 @@ var coreWords = {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
-                s.push(a - b);
+                s.push(NP.minus(a, b));
                 return [s];
             }
             return null;
@@ -2706,7 +2752,7 @@ var coreWords = {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null && b !== 0) {
-                s.push(a / b);
+                s.push(NP.divide(a, b));
                 return [s];
             }
             return null;
@@ -2730,7 +2776,7 @@ var coreWords = {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
-                s.push(a * b);
+                s.push(NP.times(a, b));
                 return [s];
             }
             return null;
@@ -2756,10 +2802,8 @@ var coreWords = {
             var argList = toArrOfStrOrNull(s.pop());
             if (words !== null && argList) {
                 var values = r.map(function () { return s.pop(); }, argList);
-                var localWD_1 = r.zipObj(r.reverse(argList), values);
-                var newWords = toPLOrNull(r.map(function (i) {
-                    return (r.is(String, i) ? r.propOr(i, i, localWD_1) : i);
-                }, words));
+                var localWD = r.zipObj(r.reverse(argList), values);
+                var newWords = toPLOrNull(subInWD(localWD, words));
                 if (newWords) {
                     pl = newWords.concat(pl);
                 }
@@ -3053,13 +3097,16 @@ var coreWords = {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
         def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
     },
-    'split<': {
-        def: [[[], []], 'dip2',
-            'size',
-            ['uncons',
-                ['dup2', '>', ['swap', ['swap', ['push'], 'dip'], 'dip'], ['swap', ['push'], 'dip'], 'if-else'], 'dip',
-            ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
-        ]
+    'split': {
+        def: [["cutVal", "theList", "operator"], [
+                [], [], "cutVal", "theList",
+                'size',
+                ['uncons',
+                    ['dup2', "operator", "apply",
+                        ['swap', ['swap', ['push'], 'dip'], 'dip'],
+                        ['swap', ['push'], 'dip'], 'if-else'], 'dip',
+                ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
+            ], "apply-with"]
     },
     'size': {
         def: function (s) {

@@ -45,7 +45,7 @@ const testIt = (p, expected_result) => {
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
   console.error("Re running in debug mode:");
-  const result2 = runDebug(p, 10);
+  const result2 = runDebug(p, 2);
   console.error(result2 ? result2 : "error", "!=", expected_result);
 
   return false;
@@ -100,12 +100,15 @@ allPassing &= testIt("[1 2] size", [[1, 2], 2]);
 
 allPassing &= testIt("[1 2] [3] concat", [[1, 2, 3]]);
 
-allPassing &= testIt("6 [3 8 5 7 10 2 9 1] split<", [[3,5,2,1, 6], [8,7,10,9]]);
+allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3,5,2,1, 6], [8,7,10,9]]);
+allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [ [ 3, 2, 1, 5 ], [ 6, 8, 7, 10, 5, 9 ] ] );
+
+allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3,5,2,1,6], [8,7,10,9]]);
 
 allPassing &= testIt(`
-[6 3 8 4 5 7 2 9 1] 
-[size 1 <=] [] [uncons split<] [concat] binrec
-`, [[1,2,3,4,5,6,7,8,9]]);
+[5 6 3 8 4 5 7 2 9 1] 
+[size 1 <=] [] [uncons [>] split] [concat] binrec
+`, [[1,2,3,4,5,5,6,7,8,9]]);
 
 allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with", [27]);
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] apply-with", [11]);
@@ -142,5 +145,5 @@ console.log("Pounce Tests Pass:", allPassing === 1);
 
 // runDebug(`
 // [6 3 8 4 5 7 2 9 1] 
-// [size 1 <=] [] [uncons split<] [concat] binrec
+// [size 1 <=] [] [uncons [>] split] [concat] binrec
 // `, 1);
