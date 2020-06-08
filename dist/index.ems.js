@@ -3091,6 +3091,20 @@ var coreWords = {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
         def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
     },
+    'map': {
+        // { type: 'Init extends (list<words>)' },
+        // { type: 'TermTest extends (list<words>)' },
+        // { type: 'Terminal extends (list<words>)' },
+        // { type: 'Recurse extends (list<words>)' },
+        // { type: 'Final extends (list<words>)' }
+        def: [["list", "phrase"], [
+                [[], "list"],
+                ['size', 0, '<='],
+                ['drop'],
+                ['uncons', 'swap', 'phrase', 'apply', 'swap', ["push"], 'dip'],
+                [], 'linrec5'
+            ], "apply-with"]
+    },
     'split': {
         def: [["cutVal", "theList", "operator"], [
                 [], [], "cutVal", "theList",
@@ -3317,7 +3331,7 @@ var coreWords = {
     // //         'process-map': [
     // //             ['size'], 'dip2', 'rolldown', 0, '>',
     // //             ['rotate', 'pop', 'rolldown', 'dup', ['apply'], 'dip', ['swap'], 'dip2', ['prepend'], 'dip', 'swap', 'process-map'],
-    // //             [['drop', 'drop'], 'dip'], 'if-else']
+    // //             [['drop', 'drop'], 'dip'], 'ifte']
     // //     },
     // //     'definition': ['list_module', 'import', 'setup-map', 'process-map']
     // // },

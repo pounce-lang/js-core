@@ -103,7 +103,8 @@ allPassing &= testIt("[1 2] [3] concat", [[1, 2, 3]]);
 allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3,5,2,1, 6], [8,7,10,9]]);
 allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [ [ 3, 2, 1, 5 ], [ 6, 8, 7, 10, 5, 9 ] ] );
 
-allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3,5,2,1,6], [8,7,10,9]]);
+allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 ==] map", [[false, true, false, false, true, true, false, false]]);
+allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 *] map", [[6, 16, 10, 14, 20, 4, 18, 2]]);
 
 allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
