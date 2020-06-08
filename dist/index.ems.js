@@ -3101,7 +3101,7 @@ var coreWords = {
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', 'swap', 'phrase', 'apply', 'swap', ["push"], 'dip'],
+                ['uncons', ["swap", ["phrase", 'apply'], 'dip', "swap", 'push'], 'dip'],
                 [], 'linrec5'
             ], "apply-with"]
     },

@@ -474,10 +474,10 @@ export const coreWords: WordDictionary = {
         // { type: 'Recurse extends (list<words>)' },
         // { type: 'Final extends (list<words>)' }
     def: [["list", "phrase"], [ 
-        [[], "list"], 
+        [ [], "list"], 
         ['size', 0, '<='],
         ['drop'],
-        ['uncons', 'swap', 'phrase', 'apply', 'swap', ["push"], 'dip'],
+        ['uncons', ["swap", ["phrase", 'apply'], 'dip', "swap", 'push'], 'dip'],
         [], 'linrec5'
           ], "apply-with"  ]
     },

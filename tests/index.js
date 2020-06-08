@@ -105,6 +105,7 @@ allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [ [ 3, 2, 1, 5 ], [ 6, 
 
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 ==] map", [[false, true, false, false, true, true, false, false]]);
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 *] map", [[6, 16, 10, 14, 20, 4, 18, 2]]);
+allPassing &= testIt("3 2 1 [1 2 3] [+] map", [[2, 4, 6]]);
 
 allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
