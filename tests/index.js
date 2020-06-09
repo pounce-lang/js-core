@@ -119,18 +119,15 @@ allPassing &= testIt(`
 210 2 [] 
 [[p n fs] [p n fs p 1 <=] apply-with]
 [[p n fs] [fs] apply-with]
-[[p n fs] 
-[p n fs p n % 0 ==] apply-with 
-[[p n fs] [p n / n n fs cons] apply-with] [[p n fs] [p n 1 + fs] apply-with] if-else]
+[[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] apply-with]
 [] linrec
 `, [[7,5,3,2]]);
 allPassing &= testIt(`
-3599 [2 []] 
+3599 
+[2 []] 
 [[p n fs] [p n fs p 1 <=] apply-with]
 [[p n fs] [fs] apply-with]
-[[p n fs] 
-[p n fs p n % 0 ==] apply-with 
-[[p n fs] [p n / n n fs cons] apply-with] [[p n fs] [p n 1 + fs] apply-with] if-else]
+[[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] apply-with]
 [] linrec5
 `, [[61, 59]]);
 

@@ -3098,11 +3098,13 @@ var coreWords = {
         def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
     },
     'map': {
-        // { type: 'Init extends (list<words>)' },
-        // { type: 'TermTest extends (list<words>)' },
-        // { type: 'Terminal extends (list<words>)' },
-        // { type: 'Recurse extends (list<words>)' },
-        // { type: 'Final extends (list<words>)' }
+        sig: [
+            [
+                { type: 'ValueList extends (list<words>)' },
+                { type: 'Phrase extends (list<words>)' }
+            ],
+            [{ type: 'ResultValueList extends (list<words>)' }]
+        ],
         def: [["list", "phrase"], [
                 [[], "list"],
                 ['size', 0, '<='],
