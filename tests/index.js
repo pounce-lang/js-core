@@ -107,6 +107,11 @@ allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 ==] map", [[false, true, false, 
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 *] map", [[6, 16, 10, 14, 20, 4, 18, 2]]);
 allPassing &= testIt("3 2 1 [1 2 3] [+] map", [[2, 4, 6]]);
 
+allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 !=] filter", [[3, 5, 7, 9, 1]]);
+allPassing &= testIt("[3 8 5 7 10 2 9 1] [3 % 0 ==] filter", [[3, 9]]);
+allPassing &= testIt("[3 8 5 7 10 2 9 1] [7 > ] filter", [[8, 10, 9]]);
+
+
 allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
 [size 1 <=] [] [uncons [>] split] [concat] binrec
@@ -143,6 +148,5 @@ allPassing &= (result1.value.active === false && result1.value.stack[0] === 1);
 console.log("Pounce Tests Pass:", allPassing === 1);
 
 // runDebug(`
-// [6 3 8 4 5 7 2 9 1] 
-// [size 1 <=] [] [uncons [>] split] [concat] binrec
+// [3 8 5 7 10 2 9 1] [2 % 0 !=] filter
 // `, 1);

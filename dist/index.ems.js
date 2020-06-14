@@ -3093,10 +3093,8 @@ var coreWords = {
     },
     'map': {
         sig: [
-            [
-                { type: 'ValueList extends (list<words>)' },
-                { type: 'Phrase extends (list<words>)' }
-            ],
+            [{ type: 'ValueList extends (list<words>)' },
+                { type: 'Phrase extends (list<words>)' }],
             [{ type: 'ResultValueList extends (list<words>)' }]
         ],
         def: [["list", "phrase"], [
@@ -3104,6 +3102,20 @@ var coreWords = {
                 ['size', 0, '<='],
                 ['drop'],
                 ['uncons', ["swap", ["phrase", 'apply'], 'dip', "swap", 'push'], 'dip'],
+                [], 'linrec5'
+            ], "apply-with"]
+    },
+    'filter': {
+        sig: [
+            [{ type: 'ValueList extends (list<words>)' },
+                { type: 'Phrase extends (list<words>)' }],
+            [{ type: 'ResultValueList extends (list<words>)' }]
+        ],
+        def: [["list", "phrase"], [
+                [[], "list"],
+                ['size', 0, '<='],
+                ['drop'],
+                ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
                 [], 'linrec5'
             ], "apply-with"]
     },
@@ -3314,29 +3326,6 @@ var coreWords = {
     // //     }
     // // },
     // // 'floor': ['dup', 1, '%', '-'],
-    // // 'map-under': {
-    // //     'requires': 'list_module',
-    // //     'named-args': ['c', 'q'],
-    // //     'local-words': {
-    // //         'init-a': [[[]], ['a'], 'local-def'],
-    // //         'update-a': ['a', 'cons', [], 'cons', ['a'], 'local-def'],
-    // //         'destructive-first': ['c', 'pop', 'swap', [], 'cons', ['c'], 'local-def'],
-    // //         'maping': ['c', '_list-length', 0, '>',
-    // //             ['destructive-first', 'q', 'apply', 'update-a', 'maping'],
-    // //             [], 'if-else']
-    // //     },
-    // //     'definition': ['init-a', 'maping', 'a']
-    // // },
-    // // 'map': {
-    // //     'local-words': {
-    // //         'setup-map': [[]],
-    // //         'process-map': [
-    // //             ['size'], 'dip2', 'rolldown', 0, '>',
-    // //             ['rotate', 'pop', 'rolldown', 'dup', ['apply'], 'dip', ['swap'], 'dip2', ['prepend'], 'dip', 'swap', 'process-map'],
-    // //             [['drop', 'drop'], 'dip'], 'ifte']
-    // //     },
-    // //     'definition': ['list_module', 'import', 'setup-map', 'process-map']
-    // // },
     // // 'filter': {
     // //     'requires': 'list_module',
     // //     'local-words': {

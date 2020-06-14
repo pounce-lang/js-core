@@ -480,6 +480,19 @@ export const coreWords: WordDictionary = {
             [], 'linrec5'
         ], "apply-with"]
     },
+    'filter': {
+        sig: [
+            [{ type: 'ValueList extends (list<words>)' },
+            { type: 'Phrase extends (list<words>)' }],
+            [{ type: 'ResultValueList extends (list<words>)' }]],
+        def: [["list", "phrase"], [
+            [[], "list"],
+            ['size', 0, '<='],
+            ['drop'],
+            ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else' ], 'dip'],
+            [], 'linrec5'
+        ], "apply-with"]
+    },
 
     'split': {
         def: [["cutVal", "theList", "operator"], [
