@@ -2660,19 +2660,19 @@ var toBoolOrNull = function (u) {
 };
 var toWordOrNull = function (u) {
     //string | number | Word[] | boolean | { [index: string]: Word }
-    if (toStringOrNull(u)) {
+    if (toStringOrNull(u) !== null) {
         return u;
     }
-    if (toNumOrNull(u)) {
+    if (toNumOrNull(u) !== null) {
         return u;
     }
-    if (toArrOrNull(u)) {
+    if (toArrOrNull(u) !== null) {
         return u;
     }
-    if (toBoolOrNull(u)) {
+    if (toBoolOrNull(u) !== null) {
         return u;
     }
-    if (r.is(Object, u)) {
+    if (r.is(Object, u) !== null) {
         return u;
     }
     return null;
@@ -2689,7 +2689,7 @@ var toWordOrNull = function (u) {
 var consReslover = function (localWD) { return function (w) {
     if (r.is(String, w)) {
         var newW = toWordOrNull(r.propOr(w, w, localWD));
-        return newW ? newW : w;
+        return newW !== null ? newW : w;
     }
     var subList = toPLOrNull(w);
     if (r.is(Array, subList)) {
@@ -3122,6 +3122,21 @@ var coreWords = {
                 ['size', 0, '<='],
                 ['drop'],
                 ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
+                [], 'linrec5'
+            ], "apply-with"]
+    },
+    'reduce': {
+        sig: [
+            [{ type: 'ValueList extends (list<words>)' },
+                { type: 'Accumulater (word)' },
+                { type: 'Phrase extends (list<words>)' }],
+            [{ type: 'ResultValueList extends (list<words>)' }]
+        ],
+        def: [["list", "acc", "phrase"], [
+                ["acc", "list"],
+                ['size', 0, '<='],
+                ['drop'],
+                ['uncons', ["phrase", "apply"], 'dip'],
                 [], 'linrec5'
             ], "apply-with"]
     },

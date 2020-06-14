@@ -71,13 +71,6 @@ allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
-// ToDo work on apply-with and def-local-with
-// [a b c] [a a * b b + + c -] apply-with 
-// [a b c] add-local [pop swap [[] cons def-local]] map dip2 [a a * b b + + c -] apply drop-local
-// allPassing &= testIt("3 4 17 [a b c] [a a * b b + + c -] apply-with", [0]);
-// [[[a b c] [a a * b b + + c -]] apply-with 
-// allPassing &= testIt("3 4 17 [a b c] [a a * b b + + c -] apply-with", [0]);
-
 // def tests
 allPassing &= testIt("[1 +] [add-one] def 22 add-one", [23]);
 allPassing &= testIt("[dup2 +] [fib] def 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 8]);
@@ -112,10 +105,17 @@ allPassing &= testIt("[3 8 5 7 10 2 9 1] [3 % 0 ==] filter", [[3, 9]]);
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [7 > ] filter", [[8, 10, 9]]);
 
 
+allPassing &= testIt("[3 8 5 4 10 2 9 1] 0 [+] reduce", [42]);
+allPassing &= testIt("[3 8 5 4 10 2 9 1] 0 [2 * +] reduce", [84]);
+
+
 allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
 [size 1 <=] [] [uncons [>] split] [concat] binrec
 `, [[1,2,3,4,5,5,6,7,8,9]]);
+
+allPassing &= testIt("0 0 [a b] [a b +] apply-with", [0]);
+allPassing &= testIt("0 [a] [a] apply-with", [0]);
 
 allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with", [27]);
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] apply-with", [11]);

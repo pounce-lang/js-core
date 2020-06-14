@@ -17,19 +17,19 @@ const toBoolOrNull = (u: any): boolean | null =>
     r.is(Boolean, u) ? u : null;
 const toWordOrNull = (u: any): Word | null => {
     //string | number | Word[] | boolean | { [index: string]: Word }
-    if (toStringOrNull(u)) {
+    if (toStringOrNull(u) !== null) {
         return u;
     }
-    if (toNumOrNull(u)) {
+    if (toNumOrNull(u) !== null ) {
         return u;
     }
-    if (toArrOrNull(u)) {
+    if (toArrOrNull(u) !== null ) {
         return u;
     }
-    if (toBoolOrNull(u)) {
+    if (toBoolOrNull(u) !== null ) {
         return u;
     }
-    if (r.is(Object, u)) {
+    if (r.is(Object, u) !== null ) {
         return u;
     }
     return null;
@@ -47,7 +47,7 @@ const toWordOrNull = (u: any): Word | null => {
 const consReslover = (localWD: { [index: string]: Word }) => (w: Word): Word => {
     if (r.is(String, w)) {
         const newW = toWordOrNull(r.propOr(w, w as string, localWD));
-        return newW ? newW : w;
+        return newW !== null ? newW : w;
     }
     const subList = toPLOrNull(w);
     if (r.is(Array, subList)) {
@@ -490,6 +490,20 @@ export const coreWords: WordDictionary = {
             ['size', 0, '<='],
             ['drop'],
             ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else' ], 'dip'],
+            [], 'linrec5'
+        ], "apply-with"]
+    },
+    'reduce': {
+        sig: [
+            [{ type: 'ValueList extends (list<words>)' },
+            { type: 'Accumulater (word)' },
+            { type: 'Phrase extends (list<words>)' }],
+            [{ type: 'ResultValueList extends (list<words>)' }]],
+        def: [["list", "acc", "phrase"], [
+            ["acc", "list"],
+            ['size', 0, '<='],
+            ['drop'],
+            ['uncons', ["phrase", "apply" ], 'dip'],
             [], 'linrec5'
         ], "apply-with"]
     },
