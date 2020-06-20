@@ -24,8 +24,14 @@ export declare function interpreter(pl_in: ProgramList | string, opt?: {
     internalCallStack: string[];
     error: string;
 }, void, unknown>;
-export declare function purr(pl: ProgramList, wd: WordDictionary): Generator<{
+export declare function purr(pl: ProgramList, wd: WordDictionary, cycleLimit?: number): Generator<{
+    stack: ValueStack;
+    prog: import("./types").Word[];
+    active: boolean;
+    cyclesConsumed: number;
+} | {
     stack: ValueStack;
     prog: ProgramList;
     active: boolean;
+    cyclesConsumed?: undefined;
 }, void, unknown>;

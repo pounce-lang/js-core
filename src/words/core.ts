@@ -81,7 +81,30 @@ export const coreWords: WordDictionary = {
         sig: [[{ type: 'any' }], []],
         def: s => { s.pop(); return [s]; }
     },
-
+    'round': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        def: s => {
+            // const b = <number | null>toTypeOrNull<number | null>(s.pop(), '(int | float)');
+            const b = toNumOrNull(s.pop());
+            const a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(NP.round(a, b));
+                return [s];
+            }
+            return null;
+        }
+    },
+    'abs': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        def: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.abs(a));
+                return [s];
+            }
+            return null;
+        }
+    },
     '+': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         def: s => {
@@ -257,7 +280,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s[s.length - 1]);
-            s.push(a === b);
+            if (a !== null && b !== null) {
+                s.push(a === b);
+            }
             return [s];
         }
     },
@@ -265,7 +290,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
-            s.push(a === b);
+            if (a !== null && b !== null) {
+                s.push(a === b);
+            }
             return [s];
         }
     },
@@ -273,7 +300,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
-            s.push(a !== b);
+            if (a !== null && b !== null) {
+                s.push(a !== b);
+            }
             return [s];
         }
     },
@@ -281,7 +310,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
-            s.push(a > b);
+            if (a !== null && b !== null) {
+                s.push(a > b);
+            }
             return [s];
         }
     },
@@ -289,7 +320,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
-            s.push(a < b);
+            if (a !== null && b !== null) {
+                s.push(a < b);
+            }
             return [s];
         }
     },
@@ -297,7 +330,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
-            s.push(a >= b);
+            if (a !== null && b !== null) {
+                s.push(a >= b);
+            }
             return [s];
         }
     },
@@ -305,7 +340,9 @@ export const coreWords: WordDictionary = {
         def: s => {
             const b = toNumOrNull(s.pop());
             const a = toNumOrNull(s.pop());
-            s.push(a <= b);
+            if (a !== null && b !== null) {
+                s.push(a <= b);
+            }
             return [s];
         }
     },

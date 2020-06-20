@@ -69,6 +69,14 @@ allPassing &= testIt("2 1 [==] [5] [7] ifte", [7]);
 allPassing &= testIt("2 1[<] [5] [7 3 [+] apply] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
+allPassing &= testIt("2 5 +", [7]);
+allPassing &= testIt("2 5 -", [-3]);
+allPassing &= testIt("2 5 *", [10]);
+allPassing &= testIt("2 5 /", [0.4]);
+allPassing &= testIt("2 5 %", [2]);
+allPassing &= testIt("-2 abs", [2]);
+//NP.round(0.105, 2);
+allPassing &= testIt("0.105 2 round", [0.11]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
 // def tests

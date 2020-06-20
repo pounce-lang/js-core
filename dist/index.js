@@ -2721,6 +2721,30 @@ var coreWords = {
         sig: [[{ type: 'any' }], []],
         def: function (s) { s.pop(); return [s]; }
     },
+    'round': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        def: function (s) {
+            // const b = <number | null>toTypeOrNull<number | null>(s.pop(), '(int | float)');
+            var b = toNumOrNull(s.pop());
+            var a = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(NP.round(a, b));
+                return [s];
+            }
+            return null;
+        }
+    },
+    'abs': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        def: function (s) {
+            var a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.abs(a));
+                return [s];
+            }
+            return null;
+        }
+    },
     '+': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         def: function (s) {
@@ -2890,7 +2914,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s[s.length - 1]);
-            s.push(a === b);
+            if (a !== null && b !== null) {
+                s.push(a === b);
+            }
             return [s];
         }
     },
@@ -2898,7 +2924,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
-            s.push(a === b);
+            if (a !== null && b !== null) {
+                s.push(a === b);
+            }
             return [s];
         }
     },
@@ -2906,7 +2934,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
-            s.push(a !== b);
+            if (a !== null && b !== null) {
+                s.push(a !== b);
+            }
             return [s];
         }
     },
@@ -2914,7 +2944,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
-            s.push(a > b);
+            if (a !== null && b !== null) {
+                s.push(a > b);
+            }
             return [s];
         }
     },
@@ -2922,7 +2954,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
-            s.push(a < b);
+            if (a !== null && b !== null) {
+                s.push(a < b);
+            }
             return [s];
         }
     },
@@ -2930,7 +2964,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
-            s.push(a >= b);
+            if (a !== null && b !== null) {
+                s.push(a >= b);
+            }
             return [s];
         }
     },
@@ -2938,7 +2974,9 @@ var coreWords = {
         def: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
-            s.push(a <= b);
+            if (a !== null && b !== null) {
+                s.push(a <= b);
+            }
             return [s];
         }
     },
@@ -3500,14 +3538,17 @@ function interpreter(pl_in, opt) {
 // Assumes that you have run and tested the interpreter with parsed pre processed input 
 // opt:{ logLevel: 0, yieldOnId: false, preProcessed: true, wd: coreWords_merged_with_preProcessedDefs }
 //
-function purr(pl, wd) {
-    var s, w, wds, plist;
+function purr(pl, wd, cycleLimit) {
+    var s, w, cycles, wds, plist;
     var _a, _b;
+    if (cycleLimit === void 0) { cycleLimit = 10000; }
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
                 s = [];
-                while ((w = pl.shift()) !== undefined) {
+                cycles = 0;
+                while ((w = pl.shift()) !== undefined && cycles < cycleLimit) {
+                    cycles += 1;
                     wds = r.is(String, w) ? wd[w] : null;
                     if (wds) {
                         if (typeof wds.def === 'function') {
@@ -3529,10 +3570,16 @@ function purr(pl, wd) {
                         }
                     }
                 }
-                return [4 /*yield*/, { stack: s, prog: pl, active: false }];
+                if (!(pl.length > 0)) return [3 /*break*/, 2];
+                return [4 /*yield*/, { stack: [], prog: __spreadArrays(s, pl), active: false, cyclesConsumed: cycles }];
             case 1:
                 _c.sent();
-                return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 2: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
+            case 3:
+                _c.sent();
+                _c.label = 4;
+            case 4: return [2 /*return*/];
         }
     });
 }

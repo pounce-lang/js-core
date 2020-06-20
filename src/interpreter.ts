@@ -91,12 +91,13 @@ export function* interpreter(
 //
 export function* purr(
   pl: ProgramList,
-  wd: WordDictionary
+  wd: WordDictionary,
+  cycleLimit: number = 10000
 ) {
   let s: ValueStack = [];
   let w;
   let cycles = 0;
-  while ((w = pl.shift()) !== undefined) {
+  while ((w = pl.shift()) !== undefined && cycles < cycleLimit) {
     cycles += 1;
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
@@ -119,5 +120,10 @@ export function* purr(
       }
     }
   }
-  yield { stack: s, prog: pl, active: false };
+  if (pl.length > 0) {
+    yield { stack: [] as ValueStack, prog: [...s, ...pl], active: false, cyclesConsumed: cycles };
+  }
+  else {
+    yield { stack: s, prog: pl, active: false };
+  }
 }
