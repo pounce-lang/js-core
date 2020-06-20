@@ -3541,7 +3541,7 @@ function interpreter(pl_in, opt) {
 function purr(pl, wd, cycleLimit) {
     var s, w, cycles, wds, plist;
     var _a, _b;
-    if (cycleLimit === void 0) { cycleLimit = 10000; }
+    if (cycleLimit === void 0) { cycleLimit = 1000000; }
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
@@ -3571,7 +3571,7 @@ function purr(pl, wd, cycleLimit) {
                     }
                 }
                 if (!(pl.length > 0)) return [3 /*break*/, 2];
-                return [4 /*yield*/, { stack: [], prog: __spreadArrays(s, pl), active: false, cyclesConsumed: cycles }];
+                return [4 /*yield*/, { stack: [], prog: __spreadArrays(s, [w], pl), active: false, cyclesConsumed: cycles }];
             case 1:
                 _c.sent();
                 return [3 /*break*/, 4];

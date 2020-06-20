@@ -70,12 +70,13 @@ allPassing &= testIt("2 1[<] [5] [7 3 [+] apply] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("2 5 +", [7]);
+allPassing &= testIt(".1 .2 +", [0.3]);
 allPassing &= testIt("2 5 -", [-3]);
+allPassing &= testIt("1.0 0.9 -", [0.1]);
 allPassing &= testIt("2 5 *", [10]);
 allPassing &= testIt("2 5 /", [0.4]);
 allPassing &= testIt("2 5 %", [2]);
 allPassing &= testIt("-2 abs", [2]);
-//NP.round(0.105, 2);
 allPassing &= testIt("0.105 2 round", [0.11]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
@@ -152,6 +153,19 @@ const [preProcessedProgram1, corePlusUserDefinedWords1] = preProcessDefs(parsedP
 const runner1 = purr(preProcessedProgram1, corePlusUserDefinedWords1);
 const result1 = runner1.next();
 allPassing &= (result1.value.active === false && result1.value.stack[0] === 1);
+
+const program2 = "0 [ 1 +] 10000 times";
+const parsedProgram2 = parse(program2);
+const [preProcessedProgram2, corePlusUserDefinedWords2] = preProcessDefs(parsedProgram2, coreWords);
+const runner2 = purr(preProcessedProgram2, corePlusUserDefinedWords2, 100);
+const result2 = runner2.next();
+allPassing &= (result2.value.active === false && result2.value.stack[0] === undefined && result2.value.cyclesConsumed === 100);
+// ... a pounce program that did not finish should be ready to be continued (without parsing)
+const parsedProgram3 = result2.value.prog;
+const [preProcessedProgram3, corePlusUserDefinedWords3] = preProcessDefs(parsedProgram3, coreWords);
+const runner3 = purr(preProcessedProgram3, corePlusUserDefinedWords3);
+const result3 = runner3.next();
+allPassing &= (result3.value.active === false && result3.value.stack[0] === 10000);
 
 console.log("Pounce Tests Pass:", allPassing === 1);
 

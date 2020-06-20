@@ -92,7 +92,7 @@ export function* interpreter(
 export function* purr(
   pl: ProgramList,
   wd: WordDictionary,
-  cycleLimit: number = 10000
+  cycleLimit: number = 1000000
 ) {
   let s: ValueStack = [];
   let w;
@@ -121,7 +121,7 @@ export function* purr(
     }
   }
   if (pl.length > 0) {
-    yield { stack: [] as ValueStack, prog: [...s, ...pl], active: false, cyclesConsumed: cycles };
+    yield { stack: [] as ValueStack, prog: [...s, w, ...pl], active: false, cyclesConsumed: cycles };
   }
   else {
     yield { stack: s, prog: pl, active: false };
