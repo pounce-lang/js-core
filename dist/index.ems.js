@@ -1,4 +1,4 @@
-import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, filter } from 'ramda';
+import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, keys, path, filter } from 'ramda';
 import NP from 'number-precision';
 import 'fbp-types';
 
@@ -2696,6 +2696,26 @@ var subInWD = function (localWD, words) {
     return map(resolveWord, words);
 };
 var coreWords = {
+    'words': {
+        sig: [[], [{ type: 'list' }]],
+        def: function (s) {
+            s.push(introspectWords());
+            return [s];
+        }
+    },
+    // introspectWord
+    'word': {
+        sig: [[{ type: 'list<string>)' }], [{ type: 'record' }]],
+        def: function (s) {
+            var phrase = toArrOfStrOrNull(s.pop());
+            var wordName = toStringOrNull(phrase[0]);
+            if (wordName) {
+                s.push(introspectWord(wordName));
+                return [s];
+            }
+            return null;
+        }
+    },
     'dup': {
         sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
         def: function (s) { s.push(s[s.length - 1]); return [s]; }
@@ -3577,6 +3597,8 @@ function purr(pl, wd, cycleLimit) {
         }
     });
 }
+var introspectWords = function () { return keys(coreWords); };
+var introspectWord = function (wn) { return JSON.parse(JSON.stringify(path([wn], coreWords))); };
 
 // the Pounce language core module exposes these function
 var parse$1 = parser;

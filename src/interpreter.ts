@@ -127,3 +127,6 @@ export function* purr(
     yield { stack: s, prog: pl, active: false };
   }
 }
+
+export const introspectWords = () => r.keys(coreWords);
+export const introspectWord = (wn: string) => JSON.parse(JSON.stringify(r.path([wn], coreWords)));

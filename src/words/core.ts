@@ -2,6 +2,7 @@ import * as r from "ramda";
 import { WordDictionary, WordValue } from "../WordDictionary.types";
 import { ProgramList, Word } from '../types';
 import NP from 'number-precision';
+import { introspectWords, introspectWord } from "../interpreter";
 
 export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
@@ -62,11 +63,31 @@ const subInWD = (localWD: { [index: string]: Word }, words: Word[]): Word[] => {
 }
 
 export const coreWords: WordDictionary = {
-    'dup': {
-        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
-        def: s => { s.push(s[s.length - 1]); return [s]; }
-    },
-    //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
+   'words': {
+    sig: [[], [{ type: 'list' }]],
+        def: (s) => {
+            s.push(introspectWords());
+            return [s];
+        }
+   },
+// introspectWord
+'word': {
+    sig: [[{ type: 'list<string>)'}], [{ type: 'record' }]],
+    def: s => { 
+        const phrase = toArrOfStrOrNull(s.pop());
+        const wordName = toStringOrNull(phrase[0]);
+        if (wordName) {
+        s.push(introspectWord(wordName));
+        return [s];
+        }
+        return null; 
+    }
+},
+'dup': {
+    sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
+    def: s => { s.push(s[s.length - 1]); return [s]; }
+},
+//    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'swap': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
         def: s => {

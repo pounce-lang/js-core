@@ -53,6 +53,9 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
+allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","apply","apply-with","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","popInternalCallStack"]]);
+allPassing &= testIt("[dup2] word", [{"sig":[[{"type":"A","use":"observe"},{"type":"B","use":"observe"}],[{"type":"A"},{"type":"B"}]],"def":[["dup"],"dip","dup",["swap"],"dip"]}]);
+allPassing &= testIt("[word] word", [{"sig":[[{"type":"list<string>)"}],[{"type":"record"}]]}]);
 allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
 allPassing &= testIt("3 2 7 [+] dip -", [-2]);
