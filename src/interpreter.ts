@@ -128,5 +128,5 @@ export function* purr(
   }
 }
 
-export const introspectWords = () => r.keys(coreWords);
+export const introspectWords = () => r.keys(r.omit(['popInternalCallStack'], coreWords));
 export const introspectWord = (wn: string) => JSON.parse(JSON.stringify(r.path([wn], coreWords)));

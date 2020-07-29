@@ -1,4 +1,4 @@
-import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, keys, path, filter } from 'ramda';
+import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, keys, omit, path, filter } from 'ramda';
 import NP from 'number-precision';
 import 'fbp-types';
 
@@ -3212,6 +3212,18 @@ var coreWords = {
             return [s];
         }
     },
+    'depth': {
+        def: function (s) {
+            s.push(s.length);
+            return [s];
+        }
+    },
+    'stack-copy': {
+        def: function (s) {
+            s.push(__spreadArrays(s));
+            return [s];
+        }
+    },
     'popInternalCallStack': {
         def: []
     }
@@ -3597,7 +3609,7 @@ function purr(pl, wd, cycleLimit) {
         }
     });
 }
-var introspectWords = function () { return keys(coreWords); };
+var introspectWords = function () { return keys(omit(['popInternalCallStack'], coreWords)); };
 var introspectWord = function (wn) { return JSON.parse(JSON.stringify(path([wn], coreWords))); };
 
 // the Pounce language core module exposes these function

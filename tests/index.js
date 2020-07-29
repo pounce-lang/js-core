@@ -53,9 +53,9 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","apply","apply-with","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","popInternalCallStack"]]);
-allPassing &= testIt("[dup2] word", [{"sig":[[{"type":"A","use":"observe"},{"type":"B","use":"observe"}],[{"type":"A"},{"type":"B"}]],"def":[["dup"],"dip","dup",["swap"],"dip"]}]);
-allPassing &= testIt("[word] word", [{"sig":[[{"type":"list<string>)"}],[{"type":"record"}]]}]);
+allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","apply","apply-with","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","depth","stack-copy"]]);
+allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "def": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
+allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
 allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
 allPassing &= testIt("3 2 7 [+] dip -", [-2]);
@@ -94,19 +94,21 @@ allPassing &= testIt("5 [0 =] [1 +] [dup 1 -] [*] linrec", [120]);
 
 allPassing &= testIt("A [B] cons", [['A', 'B']]);
 allPassing &= testIt("[A B] uncons", ['A', ['B']]);
-allPassing &= testIt("[1 2] uncons cons", [[1,2]]);
+allPassing &= testIt("[1 2] uncons cons", [[1, 2]]);
 
 allPassing &= testIt("[A] B push", [['A', 'B']]);
 allPassing &= testIt("[A B] pop", [['A'], 'B']);
-allPassing &= testIt("[1 2] pop push", [[1,2]]);
-allPassing &= testIt("[1 2] pop swap cons", [[2,1]]);
+allPassing &= testIt("[1 2] pop push", [[1, 2]]);
+allPassing &= testIt("[1 2] pop swap cons", [[2, 1]]);
 
+allPassing &= testIt("[1 2] [3] 4 depth", [[1, 2], [3], 4, 3]);
+allPassing &= testIt("[1 2] [3] 4 stack-copy", [[1, 2], [3], 4, [[1, 2], [3], 4]]);
 allPassing &= testIt("[1 2] size", [[1, 2], 2]);
 
 allPassing &= testIt("[1 2] [3] concat", [[1, 2, 3]]);
 
-allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3,5,2,1, 6], [8,7,10,9]]);
-allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [ [ 3, 2, 1, 5 ], [ 6, 8, 7, 10, 5, 9 ] ] );
+allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3, 5, 2, 1, 6], [8, 7, 10, 9]]);
+allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [[3, 2, 1, 5], [6, 8, 7, 10, 5, 9]]);
 
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 ==] map", [[false, true, false, false, true, true, false, false]]);
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 *] map", [[6, 16, 10, 14, 20, 4, 18, 2]]);
@@ -124,7 +126,7 @@ allPassing &= testIt("[3 8 5 4 10 2 9 1] 0 [2 * +] reduce", [84]);
 allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
 [size 1 <=] [] [uncons [>] split] [concat] binrec
-`, [[1,2,3,4,5,5,6,7,8,9]]);
+`, [[1, 2, 3, 4, 5, 5, 6, 7, 8, 9]]);
 
 allPassing &= testIt("0 0 [a b] [a b +] apply-with", [0]);
 allPassing &= testIt("0 [a] [a] apply-with", [0]);
@@ -138,7 +140,7 @@ allPassing &= testIt(`
 [[p n fs] [fs] apply-with]
 [[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] apply-with]
 [] linrec
-`, [[7,5,3,2]]);
+`, [[7, 5, 3, 2]]);
 allPassing &= testIt(`
 3599 
 [2 []] 

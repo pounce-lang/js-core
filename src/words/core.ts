@@ -21,16 +21,16 @@ const toWordOrNull = (u: any): Word | null => {
     if (toStringOrNull(u) !== null) {
         return u;
     }
-    if (toNumOrNull(u) !== null ) {
+    if (toNumOrNull(u) !== null) {
         return u;
     }
-    if (toArrOrNull(u) !== null ) {
+    if (toArrOrNull(u) !== null) {
         return u;
     }
-    if (toBoolOrNull(u) !== null ) {
+    if (toBoolOrNull(u) !== null) {
         return u;
     }
-    if (r.is(Object, u) !== null ) {
+    if (r.is(Object, u) !== null) {
         return u;
     }
     return null;
@@ -63,31 +63,31 @@ const subInWD = (localWD: { [index: string]: Word }, words: Word[]): Word[] => {
 }
 
 export const coreWords: WordDictionary = {
-   'words': {
-    sig: [[], [{ type: 'list' }]],
+    'words': {
+        sig: [[], [{ type: 'list' }]],
         def: (s) => {
             s.push(introspectWords());
             return [s];
         }
-   },
-// introspectWord
-'word': {
-    sig: [[{ type: 'list<string>)'}], [{ type: 'record' }]],
-    def: s => { 
-        const phrase = toArrOfStrOrNull(s.pop());
-        const wordName = toStringOrNull(phrase[0]);
-        if (wordName) {
-        s.push(introspectWord(wordName));
-        return [s];
+    },
+    // introspectWord
+    'word': {
+        sig: [[{ type: 'list<string>)' }], [{ type: 'record' }]],
+        def: s => {
+            const phrase = toArrOfStrOrNull(s.pop());
+            const wordName = toStringOrNull(phrase[0]);
+            if (wordName) {
+                s.push(introspectWord(wordName));
+                return [s];
+            }
+            return null;
         }
-        return null; 
-    }
-},
-'dup': {
-    sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
-    def: s => { s.push(s[s.length - 1]); return [s]; }
-},
-//    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
+    },
+    'dup': {
+        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
+        def: s => { s.push(s[s.length - 1]); return [s]; }
+    },
+    //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'swap': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
         def: s => {
@@ -547,7 +547,7 @@ export const coreWords: WordDictionary = {
             [[], "list"],
             ['size', 0, '<='],
             ['drop'],
-            ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else' ], 'dip'],
+            ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
             [], 'linrec5'
         ], "apply-with"]
     },
@@ -561,7 +561,7 @@ export const coreWords: WordDictionary = {
             ["acc", "list"],
             ['size', 0, '<='],
             ['drop'],
-            ['uncons', ["phrase", "apply" ], 'dip'],
+            ['uncons', ["phrase", "apply"], 'dip'],
             [], 'linrec5'
         ], "apply-with"]
     },
@@ -583,6 +583,18 @@ export const coreWords: WordDictionary = {
             if (arr) {
                 s.push(arr.length);
             }
+            return [s];
+        }
+    },
+    'depth': {
+        def: s => {
+            s.push(s.length);
+            return [s];
+        }
+    },
+    'stack-copy': {
+        def: s => {
+            s.push([...s]);
             return [s];
         }
     },
