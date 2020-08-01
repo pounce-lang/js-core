@@ -53,7 +53,7 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","apply","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","depth","stack-copy"]]);
+allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","play","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","depth","stack-copy"]]);
 allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "compose": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
 allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
 allPassing &= testIt("4 dup drop", [4]);
@@ -64,7 +64,7 @@ allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
 allPassing &= testIt('A B C rolldown', ['B', 'C', 'A']);
 allPassing &= testIt("true [5] [7] if-else", [5]);
 allPassing &= testIt("false [5] [7] if-else", [7]);
-allPassing &= testIt("false [5] [7 3 [+] apply] if-else", [10]);
+allPassing &= testIt("false [5] [7 3 [+] play] if-else", [10]);
 allPassing &= testIt("2 1 [>] [5] [7] ifte", [5]);
 allPassing &= testIt("2 1 [=] [5] [7] ifte", [2, 7]);
 allPassing &= testIt("0 0 [=] [5] [7] ifte", [0, 5]);
@@ -73,7 +73,7 @@ allPassing &= testIt("a b =", ['a', false]);
 allPassing &= testIt("b b =", ['b', true]);
 allPassing &= testIt("a b ==", [false]);
 allPassing &= testIt("b b ==", [true]);
-allPassing &= testIt("2 1[<] [5] [7 3 [+] apply] ifte", [10]);
+allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("2 5 +", [7]);
@@ -91,8 +91,8 @@ allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 allPassing &= testIt("[1 +] [add-one] compose 22 add-one", [23]);
 allPassing &= testIt("[dup2 +] [fib] compose 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
-//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] compose 5 [1 swap] apply fac
-allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] compose 5 [1 swap] apply fac", [120]);
+//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] compose 5 [1 swap] play fac
+allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] compose 5 [1 swap] play fac", [120]);
 allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] constrec", [120]);
 allPassing &= testIt("5 [0 =] [1 +] [dup 1 -] [*] linrec", [120]);
 

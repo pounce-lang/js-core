@@ -2826,7 +2826,7 @@ var coreWords = {
             return null;
         }
     },
-    'apply': {
+    'play': {
         sig: [[{ type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
         compose: function (s, pl) {
             var block = toPLOrNull(s.pop());
@@ -2927,8 +2927,8 @@ var coreWords = {
         }
     },
     'ifte': {
-        // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
-        compose: [['apply'], 'dip2', 'if-else']
+        // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally play the first or second quotation',
+        compose: [['play'], 'dip2', 'if-else']
     },
     '=': {
         compose: function (s) {
@@ -3182,7 +3182,7 @@ var coreWords = {
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', ["swap", ["phrase", 'apply'], 'dip', "swap", 'push'], 'dip'],
+                ['uncons', ["swap", ["phrase", 'play'], 'dip', "swap", 'push'], 'dip'],
                 [], 'linrec5'
             ], "pounce"]
     },
@@ -3196,7 +3196,7 @@ var coreWords = {
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
+                ['uncons', ["swap", ["dup", "phrase", 'play'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
                 [], 'linrec5'
             ], "pounce"]
     },
@@ -3211,7 +3211,7 @@ var coreWords = {
                 ["acc", "list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', ["phrase", "apply"], 'dip'],
+                ['uncons', ["phrase", "play"], 'dip'],
                 [], 'linrec5'
             ], "pounce"]
     },
@@ -3220,7 +3220,7 @@ var coreWords = {
                 [], [], "cutVal", "theList",
                 'size',
                 ['uncons',
-                    ['dup2', "operator", "apply",
+                    ['dup2', "operator", "play",
                         ['swap', ['swap', ['push'], 'dip'], 'dip'],
                         ['swap', ['push'], 'dip'], 'if-else'], 'dip',
                 ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
@@ -3412,7 +3412,7 @@ var coreWords = {
     // //     'definition': [[], ['cons'], 'c', 'repeat', 'swap', [['uncons'], 'c', 'repeat', 'drop'], 'dip']
     // // },
     // // 'case': {
-    // //     expects: [{ desc: 'key', ofType: 'word' }, { desc: 'a', ofType: 'record' }], effects: [-2], tests: [], desc: 'apply a matching case',
+    // //     expects: [{ desc: 'key', ofType: 'word' }, { desc: 'a', ofType: 'record' }], effects: [-2], tests: [], desc: 'play a matching case',
     // //     definition: function (s: Json[], pl: PL) {
     // //         const case_record = s.pop();
     // //         let key = s.pop();
@@ -3440,7 +3440,7 @@ var coreWords = {
     // //         'setup-filter': [[]],
     // //         'process-filter': [
     // //             ["size"], "dip2", "rolldown", 0, ">",
-    // //             ["rotate", "pop", "rolldown", ["dup"], "dip", "dup", ["apply"], "dip", "swap",
+    // //             ["rotate", "pop", "rolldown", ["dup"], "dip", "dup", ["play"], "dip", "swap",
     // //                 [["swap"], "dip2", ["prepend"], "dip"],
     // //                 [["swap"], "dip2", ["drop"], "dip"], "if-else", "swap", "process-filter"],
     // //             [["drop", "drop"], "dip"], "if-else"]
@@ -3452,7 +3452,7 @@ var coreWords = {
     // //     'local-words': {
     // //         'more?': ['rolldown', 'size', 0, '>', ['rollup'], 'dip'],
     // //         'process-reduce': ['more?', ['reduce-step', 'process-reduce'], 'if'],
-    // //         'reduce-step': [['pop'], 'dip2', 'dup', [['swap'], 'dip', 'apply'], 'dip'],
+    // //         'reduce-step': [['pop'], 'dip2', 'dup', [['swap'], 'dip', 'play'], 'dip'],
     // //         'teardown-reduce': ['drop', ['drop'], 'dip'],
     // //     },
     // //     'definition': ['process-reduce', 'teardown-reduce']
