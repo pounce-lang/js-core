@@ -2704,7 +2704,7 @@ var subInWD = function (localWD, words) {
 var coreWords = {
     'words': {
         sig: [[], [{ type: 'list' }]],
-        def: function (s) {
+        compose: function (s) {
             s.push(introspectWords());
             return [s];
         }
@@ -2712,7 +2712,7 @@ var coreWords = {
     // introspectWord
     'word': {
         sig: [[{ type: 'list<string>)' }], [{ type: 'record' }]],
-        def: function (s) {
+        compose: function (s) {
             var phrase = toArrOfStrOrNull(s.pop());
             var wordName = toStringOrNull(phrase[0]);
             if (wordName) {
@@ -2724,12 +2724,12 @@ var coreWords = {
     },
     'dup': {
         sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
-        def: function (s) { s.push(s[s.length - 1]); return [s]; }
+        compose: function (s) { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'swap': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'B' }, { type: 'A' }]],
-        def: function (s) {
+        compose: function (s) {
             var top = s.pop();
             var under = s.pop();
             s.push(top);
@@ -2739,11 +2739,11 @@ var coreWords = {
     },
     'drop': {
         sig: [[{ type: 'any' }], []],
-        def: function (s) { s.pop(); return [s]; }
+        compose: function (s) { s.pop(); return [s]; }
     },
     'round': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             // const b = <number | null>toTypeOrNull<number | null>(s.pop(), '(int | float)');
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -2756,7 +2756,7 @@ var coreWords = {
     },
     'abs': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             var a = toNumOrNull(s.pop());
             if (a !== null) {
                 s.push(Math.abs(a));
@@ -2767,7 +2767,7 @@ var coreWords = {
     },
     '+': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             // const b = <number | null>toTypeOrNull<number | null>(s.pop(), '(int | float)');
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
@@ -2780,7 +2780,7 @@ var coreWords = {
     },
     '-': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -2792,7 +2792,7 @@ var coreWords = {
     },
     '/': {
         sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null && b !== 0) {
@@ -2804,7 +2804,7 @@ var coreWords = {
     },
     '%': {
         sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null && b !== 0) {
@@ -2816,7 +2816,7 @@ var coreWords = {
     },
     '*': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -2828,7 +2828,7 @@ var coreWords = {
     },
     'apply': {
         sig: [[{ type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             var block = toPLOrNull(s.pop());
             if (block) {
                 pl = block.concat(pl);
@@ -2839,9 +2839,9 @@ var coreWords = {
             return [s, pl];
         }
     },
-    'apply-with': {
+    'pounce': {
         sig: [[{ type: 'Args extends (list<string>)', use: 'pop-each!' }, { type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             var words = toPLOrNull(s.pop());
             var argList = toArrOfStrOrNull(s.pop());
             if (words !== null && argList) {
@@ -2857,7 +2857,7 @@ var coreWords = {
     },
     'dip': {
         sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             var block = toPLOrNull(s.pop());
             var item = s.pop();
             pl = [item].concat(pl);
@@ -2872,7 +2872,7 @@ var coreWords = {
     },
     'dip2': {
         sig: [[{ type: 'a' }, { type: 'b' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'a' }, { type: 'b' }]],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             var block = toPLOrNull(s.pop());
             var item2 = s.pop();
             pl = [item2].concat(pl);
@@ -2889,18 +2889,18 @@ var coreWords = {
     },
     'rotate': {
         sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'C' }, { type: 'B' }, { type: 'A' }]],
-        def: ['swap', ['swap'], 'dip', 'swap']
+        compose: ['swap', ['swap'], 'dip', 'swap']
     },
     'rollup': {
         sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'C' }, { type: 'A' }, { type: 'B' }]],
-        def: ['swap', ['swap'], 'dip']
+        compose: ['swap', ['swap'], 'dip']
     },
     'rolldown': {
         sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'B' }, { type: 'C' }, { type: 'A' }]],
-        def: [['swap'], 'dip', 'swap']
+        compose: [['swap'], 'dip', 'swap']
     },
     'if-else': {
-        def: function (s, pl) {
+        compose: function (s, pl) {
             var else_block = toPLOrNull(s.pop());
             var then_block = toPLOrNull(s.pop());
             var condition = toBoolOrNull(s.pop());
@@ -2928,30 +2928,47 @@ var coreWords = {
     },
     'ifte': {
         // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally apply the first or second quotation',
-        def: [['apply'], 'dip2', 'if-else']
+        compose: [['apply'], 'dip2', 'if-else']
     },
     '=': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
+        compose: function (s) {
+            var top = s.pop();
+            var b = toNumOrNull(top);
             var a = toNumOrNull(s[s.length - 1]);
             if (a !== null && b !== null) {
                 s.push(a === b);
+            }
+            else {
+                var c = toStringOrNull(top);
+                var d = toStringOrNull(s[s.length - 1]);
+                if (c !== null && d !== null) {
+                    s.push(c === d);
+                }
             }
             return [s];
         }
     },
     '==': {
-        def: function (s) {
-            var b = toNumOrNull(s.pop());
-            var a = toNumOrNull(s.pop());
-            if (a !== null && b !== null) {
-                s.push(a === b);
+        compose: function (s) {
+            var b = s.pop();
+            var a = s.pop();
+            var num_b = toNumOrNull(b);
+            var num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a === num_b);
+            }
+            else {
+                var str_b = toStringOrNull(b);
+                var str_a = toStringOrNull(a);
+                if (str_a !== null && str_b !== null) {
+                    s.push(str_a === str_b);
+                }
             }
             return [s];
         }
     },
     '!=': {
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -2961,7 +2978,7 @@ var coreWords = {
         }
     },
     '>': {
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -2971,7 +2988,7 @@ var coreWords = {
         }
     },
     '<': {
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -2981,7 +2998,7 @@ var coreWords = {
         }
     },
     '>=': {
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -2991,7 +3008,7 @@ var coreWords = {
         }
     },
     '<=': {
-        def: function (s) {
+        compose: function (s) {
             var b = toNumOrNull(s.pop());
             var a = toNumOrNull(s.pop());
             if (a !== null && b !== null) {
@@ -3001,7 +3018,7 @@ var coreWords = {
         }
     },
     'concat': {
-        def: function (s) {
+        compose: function (s) {
             var b = toArrOrNull(s.pop());
             var a = toArrOrNull(s.pop());
             if (a && b) {
@@ -3011,7 +3028,7 @@ var coreWords = {
         }
     },
     'cons': {
-        def: function (s) {
+        compose: function (s) {
             var b = toArrOrNull(s.pop());
             var a = s.pop();
             if (b) {
@@ -3021,7 +3038,7 @@ var coreWords = {
         }
     },
     'uncons': {
-        def: function (s) {
+        compose: function (s) {
             var arr = toArrOrNull(s.pop());
             if (arr) {
                 s.push(r.head(arr), r.tail(arr));
@@ -3030,7 +3047,7 @@ var coreWords = {
         }
     },
     'push': {
-        def: function (s) {
+        compose: function (s) {
             var item = s.pop();
             var arr = toArrOrNull(s.pop());
             if (arr) {
@@ -3040,7 +3057,7 @@ var coreWords = {
         }
     },
     'pop': {
-        def: function (s) {
+        compose: function (s) {
             var arr = toArrOrNull(s.pop());
             if (arr) {
                 s.push(r.init(arr), r.last(arr));
@@ -3056,7 +3073,7 @@ var coreWords = {
                 { type: 'Recurse extends (list<words>)' },
                 { type: 'Final extends (list<words>)' }
             ], []],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             // initial increment condition recurse final constrec
             var final = toPLOrNull(s.pop());
             var recurse = toPLOrNull(s.pop());
@@ -3077,7 +3094,7 @@ var coreWords = {
                 { type: 'Recurse extends (list<words>)' },
                 { type: 'Final extends (list<words>)' }
             ], []],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             // termtest && terminal && recurse && final linrec 
             var final = toPLOrNull(s.pop());
             var recurse = toPLOrNull(s.pop());
@@ -3103,7 +3120,7 @@ var coreWords = {
                 { type: 'Recurse extends (list<words>)' },
                 { type: 'Final extends (list<words>)' }
             ], []],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             // termtest && terminal && recurse && final linrec 
             var final = toPLOrNull(s.pop());
             var recurse = toPLOrNull(s.pop());
@@ -3129,7 +3146,7 @@ var coreWords = {
                 { type: 'Recurse extends (list<words>)' },
                 { type: 'Final extends (list<words>)' }
             ], []],
-        def: function (s, pl) {
+        compose: function (s, pl) {
             // termtest && terminal && recurse && final binrec 
             var final = toPLOrNull(s.pop());
             var recurse = toPLOrNull(s.pop());
@@ -3149,11 +3166,11 @@ var coreWords = {
     },
     'dup2': {
         sig: [[{ type: 'A', use: 'observe' }, { type: 'B', use: 'observe' }], [{ type: 'A' }, { type: 'B' }]],
-        def: [['dup'], 'dip', 'dup', ['swap'], 'dip']
+        compose: [['dup'], 'dip', 'dup', ['swap'], 'dip']
     },
     'times': {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
-        def: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
+        compose: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
     },
     'map': {
         sig: [
@@ -3161,13 +3178,13 @@ var coreWords = {
                 { type: 'Phrase extends (list<words>)' }],
             [{ type: 'ResultValueList extends (list<words>)' }]
         ],
-        def: [["list", "phrase"], [
+        compose: [["list", "phrase"], [
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
                 ['uncons', ["swap", ["phrase", 'apply'], 'dip', "swap", 'push'], 'dip'],
                 [], 'linrec5'
-            ], "apply-with"]
+            ], "pounce"]
     },
     'filter': {
         sig: [
@@ -3175,13 +3192,13 @@ var coreWords = {
                 { type: 'Phrase extends (list<words>)' }],
             [{ type: 'ResultValueList extends (list<words>)' }]
         ],
-        def: [["list", "phrase"], [
+        compose: [["list", "phrase"], [
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
                 ['uncons', ["swap", ["dup", "phrase", 'apply'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
                 [], 'linrec5'
-            ], "apply-with"]
+            ], "pounce"]
     },
     'reduce': {
         sig: [
@@ -3190,16 +3207,16 @@ var coreWords = {
                 { type: 'Phrase extends (list<words>)' }],
             [{ type: 'ResultValueList extends (list<words>)' }]
         ],
-        def: [["list", "acc", "phrase"], [
+        compose: [["list", "acc", "phrase"], [
                 ["acc", "list"],
                 ['size', 0, '<='],
                 ['drop'],
                 ['uncons', ["phrase", "apply"], 'dip'],
                 [], 'linrec5'
-            ], "apply-with"]
+            ], "pounce"]
     },
     'split': {
-        def: [["cutVal", "theList", "operator"], [
+        compose: [["cutVal", "theList", "operator"], [
                 [], [], "cutVal", "theList",
                 'size',
                 ['uncons',
@@ -3207,10 +3224,10 @@ var coreWords = {
                         ['swap', ['swap', ['push'], 'dip'], 'dip'],
                         ['swap', ['push'], 'dip'], 'if-else'], 'dip',
                 ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
-            ], "apply-with"]
+            ], "pounce"]
     },
     'size': {
-        def: function (s) {
+        compose: function (s) {
             var arr = toArrOrNull(s[s.length - 1]);
             if (arr) {
                 s.push(arr.length);
@@ -3219,19 +3236,19 @@ var coreWords = {
         }
     },
     'depth': {
-        def: function (s) {
+        compose: function (s) {
             s.push(s.length);
             return [s];
         }
     },
     'stack-copy': {
-        def: function (s) {
+        compose: function (s) {
             s.push(__spreadArrays(s));
             return [s];
         }
     },
     'popInternalCallStack': {
-        def: []
+        compose: []
     }
     // // 'import': {
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
@@ -3452,15 +3469,15 @@ var preProcessDefs = function (pl, coreWords) {
     // non-FP section (candidate for refactor)
     var next_pl = __spreadArrays(pl);
     var next_wd = {};
-    var def_i = r.findIndex(function (word) { return word === 'def'; }, next_pl);
+    var def_i = r.findIndex(function (word) { return word === 'compose'; }, next_pl);
     while (def_i !== -1) {
         if (def_i >= 2) {
             var word = toPLOrNull(next_pl[def_i - 2]);
             var key = toStringOrNull(r.head(toArrOrNull(next_pl[def_i - 1])));
             next_pl.splice(def_i - 2, 3); // splice is particularly mutant
-            next_wd = defineWord(next_wd, key, { "def": word });
+            next_wd = defineWord(next_wd, key, { "compose": word });
         }
-        def_i = r.findIndex(function (word) { return word === 'def'; }, next_pl);
+        def_i = r.findIndex(function (word) { return word === 'compose'; }, next_pl);
     }
     return [next_pl, r.mergeRight(coreWords, next_wd)];
 };
@@ -3513,15 +3530,15 @@ function interpreter(pl_in, opt) {
             case 8:
                 _k.label = 9;
             case 9:
-                if (typeof wds.def === 'function') {
-                    _g = wds.def(s, pl), s = _g[0], _h = _g[1], pl = _h === void 0 ? pl : _h;
+                if (typeof wds.compose === 'function') {
+                    _g = wds.compose(s, pl), s = _g[0], _h = _g[1], pl = _h === void 0 ? pl : _h;
                 }
                 else {
                     if (w === "popInternalCallStack") {
                         internalCallStack.pop();
                     }
                     else {
-                        plist = toPLOrNull(wds.def);
+                        plist = toPLOrNull(wds.compose);
                         if (plist) {
                             internalCallStack.push(toStringOrNull(w));
                             pl = __spreadArrays(plist, ["popInternalCallStack"], pl);
@@ -3583,11 +3600,11 @@ function purr(pl, wd, cycleLimit) {
                     cycles += 1;
                     wds = r.is(String, w) ? wd[w] : null;
                     if (wds) {
-                        if (typeof wds.def === 'function') {
-                            _a = wds.def(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
+                        if (typeof wds.compose === 'function') {
+                            _a = wds.compose(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
                         }
                         else {
-                            plist = toPLOrNull(wds.def);
+                            plist = toPLOrNull(wds.compose);
                             if (plist) {
                                 pl.unshift.apply(pl, plist);
                             }

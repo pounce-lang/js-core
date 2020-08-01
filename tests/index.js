@@ -53,8 +53,8 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","apply","apply-with","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","depth","stack-copy"]]);
-allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "def": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
+allPassing &= testIt("words", [["words","word","dup","swap","drop","round","abs","+","-","/","%","*","apply","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","depth","stack-copy"]]);
+allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "compose": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
 allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
 allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
@@ -69,6 +69,10 @@ allPassing &= testIt("2 1 [>] [5] [7] ifte", [5]);
 allPassing &= testIt("2 1 [=] [5] [7] ifte", [2, 7]);
 allPassing &= testIt("0 0 [=] [5] [7] ifte", [0, 5]);
 allPassing &= testIt("2 1 [==] [5] [7] ifte", [7]);
+allPassing &= testIt("a b =", ['a', false]);
+allPassing &= testIt("b b =", ['b', true]);
+allPassing &= testIt("a b ==", [false]);
+allPassing &= testIt("b b ==", [true]);
 allPassing &= testIt("2 1[<] [5] [7 3 [+] apply] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
@@ -83,12 +87,12 @@ allPassing &= testIt("-2 abs", [2]);
 allPassing &= testIt("0.105 2 round", [0.11]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
-// def tests
-allPassing &= testIt("[1 +] [add-one] def 22 add-one", [23]);
-allPassing &= testIt("[dup2 +] [fib] def 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 8]);
+// compose tests
+allPassing &= testIt("[1 +] [add-one] compose 22 add-one", [23]);
+allPassing &= testIt("[dup2 +] [fib] compose 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
-//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] def 5 [1 swap] apply fac
-allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] def 5 [1 swap] apply fac", [120]);
+//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] compose 5 [1 swap] apply fac
+allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] compose 5 [1 swap] apply fac", [120]);
 allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] constrec", [120]);
 allPassing &= testIt("5 [0 =] [1 +] [dup 1 -] [*] linrec", [120]);
 
@@ -128,31 +132,31 @@ allPassing &= testIt(`
 [size 1 <=] [] [uncons [>] split] [concat] binrec
 `, [[1, 2, 3, 4, 5, 5, 6, 7, 8, 9]]);
 
-allPassing &= testIt("0 0 [a b] [a b +] apply-with", [0]);
-allPassing &= testIt("0 [a] [a] apply-with", [0]);
+allPassing &= testIt("0 0 [a b] [a b +] pounce", [0]);
+allPassing &= testIt("0 [a] [a] pounce", [0]);
 
-allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] apply-with", [27]);
-allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] apply-with", [11]);
+allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] pounce", [27]);
+allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] pounce", [11]);
 
 allPassing &= testIt(`
 210 2 [] 
-[[p n fs] [p n fs p 1 <=] apply-with]
-[[p n fs] [fs] apply-with]
-[[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] apply-with]
+[[p n fs] [p n fs p 1 <=] pounce]
+[[p n fs] [fs] pounce]
+[[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] pounce]
 [] linrec
 `, [[7, 5, 3, 2]]);
 allPassing &= testIt(`
 3599 
 [2 []] 
-[[p n fs] [p n fs p 1 <=] apply-with]
-[[p n fs] [fs] apply-with]
-[[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] apply-with]
+[[p n fs] [p n fs p 1 <=] pounce]
+[[p n fs] [fs] pounce]
+[[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] pounce]
 [] linrec5
 `, [[61, 59]]);
 
 
 // set up a production configuration and test purr
-const program1 = "0 increment increment decrement [1 +] [increment] def [1 -] [decrement] def";
+const program1 = "0 increment increment decrement [1 +] [increment] compose [1 -] [decrement] compose";
 const parsedProgram1 = parse(program1);
 const [preProcessedProgram1, corePlusUserDefinedWords1] = preProcessDefs(parsedProgram1, coreWords);
 const runner1 = purr(preProcessedProgram1, corePlusUserDefinedWords1);

@@ -53,15 +53,15 @@ export function* interpreter(
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
       opt.logLevel && !opt.yieldOnId ? debugLevel(internalCallStack, opt.logLevel) ? yield { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: [...internalCallStack] } : null : null;
-      if (typeof wds.def === 'function') {
-        [s, pl = pl] = wds.def(s, pl);
+      if (typeof wds.compose === 'function') {
+        [s, pl = pl] = wds.compose(s, pl);
       }
       else {
         if (w === "popInternalCallStack") {
           internalCallStack.pop();
         }
         else {
-          let plist = toPLOrNull(wds.def);
+          let plist = toPLOrNull(wds.compose);
           if (plist) {
             internalCallStack.push(toStringOrNull(w));
             pl = [...plist, "popInternalCallStack", ...pl];
@@ -101,11 +101,11 @@ export function* purr(
     cycles += 1;
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
-      if (typeof wds.def === 'function') {
-        [s, pl = pl] = wds.def(s, pl);
+      if (typeof wds.compose === 'function') {
+        [s, pl = pl] = wds.compose(s, pl);
       }
       else {
-        const plist = toPLOrNull(wds.def);
+        const plist = toPLOrNull(wds.compose);
         if (plist) {
           pl.unshift(...plist);
         }

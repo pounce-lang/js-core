@@ -16,15 +16,15 @@ export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [Pro
     // non-FP section (candidate for refactor)
     let next_pl = [...pl]
     let next_wd = {};
-    let def_i = r.findIndex(word => word === 'def', next_pl);
+    let def_i = r.findIndex(word => word === 'compose', next_pl);
     while (def_i !== -1) {
       if (def_i >= 2) {
         const word = toPLOrNull(next_pl[def_i - 2]);
         const key = toStringOrNull(r.head(toArrOrNull(next_pl[def_i - 1])));
         next_pl.splice(def_i - 2, 3); // splice is particularly mutant
-        next_wd = defineWord(next_wd, key, { "def": word });
+        next_wd = defineWord(next_wd, key, { "compose": word });
       }
-      def_i = r.findIndex(word => word === 'def', next_pl);
+      def_i = r.findIndex(word => word === 'compose', next_pl);
     }
     return [next_pl, r.mergeRight(coreWords, next_wd)];
   };
