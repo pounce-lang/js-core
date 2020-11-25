@@ -48,7 +48,9 @@ export function* interpreter(
   let w;
   const maxCycles = opt.maxCycles || 1000000;
   let cycles = 0;
-  while (cycles < maxCycles && internalCallStack.length < 1000 && (w = pl.shift()) !== undefined && s[0] !== null) {
+  while (cycles < maxCycles && internalCallStack.length < 1000 
+    && (w = pl.shift()) !== undefined 
+    && !(s?.length === 1 && s[0] === null)) {
     cycles += 1;
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
@@ -78,13 +80,17 @@ export function* interpreter(
     }
     else if (w !== undefined) {
       if (r.is(Array, w)) {
-        s.push([].concat(w));
+        s?.push([].concat(w));
       }
       else {
-        s.push(w);
+        s?.push(w);
       }
       opt.logLevel && opt.yieldOnId ? (debugLevel(internalCallStack, opt.logLevel)) ? yield { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: [...internalCallStack] } : null : null;
     }
+  }
+  if (s?.length === 1 && s[0] === null) {
+    console.log("s has null");
+    yield { stack: [], prog: pl, active: false, internalCallStack: [...internalCallStack], error: "a word did not find required data on the stack" };
   }
   if (cycles >= maxCycles || internalCallStack.length >= 1000) {
     yield { stack: s, prog: pl, active: false, internalCallStack: [...internalCallStack], error: "maxCycles or callStack size exceeded: this may be an infinite loop" };

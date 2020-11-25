@@ -86,10 +86,14 @@ allPassing &= testIt("2 5 %", [2]);
 allPassing &= testIt("-2 abs", [2]);
 allPassing &= testIt("0.105 2 round", [0.11]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
-allPassing &= testIt("2  /", null);
 allPassing &= testIt("/", null);
 allPassing &= testIt("2 0 /", null);
 
+allPassing &= testIt("2  /", null);
+allPassing &= testIt("- 16", null);
+allPassing &= testIt("5 - 16 ", null);
+allPassing &= testIt("3 - 16 /", null);
+allPassing &= testIt("- 16 /", null);
 
 // compose tests
 allPassing &= testIt("[1 +] [add-one] compose 22 add-one", [23]);
