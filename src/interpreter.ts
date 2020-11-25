@@ -48,13 +48,20 @@ export function* interpreter(
   let w;
   const maxCycles = opt.maxCycles || 1000000;
   let cycles = 0;
-  while (cycles < maxCycles && internalCallStack.length < 1000 && (w = pl.shift()) !== undefined) {
+  while (cycles < maxCycles && internalCallStack.length < 1000 && (w = pl.shift()) !== undefined && s[0] !== null) {
     cycles += 1;
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
       opt.logLevel && !opt.yieldOnId ? debugLevel(internalCallStack, opt.logLevel) ? yield { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: [...internalCallStack] } : null : null;
       if (typeof wds.compose === 'function') {
+        let s_ret: ValueStack | null = null;
         [s, pl = pl] = wds.compose(s, pl);
+        // if(r.isNil(s_ret)) {
+        //   cycles = maxCycles;
+        // }
+        // else {
+        //   s = s_ret;
+        // }
       }
       else {
         if (w === "popInternalCallStack") {

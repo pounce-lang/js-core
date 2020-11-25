@@ -80,7 +80,7 @@ export const coreWords: WordDictionary = {
                 s.push(introspectWord(wordName));
                 return [s];
             }
-            return null;
+            return [null];
         }
     },
     'dup': {
@@ -112,18 +112,7 @@ export const coreWords: WordDictionary = {
                 s.push(NP.round(a, b));
                 return [s];
             }
-            return null;
-        }
-    },
-    'abs': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        compose: s => {
-            const a = toNumOrNull(s.pop());
-            if (a !== null) {
-                s.push(Math.abs(a));
-                return [s];
-            }
-            return null;
+            return [null];
         }
     },
     '+': {
@@ -136,7 +125,7 @@ export const coreWords: WordDictionary = {
                 s.push(NP.plus(a, b));
                 return [s];
             }
-            return null;
+            return [null];
         }
     },
     '-': {
@@ -148,7 +137,7 @@ export const coreWords: WordDictionary = {
                 s.push(NP.minus(a, b));
                 return [s];
             }
-            return null;
+            return [null];
         }
     },
     '/': {
@@ -160,7 +149,7 @@ export const coreWords: WordDictionary = {
                 s.push(NP.divide(a, b));
                 return [s];
             }
-            return null;
+            return [null];
         }
     },
     '%': {
@@ -172,7 +161,7 @@ export const coreWords: WordDictionary = {
                 s.push(a % b);
                 return [s];
             }
-            return null;
+            return [null];
         }
     },
     '*': {
@@ -184,7 +173,445 @@ export const coreWords: WordDictionary = {
                 s.push(NP.times(a, b));
                 return [s];
             }
-            return null;
+            return [null];
+        }
+    },
+    // Math.E
+    'E': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.E);
+            return [s];
+        }
+    },
+    // Math.LN10
+    'LN10': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.LN10);
+            return [s];
+        }
+    },
+    // Math.LN2
+    'LN2': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.LN2);
+            return [s];
+        }
+    },
+    // Math.LOG10E
+    'LOG10E': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.LOG10E);
+            return [s];
+        }
+    },
+    // Math.LOG2E
+    'LOG2E': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.LOG2E);
+            return [s];
+        }
+    },
+    // Math.PI
+    'PI': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.PI);
+            return [s];
+        }
+    },
+    // Math.SQRT1_2
+    'SQRT1_2': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.SQRT1_2);
+            return [s];
+        }
+    },
+    // Math.SQRT2
+    'SQRT2': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            s.push(Math.SQRT2);
+            return [s];
+        }
+    },
+    // Math.abs()
+    'abs': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.abs(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.acos()
+    'acos': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.acos(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.acosh()
+    'acosh': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.acosh(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.asin()
+    'asin': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.asin(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.asinh()
+    'asinh': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.asinh(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.atan()
+    'atan': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.atan(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.atan2()
+    'atan2': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            const b = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(Math.atan2(b, a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.atanh()
+    'atanh': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.atanh(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.cbrt()
+    'cbrt': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.cbrt(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.ceil()
+    'ceil': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.ceil(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.cos()
+    'cos': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.cos(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.cosh()
+    'cosh': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.cosh(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.exp()
+    'exp': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.exp(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.expm1()
+    'expm1': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.expm1(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.floor()
+    'floor': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.floor(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.hypot()
+    'hypot': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.hypot(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.log()
+    'log': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.log(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.log10()
+    'log10': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.log10(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.log1p()
+    'log1p': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.log1p(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.log2()
+    'log2': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.log2(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.max()
+    'max': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.max(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.min()
+    'min': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.min(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.pow()
+    'pow': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            const b = toNumOrNull(s.pop());
+            if (a !== null && b !== null) {
+                s.push(Math.pow(b, a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.random()
+    'random': {
+        sig: [[], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.random());
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.sign()
+    'sign': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.sign(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.sin()
+    'sin': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.sin(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.sinh()
+    'sinh': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.sinh(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.sqrt()
+    'sqrt': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.sqrt(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.tan()
+    'tan': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.tan(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.tanh()
+    'tanh': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.tanh(a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // Math.trunc()
+    'trunc': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s.pop());
+            if (a !== null) {
+                s.push(Math.trunc(a));
+                return [s];
+            }
+            return [null];
         }
     },
     'play': {
@@ -272,7 +699,7 @@ export const coreWords: WordDictionary = {
             const then_block = toPLOrNull(s.pop());
             const condition = toBoolOrNull(s.pop());
             if (condition === null || then_block === null || else_block === null) {
-                return null;
+                return [null];
             }
             if (condition) {
                 if (r.is(Array, then_block)) {
@@ -310,7 +737,7 @@ export const coreWords: WordDictionary = {
                 const d = toStringOrNull(s[s.length - 1]);
                 if (c !== null && d !== null) {
                     s.push(c === d);
-                }    
+                }
             }
             return [s];
         }
@@ -329,7 +756,7 @@ export const coreWords: WordDictionary = {
                 const str_a = toStringOrNull(a);
                 if (str_a !== null && str_b !== null) {
                     s.push(str_a === str_b);
-                }    
+                }
             }
             return [s];
         }
