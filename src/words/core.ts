@@ -176,6 +176,89 @@ export const coreWords: WordDictionary = {
             return [null];
         }
     },
+    // bitwise on integers
+    '&': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const b = toNumOrNull(s?.pop());
+            const a = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(a & b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '|': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const b = toNumOrNull(s?.pop());
+            const a = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(a | b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '^': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const b = toNumOrNull(s?.pop());
+            const a = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(a ^ b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '~': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: s => {
+            const a = toNumOrNull(s?.pop());
+            if (a !== null) {
+                s.push(~a);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '&&': {
+        sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
+        compose: s => {
+            const b = toNumOrNull(s?.pop());
+            const a = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(a && b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '||': {
+        sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
+        compose: s => {
+            const b = toNumOrNull(s?.pop());
+            const a = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(a || b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '!': {
+        sig: [[{ type: 'boolean' }], [{ type: 'boolean' }]],
+        compose: s => {
+            const a = toNumOrNull(s?.pop());
+            if (a !== null) {
+                s.push(!a);
+                return [s];
+            }
+            return [null];
+        }
+    },
     // Math.E
     'E': {
         sig: [[], [{ type: 'number' }]],
@@ -522,12 +605,8 @@ export const coreWords: WordDictionary = {
     'random': {
         sig: [[], [{ type: 'number' }]],
         compose: s => {
-            const a = toNumOrNull(s?.pop());
-            if (a !== null) {
-                s.push(Math.random());
-                return [s];
-            }
-            return [null];
+            s.push(Math.random());
+            return [s];
         }
     },
     // Math.sign()
@@ -1067,20 +1146,6 @@ export const coreWords: WordDictionary = {
     // //             // given a dictionary
     // //             wordstack.push(importable);
     // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'random': {
-    // //     definition: function (s: Json[]) {
-    // //         s.push(Math.random());
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'round': {
-    // //     definition: function (s: Json[]) {
-    // //         const pres = s?.pop();
-    // //         const n = s?.pop();
-    // //         s.push(Math.round(n / pres) * pres);
     // //         return [s, pl];
     // //     }
     // // },

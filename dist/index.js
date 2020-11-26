@@ -2823,6 +2823,96 @@ var coreWords = {
             return [null];
         }
     },
+    // bitwise on integers
+    '&': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: function (s) {
+            var _a, _b;
+            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            if (a !== null && b !== null) {
+                s.push(a & b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '|': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: function (s) {
+            var _a, _b;
+            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            if (a !== null && b !== null) {
+                s.push(a | b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '^': {
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        compose: function (s) {
+            var _a, _b;
+            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            if (a !== null && b !== null) {
+                s.push(a ^ b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '~': {
+        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        compose: function (s) {
+            var _a;
+            var a = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            if (a !== null) {
+                s.push(~a);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '&&': {
+        sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
+        compose: function (s) {
+            var _a, _b;
+            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            if (a !== null && b !== null) {
+                s.push(a && b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '||': {
+        sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
+        compose: function (s) {
+            var _a, _b;
+            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            if (a !== null && b !== null) {
+                s.push(a || b);
+                return [s];
+            }
+            return [null];
+        }
+    },
+    '!': {
+        sig: [[{ type: 'boolean' }], [{ type: 'boolean' }]],
+        compose: function (s) {
+            var _a;
+            var a = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            if (a !== null) {
+                s.push(!a);
+                return [s];
+            }
+            return [null];
+        }
+    },
     // Math.E
     'E': {
         sig: [[], [{ type: 'number' }]],
@@ -3192,13 +3282,8 @@ var coreWords = {
     'random': {
         sig: [[], [{ type: 'number' }]],
         compose: function (s) {
-            var _a;
-            var a = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
-            if (a !== null) {
-                s.push(Math.random());
-                return [s];
-            }
-            return [null];
+            s.push(Math.random());
+            return [s];
         }
     },
     // Math.sign()
@@ -3759,20 +3844,6 @@ var coreWords = {
     // //             // given a dictionary
     // //             wordstack.push(importable);
     // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'random': {
-    // //     definition: function (s: Json[]) {
-    // //         s.push(Math.random());
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'round': {
-    // //     definition: function (s: Json[]) {
-    // //         const pres = s?.pop();
-    // //         const n = s?.pop();
-    // //         s.push(Math.round(n / pres) * pres);
     // //         return [s, pl];
     // //     }
     // // },
