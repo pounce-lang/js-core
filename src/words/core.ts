@@ -227,8 +227,8 @@ export const coreWords: WordDictionary = {
     '&&': {
         sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
+            const b = toBoolOrNull(s?.pop());
+            const a = toBoolOrNull(s?.pop());
             if (a !== null && b !== null) {
                 s.push(a && b);
                 return [s];
@@ -239,8 +239,8 @@ export const coreWords: WordDictionary = {
     '||': {
         sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
+            const b = toBoolOrNull(s?.pop());
+            const a = toBoolOrNull(s?.pop());
             if (a !== null && b !== null) {
                 s.push(a || b);
                 return [s];
@@ -251,7 +251,7 @@ export const coreWords: WordDictionary = {
     '!': {
         sig: [[{ type: 'boolean' }], [{ type: 'boolean' }]],
         compose: s => {
-            const a = toNumOrNull(s?.pop());
+            const a = toBoolOrNull(s?.pop());
             if (a !== null) {
                 s.push(!a);
                 return [s];

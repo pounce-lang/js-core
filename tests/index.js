@@ -86,9 +86,23 @@ allPassing &= testIt("2 5 %", [2]);
 allPassing &= testIt("-2 abs", [2]);
 allPassing &= testIt("0.105 2 round", [0.11]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
+
+// discrete ops
+allPassing &= testIt("false false || ", [false]);
+allPassing &= testIt("false true || ", [true]);
+allPassing &= testIt("true false || ", [true]);
+allPassing &= testIt("true true || ", [true]);
+allPassing &= testIt("false false && ", [false]);
+allPassing &= testIt("false true && ", [false]);
+allPassing &= testIt("true false && ", [false]);
+allPassing &= testIt("true true && ", [true]);
+allPassing &= testIt("false !", [true]);
+allPassing &= testIt("true !", [false]);
+
+
+// not valid program tests (should not crash)
 allPassing &= testIt("/", null);
 allPassing &= testIt("2 0 /", null);
-
 allPassing &= testIt("2  /", null);
 allPassing &= testIt("- 16", null);
 allPassing &= testIt("5 - 16 ", null);

@@ -3,7 +3,7 @@ grammar Pinna
   pinna_pl <-  ws* value (ws* value)* ws*          %make_pinna_pl
   pinna_empty  <- ws*                              %make_pinna_empty
 
-  word    <-  [a-zA-Z0-9\_\-\+\=\/\~\!\@\$\%\^\&\*\?\<\>]+ [a-zA-Z0-9\_\-\+\=\/\~\!\@\#\$\%\^\&\*\?\.\<\>]* %make_word
+  word    <-  [a-zA-Z0-9\|\_\-\+\=\/\~\!\@\$\%\^\&\*\?\<\>]+ [a-zA-Z0-9\_\-\+\=\/\~\!\@\#\$\%\^\&\*\?\.\<\>]* %make_word
   value   <-  list / number / word / string / map
 
   map     <-  "{" ws* pair? (ws*  ws* pair)* ws* "}" %make_map
