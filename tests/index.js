@@ -53,7 +53,7 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words","word","dup","swap","drop","round","+","-","/","%","*","&","|","^","~","&&","||","!","E","LN10","LN2","LOG10E","LOG2E","PI","SQRT1_2","SQRT2","abs","acos","acosh","asin","asinh","atan","atan2","atanh","cbrt","ceil","cos","cosh","exp","expm1","floor","hypot","log","log10","log1p","log2","max","min","pow","random","sign","sin","sinh","sqrt","tan","tanh","trunc","play","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","filter","reduce","split","size","depth","stack-copy"]]);
+allPassing &= testIt("words", [["words", "word", "dup", "swap", "drop", "round", "+", "-", "/", "%", "*", "&", "|", "^", "~", "&&", "||", "!", "E", "LN10", "LN2", "LOG10E", "LOG2E", "PI", "SQRT1_2", "SQRT2", "abs", "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh", "cbrt", "ceil", "cos", "cosh", "exp", "expm1", "floor", "hypot", "log", "log10", "log1p", "log2", "max", "min", "pow", "random", "sign", "sin", "sinh", "sqrt", "tan", "tanh", "trunc", "play", "pounce", "dip", "dip2", "rotate", "rollup", "rolldown", "if-else", "ifte", "=", "==", "!=", ">", "<", ">=", "<=", "concat", "cons", "uncons", "push", "pop", "constrec", "linrec", "linrec5", "binrec", "dup2", "times", "map", "filter", "reduce", "split", "size", "depth", "stack-copy"]]);
 allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "compose": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
 allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
 allPassing &= testIt("4 dup drop", [4]);
@@ -175,6 +175,28 @@ allPassing &= testIt(`
 [[p n fs] [p n % 0 == [p n / n n fs cons] [p n 1 + fs] if-else] pounce]
 [] linrec5
 `, [[61, 59]]);
+
+
+// test custom dictionaries
+const program0 = "0 test5 swap";
+const parsedProgram0 = parse(program0);
+const customWords0 = {
+  ...coreWords,
+  "test5": {
+    compose: (s) => {
+      s.push(5);
+      return [s];
+    },
+    // sig: [[], [{ type: 'number' }]],
+  }
+};
+const [preProcessedProgram0, corePlusUserDefinedWords0] = preProcessDefs(parsedProgram0, customWords0); // coreWords);
+const runner0 = interpreter(preProcessedProgram0, { wd: corePlusUserDefinedWords0 });
+const result0 = runner0.next();
+if (!(result0.value.active === false && result0.value.stack[0] === 5)) {
+  console.log("hmmm", result0.value.stack);
+}
+allPassing &= (result0.value.active === false && result0.value.stack[0] === 5);
 
 
 // set up a production configuration and test purr
