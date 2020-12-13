@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Pounce is a concatinative programming language. Core includes a parser and interpreter, written in Javascript. Pounce is infulenced by Forth, Joy, Cat and Kitten.",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
@@ -12,7 +12,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "publish": "npm login; npm publish --access public",
-    "test": "node ./tests/index.js ; node ./tests/parser_test.js"
+    "test": "node ./tests/parser_test.js; node ./tests/typeChecker_test.js ; node ./tests/index.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse",
@@ -21,7 +21,7 @@
     "@types/ramda": "^0.26.38",
     "rollup": "^1.27.13",
     "rollup-plugin-typescript2": "^0.25.3",
-    "typescript": "^3.7.3",
+    "typescript": "^4.1.2",
     "canopy": "^0.3.0"
   },
   "dependencies": {

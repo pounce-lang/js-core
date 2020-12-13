@@ -37,3 +37,4 @@ export declare function purr(pl: ProgramList, wd: WordDictionary, cycleLimit?: n
 }, void, unknown>;
 export declare const introspectWords: () => (string | number)[];
 export declare const introspectWord: (wn: string) => any;
+export declare const preProcess: (pl: ProgramList, coreWords: WordDictionary) => [ProgramList, WordDictionary];

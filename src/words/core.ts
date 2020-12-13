@@ -930,6 +930,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'pop': {
+        sig: [[{ type: 'list<A>', use: 'observe' }], [{ type: 'A' }]],
         compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
