@@ -51,23 +51,26 @@ const combineSigs = (inS: Signature, outS: Signature) => {
       }
     });
   } 
-  // console.log("ioSigs", ioSigs);
+  console.log("ioSigs", ioSigs);
   return ioSigs;
 };
 
 const getGenericMapping = (typeStack: Array<string>, ioSigs: CombinedSig[]): {[key:string]: string} => {
   let genMappings: {[key:string]: string} = {};
   const acc1 = r.reduce((acc: Array<string>, sig: CombinedSig) => { 
-    let expects = sig.in.type;
+    let expects = sig?.in?.type;
+    if (!expects) {
+      return acc;
+    }
     let genInType = (expects.length === 1)? expects : "";
     let consume = (sig.in?.use !== "observe");
     let foundType = consume? acc.pop(): acc[acc.length - 1];
-    if (genInType) {
+    if (genInType && typeof genInType === 'string') {
       genMappings[genInType] = foundType; 
     }
     return acc;
   }, typeStack, ioSigs);
-  // console.log("genMappings", genMappings);
+  console.log("genMappings", genMappings);
   return genMappings;
 };
 
@@ -76,22 +79,25 @@ export const typeChecker = (pl: ProgramList, wd: WordDictionary): Array<string |
   const typeStack = r.reduce((acc: Array<string>, w: Word) => {
     const wordInDictionary: WordValue | null = typeof w === "string" ? wd[w]: null;
     if (wordInDictionary) {
-      // console.log(wordInDictionary.sig);
+      console.log(wordInDictionary.sig);
       const inSignature = r.reverse(r.head(wordInDictionary.sig));
       const outSignature = r.reverse(r.head(r.tail(wordInDictionary.sig)));
       let ioSigs: CombinedSig[] = combineSigs(inSignature, outSignature);
       let genMappings: {[key:string]: string} = getGenericMapping( acc, ioSigs);
       acc = r.reduce((acc: Array<string>, sig: CombinedSig) => { 
-        const outType = sig.out?.type
-        if (outType) {
+        const outType = sig.out?.type;
+        if (outType && typeof outType === 'string') {
           if (outType.length === 1) {
-            // console.log("push genMappings[outType]", outType, genMappings[outType]);
-            acc.push(genMappings[outType])
+            console.log("push genMappings[outType]", outType, genMappings[outType]);
+            acc.push(genMappings[outType]);
           }
           else {
-            // console.log("push outType", outType);
-            acc.push(outType)
+            console.log("push outType", outType);
+            acc.push(outType.toUpperCase());
           }
+        }
+        else if (outType) { // array of type
+          console.log("outType: ", typeof outType, JSON.stringify(outType));
         }
         return acc;
       }, acc, r.reverse(ioSigs));
@@ -103,6 +109,6 @@ export const typeChecker = (pl: ProgramList, wd: WordDictionary): Array<string |
     }
     return acc;
   }, [], pl);
-  // console.log(tree);
+  console.log(typeStack);
   return typeStack;
 };

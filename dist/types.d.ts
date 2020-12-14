@@ -4,7 +4,7 @@ export declare type Word = string | number | Word[] | boolean | {
 export declare type ValueStack = Word[];
 export declare type ProgramList = Word[];
 export declare type Sig = {
-    type: string;
+    type: string | string[];
     gaurd?: Word[];
     use?: string;
 };

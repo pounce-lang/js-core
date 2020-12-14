@@ -33,34 +33,16 @@ const testIt = (p, expected_result) => {
 };
 
 let allPassing = 1;
-allPassing &= testIt("Hello Pounce", ["STRING", "STRING"]);
-allPassing &= testIt("4 dup drop", ["NUMBER"]);
-allPassing &= testIt("5 8 dup drop", ["NUMBER", "NUMBER"]);
-allPassing &= testIt("hello 8", ["STRING", "NUMBER"]);
-allPassing &= testIt("hello 8 swap", ["NUMBER", "STRING"]);
-//allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", ["NUMBER"]);
-// allPassing &= testIt("3 2 7 [+] dip -", [-2]);
-
-// allPassing &= testIt("3 2 7 rotate", [7, 2, 3]);
-// allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
-// allPassing &= testIt('A B C rolldown', ['B', 'C', 'A']);
-
-allPassing &= testIt("aa 2 true rotate", ["BOOLEAN", "NUMBER", "STRING"]);
-allPassing &= testIt('A 77 false rollup', ["BOOLEAN", "STRING", "NUMBER"]);
-allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
-// allPassing &= testIt("true [5] [7] if-else", ["NUMBER"]);
-// allPassing &= testIt("false [5] [7] if-else", ["NUMBER"]);
-// allPassing &= testIt("false [5] [7 3 [+] play] if-else", ["NUMBER"]);
-// allPassing &= testIt("2 1 [>] [5] [7] ifte", ["NUMBER"]);
-// allPassing &= testIt("2 1 [=] [5] [7] ifte", ["NUMBER", "NUMBER"]);
-// allPassing &= testIt("0 0 [=] [5] [7] ifte", ["NUMBER", "NUMBER"]);
-// allPassing &= testIt("2 1 [==] [5] [7] ifte", ["NUMBER"]);
-// allPassing &= testIt("a b =", ['a', false]);
-// allPassing &= testIt("b b =", ['b', true]);
-// allPassing &= testIt("a b ==", [false]);
-// allPassing &= testIt("b b ==", [true]);
-// allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", ["NUMBER"]);
-// allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", ["NUMBER", "NUMBER", "NUMBER"]);
+// allPassing &= testIt("Hello Pounce", ["STRING", "STRING"]);
+// allPassing &= testIt("4 dup drop", ["NUMBER"]);
+// allPassing &= testIt("5 8 dup drop", ["NUMBER", "NUMBER"]);
+// allPassing &= testIt("hello 8", ["STRING", "NUMBER"]);
+// allPassing &= testIt("hello 8 swap", ["NUMBER", "STRING"]);
+// allPassing &= testIt("aa 2 true rotate", ["BOOLEAN", "NUMBER", "STRING"]);
+// allPassing &= testIt('A 77 false rollup', ["BOOLEAN", "STRING", "NUMBER"]);
+// allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
+// allPassing &= testIt("a b =", ["STRING", "BOOLEAN"]);
+// allPassing &= testIt("a b ==", ["BOOLEAN"]);
 // allPassing &= testIt("0 1 dup2 +", ["NUMBER", "NUMBER", "NUMBER"]);
 // allPassing &= testIt("2 5 +", ["NUMBER"]);
 // allPassing &= testIt(".1 .2 +", ["NUMBER"]);
@@ -71,6 +53,34 @@ allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
 // allPassing &= testIt("2 5 %", ["NUMBER"]);
 // allPassing &= testIt("-2 abs", ["NUMBER"]);
 // allPassing &= testIt("0.105 2 round", ["NUMBER"]);
+// allPassing &= testIt("A [B] cons", [["STRING", "STRING"]]);
+
+// allPassing &= testIt("[A] B push", [["STRING", "STRING"]]);
+allPassing &= testIt("[A B] uncons", ["STRING", ["STRING"]]);
+// allPassing &= testIt("[1 2] uncons cons", [["NUMBER", "NUMBER"]]);
+// allPassing &= testIt("[A B] pop", [["STRING"], "STRING"]);
+// allPassing &= testIt("[1 2] pop push", [["NUMBER", "NUMBER"]]);
+// allPassing &= testIt("[1 2] pop swap cons", [["NUMBER", "NUMBER"]]);
+
+//---------------------------------------
+
+//allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", ["NUMBER"]);
+// allPassing &= testIt("3 2 7 [+] dip -", [-2]);
+
+// allPassing &= testIt("3 2 7 rotate", [7, 2, 3]);
+// allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
+// allPassing &= testIt('A B C rolldown', ['B', 'C', 'A']);
+
+// allPassing &= testIt("true [5] [7] if-else", ["NUMBER"]);
+// allPassing &= testIt("false [5] [7] if-else", ["NUMBER"]);
+// allPassing &= testIt("false [5] [7 3 [+] play] if-else", ["NUMBER"]);
+// allPassing &= testIt("2 1 [>] [5] [7] ifte", ["NUMBER"]);
+// allPassing &= testIt("2 1 [=] [5] [7] ifte", ["NUMBER", "NUMBER"]);
+// allPassing &= testIt("0 0 [=] [5] [7] ifte", ["NUMBER", "NUMBER"]);
+// allPassing &= testIt("2 1 [==] [5] [7] ifte", ["NUMBER"]);
+// allPassing &= testIt("b b ==", [true]);
+// allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", ["NUMBER"]);
+// allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", ["NUMBER", "NUMBER", "NUMBER"]);
 // allPassing &= testIt("0 1 [dup2 +] 5 times", ["NUMBER", "NUMBER", "NUMBER", "NUMBER", "NUMBER", "NUMBER", "NUMBER"]);
 
 // // discrete ops
@@ -104,14 +114,6 @@ allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
 // allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] constrec", [120]);
 // allPassing &= testIt("5 [0 =] [1 +] [dup 1 -] [*] linrec", [120]);
 
-// allPassing &= testIt("A [B] cons", [['A', 'B']]);
-// allPassing &= testIt("[A B] uncons", ['A', ['B']]);
-// allPassing &= testIt("[1 2] uncons cons", [[1, 2]]);
-
-// allPassing &= testIt("[A] B push", [['A', 'B']]);
-// allPassing &= testIt("[A B] pop", [['A'], 'B']);
-// allPassing &= testIt("[1 2] pop push", [[1, 2]]);
-// allPassing &= testIt("[1 2] pop swap cons", [[2, 1]]);
 
 // allPassing &= testIt("[1 2] [3] 4 depth", [[1, 2], [3], 4, 3]);
 // allPassing &= testIt("[1 2] [3] 4 stack-copy", [[1, 2], [3], 4, [[1, 2], [3], 4]]);

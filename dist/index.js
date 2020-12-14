@@ -2711,7 +2711,7 @@ var coreWords = {
     },
     // introspectWord
     'word': {
-        sig: [[{ type: 'list<string>)' }], [{ type: 'record' }]],
+        sig: [[{ type: ['A'] }], [{ type: 'record' }]],
         compose: function (s) {
             var phrase = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var wordName = toStringOrNull(phrase[0]);
@@ -3362,7 +3362,7 @@ var coreWords = {
         }
     },
     'dip': {
-        sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
+        sig: [[{ type: 'A' }, { type: ['*'], use: 'run' }], [{ type: '*-result-types' }, { type: 'A' }]],
         compose: function (s, pl) {
             var block = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var item = s === null || s === void 0 ? void 0 : s.pop();
@@ -3437,6 +3437,7 @@ var coreWords = {
         compose: [['play'], 'dip2', 'if-else']
     },
     '=': {
+        sig: [[{ type: 'A', use: 'observe' }, { type: 'A' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var top = s === null || s === void 0 ? void 0 : s.pop();
             var b = toNumOrNull(top);
@@ -3455,6 +3456,7 @@ var coreWords = {
         }
     },
     '==': {
+        sig: [[{ type: 'A' }, { type: 'A' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var b = s === null || s === void 0 ? void 0 : s.pop();
             var a = s === null || s === void 0 ? void 0 : s.pop();
@@ -3534,6 +3536,7 @@ var coreWords = {
         }
     },
     'cons': {
+        sig: [[{ type: 'A' }, { type: ['*'] }], [{ type: ['A', '*'] }]],
         compose: function (s) {
             var b = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var a = s === null || s === void 0 ? void 0 : s.pop();
@@ -3544,6 +3547,7 @@ var coreWords = {
         }
     },
     'uncons': {
+        sig: [[{ type: ['A', '*'] }], [{ type: 'A' }, { type: ['*'] }]],
         compose: function (s) {
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             if (arr) {
@@ -3553,6 +3557,7 @@ var coreWords = {
         }
     },
     'push': {
+        sig: [[{ type: ['*'] }, { type: 'A' }], [{ type: ['*', 'A'] }]],
         compose: function (s) {
             var item = s === null || s === void 0 ? void 0 : s.pop();
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -3563,7 +3568,7 @@ var coreWords = {
         }
     },
     'pop': {
-        sig: [[{ type: 'list<A>', use: 'observe' }], [{ type: 'A' }]],
+        sig: [[{ type: ['*', 'A'] }], [{ type: ['*'] }, { type: 'A' }]],
         compose: function (s) {
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             if (arr) {
@@ -4186,30 +4191,33 @@ var combineSigs = function (inS, outS) {
             }
         });
     }
-    // console.log("ioSigs", ioSigs);
+    console.log("ioSigs", ioSigs);
     return ioSigs;
 };
 var getGenericMapping = function (typeStack, ioSigs) {
     var genMappings = {};
     var acc1 = r.reduce(function (acc, sig) {
-        var _a;
-        var expects = sig.in.type;
+        var _a, _b;
+        var expects = (_a = sig === null || sig === void 0 ? void 0 : sig.in) === null || _a === void 0 ? void 0 : _a.type;
+        if (!expects) {
+            return acc;
+        }
         var genInType = (expects.length === 1) ? expects : "";
-        var consume = (((_a = sig.in) === null || _a === void 0 ? void 0 : _a.use) !== "observe");
+        var consume = (((_b = sig.in) === null || _b === void 0 ? void 0 : _b.use) !== "observe");
         var foundType = consume ? acc.pop() : acc[acc.length - 1];
-        if (genInType) {
+        if (genInType && typeof genInType === 'string') {
             genMappings[genInType] = foundType;
         }
         return acc;
     }, typeStack, ioSigs);
-    // console.log("genMappings", genMappings);
+    console.log("genMappings", genMappings);
     return genMappings;
 };
 var typeChecker = function (pl, wd) {
     var typeStack = r.reduce(function (acc, w) {
         var wordInDictionary = typeof w === "string" ? wd[w] : null;
         if (wordInDictionary) {
-            // console.log(wordInDictionary.sig);
+            console.log(wordInDictionary.sig);
             var inSignature = r.reverse(r.head(wordInDictionary.sig));
             var outSignature = r.reverse(r.head(r.tail(wordInDictionary.sig)));
             var ioSigs = combineSigs(inSignature, outSignature);
@@ -4217,15 +4225,18 @@ var typeChecker = function (pl, wd) {
             acc = r.reduce(function (acc, sig) {
                 var _a;
                 var outType = (_a = sig.out) === null || _a === void 0 ? void 0 : _a.type;
-                if (outType) {
+                if (outType && typeof outType === 'string') {
                     if (outType.length === 1) {
-                        // console.log("push genMappings[outType]", outType, genMappings[outType]);
+                        console.log("push genMappings[outType]", outType, genMappings_1[outType]);
                         acc.push(genMappings_1[outType]);
                     }
                     else {
-                        // console.log("push outType", outType);
-                        acc.push(outType);
+                        console.log("push outType", outType);
+                        acc.push(outType.toUpperCase());
                     }
+                }
+                else if (outType) { // array of type
+                    console.log("outType: ", typeof outType, JSON.stringify(outType));
                 }
                 return acc;
             }, acc, r.reverse(ioSigs));
@@ -4237,7 +4248,7 @@ var typeChecker = function (pl, wd) {
         }
         return acc;
     }, [], pl);
-    // console.log(tree);
+    console.log(typeStack);
     return typeStack;
 };
 

@@ -72,7 +72,7 @@ export const coreWords: WordDictionary = {
     },
     // introspectWord
     'word': {
-        sig: [[{ type: 'list<string>)' }], [{ type: 'record' }]],
+        sig: [[{ type: ['A'] }], [{ type: 'record' }]],
         compose: s => {
             const phrase = toArrOfStrOrNull(s?.pop());
             const wordName = toStringOrNull(phrase[0]);
@@ -729,7 +729,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'dip': {
-        sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
+        sig: [[{ type: 'A' }, { type: ['*'], use: 'run' }], [{ type: '*-result-types' }, { type: 'A' }]],
         compose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             const item = s?.pop();
@@ -804,6 +804,7 @@ export const coreWords: WordDictionary = {
         compose: [['play'], 'dip2', 'if-else']
     },
     '=': {
+        sig: [[{ type: 'A', use: 'observe' }, { type: 'A' }], [{ type: 'boolean' }]],
         compose: s => {
             const top = s?.pop();
             const b = toNumOrNull(top);
@@ -822,6 +823,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '==': {
+        sig: [[{ type: 'A'}, { type: 'A'}], [{ type: 'boolean' }]],
         compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -901,6 +903,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'cons': {
+        sig: [[{ type: 'A' }, { type: ['*'] }], [{ type: ['A', '*'] }]],
         compose: s => {
             const b = toArrOrNull(s?.pop());
             const a = s?.pop();
@@ -911,6 +914,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'uncons': {
+        sig: [[{ type: ['A', '*'] }], [{ type: 'A' }, { type: ['*'] }]],
         compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
@@ -920,6 +924,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'push': {
+        sig: [[{ type: ['*'] }, { type: 'A' }], [{ type: ['*', 'A'] }]],
         compose: s => {
             const item = s?.pop();
             const arr = toArrOrNull(s?.pop());
@@ -930,7 +935,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'pop': {
-        sig: [[{ type: 'list<A>', use: 'observe' }], [{ type: 'A' }]],
+        sig: [[{ type: ['*', 'A'] }], [{ type: ['*'] }, { type: 'A' }]],
         compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
