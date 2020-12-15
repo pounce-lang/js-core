@@ -4196,6 +4196,7 @@ var combineSigs = function (inS, outS) {
 };
 var getGenericMapping = function (typeStack, ioSigs) {
     var genMappings = {};
+    console.log("typeStack is", typeStack);
     var acc1 = r.reduce(function (acc, sig) {
         var _a, _b;
         var expects = (_a = sig === null || sig === void 0 ? void 0 : sig.in) === null || _a === void 0 ? void 0 : _a.type;
@@ -4207,6 +4208,9 @@ var getGenericMapping = function (typeStack, ioSigs) {
         var foundType = consume ? acc.pop() : acc[acc.length - 1];
         if (genInType && typeof genInType === 'string') {
             genMappings[genInType] = foundType;
+        }
+        else {
+            console.log("genInType here", genInType);
         }
         return acc;
     }, typeStack, ioSigs);
@@ -4241,10 +4245,17 @@ var typeChecker = function (pl, wd) {
                 return acc;
             }, acc, r.reverse(ioSigs));
         }
-        else {
+        else if (typeof w === 'string' || typeof w === 'number' || typeof w === 'boolean') {
             var wt = getWordType(w);
             var wtString = WordIdType[wt];
+            console.log("wtString is:", wtString);
             acc.push(wtString);
+        }
+        else if (r.is(Array, w)) {
+            var list = typeChecker(w, wd);
+            if (typeof list === 'object') {
+                acc.push(list);
+            }
         }
         return acc;
     }, [], pl);

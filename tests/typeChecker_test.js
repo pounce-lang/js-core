@@ -34,16 +34,6 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 // allPassing &= testIt("Hello Pounce", ["STRING", "STRING"]);
-// allPassing &= testIt("4 dup drop", ["NUMBER"]);
-// allPassing &= testIt("5 8 dup drop", ["NUMBER", "NUMBER"]);
-// allPassing &= testIt("hello 8", ["STRING", "NUMBER"]);
-// allPassing &= testIt("hello 8 swap", ["NUMBER", "STRING"]);
-// allPassing &= testIt("aa 2 true rotate", ["BOOLEAN", "NUMBER", "STRING"]);
-// allPassing &= testIt('A 77 false rollup', ["BOOLEAN", "STRING", "NUMBER"]);
-// allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
-// allPassing &= testIt("a b =", ["STRING", "BOOLEAN"]);
-// allPassing &= testIt("a b ==", ["BOOLEAN"]);
-// allPassing &= testIt("0 1 dup2 +", ["NUMBER", "NUMBER", "NUMBER"]);
 // allPassing &= testIt("2 5 +", ["NUMBER"]);
 // allPassing &= testIt(".1 .2 +", ["NUMBER"]);
 // allPassing &= testIt("2 5 -", ["NUMBER"]);
@@ -53,10 +43,25 @@ let allPassing = 1;
 // allPassing &= testIt("2 5 %", ["NUMBER"]);
 // allPassing &= testIt("-2 abs", ["NUMBER"]);
 // allPassing &= testIt("0.105 2 round", ["NUMBER"]);
-// allPassing &= testIt("A [B] cons", [["STRING", "STRING"]]);
+// allPassing &= testIt("[A B]", [["STRING", "STRING"]]);
+// allPassing &= testIt("8 dup", ["NUMBER", "NUMBER"]);
+// allPassing &= testIt("4 dup drop", ["NUMBER"]);
+// allPassing &= testIt("5 8 dup drop", ["NUMBER", "NUMBER"]);
+// allPassing &= testIt("hello 8", ["STRING", "NUMBER"]);
+// allPassing &= testIt("hello 8 swap", ["NUMBER", "STRING"]);
+// allPassing &= testIt("a b =", ["STRING", "BOOLEAN"]);
+// allPassing &= testIt("a b ==", ["BOOLEAN"]);
+// allPassing &= testIt("0 1 dup2 +", ["NUMBER", "NUMBER", "NUMBER"]);
+// allPassing &= testIt("aa 2 true rotate", ["BOOLEAN", "NUMBER", "STRING"]);
+// allPassing &= testIt('A 77 false rollup', ["BOOLEAN", "STRING", "NUMBER"]);
+// allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
+
+//---------------------
+
+allPassing &= testIt("A [B] cons", [["STRING", "STRING"]]);
 
 // allPassing &= testIt("[A] B push", [["STRING", "STRING"]]);
-allPassing &= testIt("[A B] uncons", ["STRING", ["STRING"]]);
+//allPassing &= testIt("[A B] uncons", ["STRING", ["STRING"]]);
 // allPassing &= testIt("[1 2] uncons cons", [["NUMBER", "NUMBER"]]);
 // allPassing &= testIt("[A B] pop", [["STRING"], "STRING"]);
 // allPassing &= testIt("[1 2] pop push", [["NUMBER", "NUMBER"]]);

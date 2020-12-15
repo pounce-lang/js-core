@@ -1,5 +1,5 @@
 import * as r from 'ramda';
-import { CombinedSig, ProgramList, Sig, Signature, Word } from '../types';
+import { CombinedSig, ProgramList, Sig, Signature, TypeScan, Word } from '../types';
 import { WordDictionary, WordValue } from "../WordDictionary.types";
 import { coreWords, toPLOrNull, toStringOrNull, toArrOrNull, toNumOrNull } from '../words/core';
 import {
@@ -55,9 +55,11 @@ const combineSigs = (inS: Signature, outS: Signature) => {
   return ioSigs;
 };
 
-const getGenericMapping = (typeStack: Array<string>, ioSigs: CombinedSig[]): {[key:string]: string} => {
-  let genMappings: {[key:string]: string} = {};
-  const acc1 = r.reduce((acc: Array<string>, sig: CombinedSig) => { 
+const getGenericMapping = (typeStack: TypeScan, ioSigs: CombinedSig[]): {[key:string]: string | TypeScan[]} => {
+  let genMappings: {[key:string]: string | TypeScan[]} = {};
+  console.log("typeStack is", typeStack);
+  
+  const acc1 = r.reduce((acc: TypeScan, sig: CombinedSig) => { 
     let expects = sig?.in?.type;
     if (!expects) {
       return acc;
@@ -68,23 +70,26 @@ const getGenericMapping = (typeStack: Array<string>, ioSigs: CombinedSig[]): {[k
     if (genInType && typeof genInType === 'string') {
       genMappings[genInType] = foundType; 
     }
+    else {
+      console.log("genInType here", genInType);
+    }
     return acc;
   }, typeStack, ioSigs);
   console.log("genMappings", genMappings);
   return genMappings;
 };
 
-export const typeChecker = (pl: ProgramList, wd: WordDictionary): Array<string | []> => {
+export const typeChecker = (pl: ProgramList, wd: WordDictionary): TypeScan => {
 
-  const typeStack = r.reduce((acc: Array<string>, w: Word) => {
+  const typeStack = r.reduce((acc: TypeScan, w: Word) => {
     const wordInDictionary: WordValue | null = typeof w === "string" ? wd[w]: null;
     if (wordInDictionary) {
       console.log(wordInDictionary.sig);
       const inSignature = r.reverse(r.head(wordInDictionary.sig));
       const outSignature = r.reverse(r.head(r.tail(wordInDictionary.sig)));
       let ioSigs: CombinedSig[] = combineSigs(inSignature, outSignature);
-      let genMappings: {[key:string]: string} = getGenericMapping( acc, ioSigs);
-      acc = r.reduce((acc: Array<string>, sig: CombinedSig) => { 
+      let genMappings: {[key:string]: string | TypeScan[]} = getGenericMapping( acc, ioSigs);
+      acc = r.reduce((acc: TypeScan, sig: CombinedSig) => { 
         const outType = sig.out?.type;
         if (outType && typeof outType === 'string') {
           if (outType.length === 1) {
@@ -102,10 +107,17 @@ export const typeChecker = (pl: ProgramList, wd: WordDictionary): Array<string |
         return acc;
       }, acc, r.reverse(ioSigs));
     }
-    else {
+    else if (typeof w === 'string' || typeof w === 'number' || typeof w === 'boolean') {
       const wt: WordIdType = getWordType(w);
       const wtString = WordIdType[wt];
+      console.log("wtString is:", wtString)
       acc.push(wtString);
+    }
+    else if (r.is(Array, w)) {
+      const list = typeChecker(w as ProgramList, wd);
+      if (typeof list === 'object') {
+        acc.push(list as TypeScan[]);
+      }
     }
     return acc;
   }, [], pl);

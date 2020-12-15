@@ -14,3 +14,4 @@ export declare type CombinedSig = {
     in: Sig | null;
     out: Sig | null;
 };
+export declare type TypeScan = Array<string | TypeScan[]>;

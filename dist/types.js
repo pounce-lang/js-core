@@ -1,0 +1,2 @@
+// Pounce interpreter types
+export {};
