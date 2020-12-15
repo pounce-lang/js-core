@@ -7,4 +7,4 @@ export type Sig = { type: string | string[], gaurd?: Word[], use?: string };
 export type Signature = Sig[];
 export type WordSignature = Signature[];
 export type CombinedSig = {in: Sig | null, out: Sig | null};
-export type TypeScan = Array<string | TypeScan[]>
+export type TypeScan = Array<string | TypeScan>

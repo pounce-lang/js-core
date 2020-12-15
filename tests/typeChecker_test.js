@@ -43,7 +43,6 @@ let allPassing = 1;
 // allPassing &= testIt("2 5 %", ["NUMBER"]);
 // allPassing &= testIt("-2 abs", ["NUMBER"]);
 // allPassing &= testIt("0.105 2 round", ["NUMBER"]);
-// allPassing &= testIt("[A B]", [["STRING", "STRING"]]);
 // allPassing &= testIt("8 dup", ["NUMBER", "NUMBER"]);
 // allPassing &= testIt("4 dup drop", ["NUMBER"]);
 // allPassing &= testIt("5 8 dup drop", ["NUMBER", "NUMBER"]);
@@ -55,22 +54,25 @@ let allPassing = 1;
 // allPassing &= testIt("aa 2 true rotate", ["BOOLEAN", "NUMBER", "STRING"]);
 // allPassing &= testIt('A 77 false rollup', ["BOOLEAN", "STRING", "NUMBER"]);
 // allPassing &= testIt('A 8 true rolldown', ["NUMBER", "BOOLEAN", "STRING"]);
-
-//---------------------
-
-allPassing &= testIt("A [B] cons", [["STRING", "STRING"]]);
-
+// allPassing &= testIt("[A B]", [["STRING", "STRING"]]);
+// allPassing &= testIt("A [B] cons", [["STRING", "STRING"]]);
+// allPassing &= testIt("5 [B] cons", [["NUMBER", "STRING"]]);
 // allPassing &= testIt("[A] B push", [["STRING", "STRING"]]);
-//allPassing &= testIt("[A B] uncons", ["STRING", ["STRING"]]);
-// allPassing &= testIt("[1 2] uncons cons", [["NUMBER", "NUMBER"]]);
+// allPassing &= testIt("[A B] uncons", ["STRING", ["STRING"]]);
+// allPassing &= testIt("[1 B] uncons cons", [["NUMBER", "STRING"]]);
 // allPassing &= testIt("[A B] pop", [["STRING"], "STRING"]);
 // allPassing &= testIt("[1 2] pop push", [["NUMBER", "NUMBER"]]);
 // allPassing &= testIt("[1 2] pop swap cons", [["NUMBER", "NUMBER"]]);
+// allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", ["NUMBER"]);
+
+//---------------------
+
+
 
 //---------------------------------------
 
-//allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", ["NUMBER"]);
-// allPassing &= testIt("3 2 7 [+] dip -", [-2]);
+allPassing &= testIt("3 wow [dup] dip", ["NUMBER", "NUMBER", "STRING"]);
+// allPassing &= testIt("3 2 7 [+] dip -", ["NUMBER"]);
 
 // allPassing &= testIt("3 2 7 rotate", [7, 2, 3]);
 // allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);

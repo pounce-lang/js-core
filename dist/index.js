@@ -3362,7 +3362,7 @@ var coreWords = {
         }
     },
     'dip': {
-        sig: [[{ type: 'A' }, { type: ['*'], use: 'run' }], [{ type: '*-result-types' }, { type: 'A' }]],
+        sig: [[{ type: 'A' }, { type: ['*'], use: 'play' }], [{ type: '*-play' }, { type: 'A' }]],
         compose: function (s, pl) {
             var block = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var item = s === null || s === void 0 ? void 0 : s.pop();
@@ -4203,14 +4203,22 @@ var getGenericMapping = function (typeStack, ioSigs) {
         if (!expects) {
             return acc;
         }
-        var genInType = (expects.length === 1) ? expects : "";
+        var genInType = (expects.length === 1) ? expects : expects;
         var consume = (((_b = sig.in) === null || _b === void 0 ? void 0 : _b.use) !== "observe");
         var foundType = consume ? acc.pop() : acc[acc.length - 1];
         if (genInType && typeof genInType === 'string') {
             genMappings[genInType] = foundType;
         }
-        else {
+        else if (typeof genInType !== 'string') {
             console.log("genInType here", genInType);
+            genInType.forEach(function (git) {
+                if (git === "*") {
+                    genMappings[git] = foundType;
+                }
+                else if (typeof foundType !== 'string') {
+                    genMappings[git] = foundType.shift();
+                }
+            });
         }
         return acc;
     }, typeStack, ioSigs);
@@ -4241,6 +4249,22 @@ var typeChecker = function (pl, wd) {
                 }
                 else if (outType) { // array of type
                     console.log("outType: ", typeof outType, JSON.stringify(outType));
+                    var arrTypes = r.map(function (i) {
+                        if (typeof i === 'string') {
+                            var MappedType = genMappings_1[i];
+                            if (typeof MappedType === 'string') {
+                                return MappedType;
+                            }
+                            else if (r.is(Array, MappedType)) {
+                                var firstMappedType = MappedType[0];
+                                if (typeof firstMappedType === 'string') {
+                                    return firstMappedType;
+                                }
+                            }
+                        }
+                        return "";
+                    }, outType);
+                    acc.push(arrTypes);
                 }
                 return acc;
             }, acc, r.reverse(ioSigs));

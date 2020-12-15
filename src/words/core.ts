@@ -729,7 +729,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'dip': {
-        sig: [[{ type: 'A' }, { type: ['*'], use: 'run' }], [{ type: '*-result-types' }, { type: 'A' }]],
+        sig: [[{ type: 'A' }, { type: ['*'], use: 'play' }], [{ type: '*-play' }, { type: 'A' }]],
         compose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             const item = s?.pop();
