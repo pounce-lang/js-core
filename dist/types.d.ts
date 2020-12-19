@@ -9,9 +9,8 @@ export declare type Sig = {
     use?: string;
 };
 export declare type Signature = Sig[];
-export declare type WordSignature = Signature[];
 export declare type CombinedSig = {
-    in: Sig | null;
-    out: Sig | null;
+    in: Signature | null;
+    out: Signature | null;
 };
-export declare type TypeScan = Array<string | TypeScan>;
+export declare type TypeScan = Array<string | CombinedSig | TypeScan>;

@@ -1,6 +1,6 @@
-import { ProgramList, ValueStack, WordSignature } from "./types";
+import { ProgramList, ValueStack, CombinedSig } from "./types";
 export declare type WordValue = {
-    sig?: WordSignature;
+    sig?: CombinedSig;
     compose: ProgramList | ((s: ValueStack, pl: ProgramList) => [
         ValueStack,
         ProgramList?

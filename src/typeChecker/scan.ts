@@ -33,10 +33,10 @@ const combineSigs = (inS: Signature, outS: Signature) => {
     inS.forEach((inSig: Sig, i: number) => {
       const outSig = outS[i];
       if (outSig) {
-        ioSigs.push({ in: inSig, out: outSig });
+        ioSigs.push({ in: [inSig], out: [outSig] });
       }
       else {
-        ioSigs.push({ in: inSig, out: null });
+        ioSigs.push({ in: [inSig], out: null });
       }
     });
   }
@@ -44,28 +44,35 @@ const combineSigs = (inS: Signature, outS: Signature) => {
     outS.forEach((outSig: Sig, i: number) => {
       const inSig = inS[i];
       if (inSig) {
-        ioSigs.push({ in: inSig, out: outSig });
+        ioSigs.push({ in: [inSig], out: [outSig] });
       }
       else {
-        ioSigs.push({ in: null, out: outSig });
+        ioSigs.push({ in: null, out: [outSig] });
       }
     });
   }
-  console.log("ioSigs", ioSigs);
+  console.log("ioSigs", JSON.stringify(ioSigs));
   return ioSigs;
 };
 
-const getGenericMapping = (typeStack: TypeScan, ioSigs: CombinedSig[]): { [key: string]: string | TypeScan } => {
-  let genMappings: { [key: string]: string | TypeScan } = {};
+const getGenericMapping = (typeStack: TypeScan, ioSigs: CombinedSig[]): { [key: string]: string | TypeScan | CombinedSig } => {
+  let genMappings: { [key: string]: string | TypeScan | CombinedSig } = {};
   console.log("typeStack is", typeStack);
 
   const acc1 = r.reduce((acc: TypeScan, sig: CombinedSig) => {
-    let expects = sig?.in?.type;
+    let expects = sig?.in?.[0]?.type;
     if (!expects) {
       return acc;
     }
     let genInType = (expects.length === 1) ? expects : expects;
-    let consume = (sig.in?.use !== "observe");
+    let consume = (sig.in?.[0]?.use !== "observe");
+    let play = (sig.in?.[0]?.use === "play");
+    if (play) {
+      acc.pop();
+      acc.pop();
+      acc.push({in:[{type:"hi"}], out: [{type:"there"}]});
+      return acc;
+    }
     let foundType = consume ? acc.pop() : acc[acc.length - 1];
     if (genInType && typeof genInType === 'string') {
       genMappings[genInType] = foundType;
@@ -76,8 +83,11 @@ const getGenericMapping = (typeStack: TypeScan, ioSigs: CombinedSig[]): { [key: 
         if (git === "*") {
           genMappings[git] = foundType;
         }
-        else if (typeof foundType !== 'string') {
-          genMappings[git] = foundType.shift();
+        else if (typeof foundType !== 'string' && Array.isArray(foundType)) {
+          console.log("foundType[]: ", foundType);
+          
+          const a = foundType as [];
+          genMappings[git] = a.shift();
         }
       });
     }
@@ -93,12 +103,13 @@ export const typeChecker = (pl: ProgramList, wd: WordDictionary): TypeScan => {
     const wordInDictionary: WordValue | null = typeof w === "string" ? wd[w] : null;
     if (wordInDictionary) {
       console.log(wordInDictionary.sig);
-      const inSignature = r.reverse(r.head(wordInDictionary.sig));
-      const outSignature = r.reverse(r.head(r.tail(wordInDictionary.sig)));
+      const inSig = wordInDictionary.sig.in ?? [];
+      const inSignature = r.reverse(inSig);
+      const outSignature = r.reverse(wordInDictionary.sig.out);
       let ioSigs: CombinedSig[] = combineSigs(inSignature, outSignature);
-      let genMappings: { [key: string]: string | TypeScan } = getGenericMapping(acc, ioSigs);
+      let genMappings: { [key: string]: string | TypeScan | CombinedSig } = getGenericMapping(acc, ioSigs);
       acc = r.reduce((acc: TypeScan, sig: CombinedSig) => {
-        const outType = sig.out?.type;
+        const outType = sig.out?.[0]?.type;
         if (outType && typeof outType === 'string') {
           if (outType.length === 1) {
             console.log("push genMappings[outType]", outType, genMappings[outType]);
@@ -117,11 +128,14 @@ export const typeChecker = (pl: ProgramList, wd: WordDictionary): TypeScan => {
               if (typeof MappedType === 'string') {
                 return MappedType;
               }
-              else if (r.is(Array, MappedType)) {
+              else if (Array.isArray(MappedType) && MappedType?.length > 0) {
                 const firstMappedType = MappedType[0];
                 if (typeof firstMappedType === 'string') {
                   return firstMappedType;
                 }
+              }
+              else if (!Array.isArray(MappedType) && MappedType?.in) {
+
               }
             }
             return "";
@@ -137,7 +151,7 @@ export const typeChecker = (pl: ProgramList, wd: WordDictionary): TypeScan => {
       console.log("wtString is:", wtString)
       acc.push(wtString);
     }
-    else if (r.is(Array, w)) {
+    else if (Array.isArray(w)) {
       const list = typeChecker(w as ProgramList, wd);
       if (typeof list === 'object') {
         acc.push(list as TypeScan);

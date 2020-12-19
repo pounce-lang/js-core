@@ -71,12 +71,10 @@ let allPassing = 1;
 
 //---------------------------------------
 
-allPassing &= testIt("3 wow [dup] dip", ["NUMBER", "NUMBER", "STRING"]);
+//allPassing &= testIt("3 wow [dup] dip", ["NUMBER", "NUMBER", "STRING"]);
+allPassing &= testIt("3 2 ok [+] dip ", ["NUMBER", "STRING"]);
 // allPassing &= testIt("3 2 7 [+] dip -", ["NUMBER"]);
 
-// allPassing &= testIt("3 2 7 rotate", [7, 2, 3]);
-// allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
-// allPassing &= testIt('A B C rolldown', ['B', 'C', 'A']);
 
 // allPassing &= testIt("true [5] [7] if-else", ["NUMBER"]);
 // allPassing &= testIt("false [5] [7] if-else", ["NUMBER"]);
