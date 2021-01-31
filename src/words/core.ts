@@ -1061,6 +1061,24 @@ export const coreWords: WordDictionary = {
             [], 'linrec5'
         ], "pounce"]
     },
+    'map2': {
+        sig: [
+            [{ type: 'ValueList extends (list<words>)' },
+            { type: 'Phrase extends (list<words>)' }],
+            [{ type: 'ResultValueList extends (list<words>)' }]],
+        compose:
+            [["list", "phrase"],
+            [
+                [[], "list"],
+                ['size', 1, '<='],
+                ['drop'],
+                [
+                    'uncons', 'uncons',
+                    ['phrase', 'play', 'push'], 'dip'
+                ],
+                [], 'linrec5'
+            ], "pounce"]
+    },
     'filter': {
         sig: [
             [{ type: 'ValueList extends (list<words>)' },

@@ -53,7 +53,7 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words", "word", "dup", "swap", "drop", "round", "+", "-", "/", "%", "*", "&", "|", "^", "~", "&&", "||", "!", "E", "LN10", "LN2", "LOG10E", "LOG2E", "PI", "SQRT1_2", "SQRT2", "abs", "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh", "cbrt", "ceil", "cos", "cosh", "exp", "expm1", "floor", "hypot", "log", "log10", "log1p", "log2", "max", "min", "pow", "random", "sign", "sin", "sinh", "sqrt", "tan", "tanh", "trunc", "play", "pounce", "dip", "dip2", "rotate", "rollup", "rolldown", "if-else", "ifte", "=", "==", "!=", ">", "<", ">=", "<=", "concat", "cons", "uncons", "push", "pop", "constrec", "linrec", "linrec5", "binrec", "dup2", "times", "map", "filter", "reduce", "split", "size", "depth", "stack-copy"]]);
+allPassing &= testIt("words", [["words", "word", "dup", "swap", "drop", "round", "+", "-", "/", "%", "*", "&", "|", "^", "~", "&&", "||", "!", "E", "LN10", "LN2", "LOG10E", "LOG2E", "PI", "SQRT1_2", "SQRT2", "abs", "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh", "cbrt", "ceil", "cos", "cosh", "exp", "expm1", "floor", "hypot", "log", "log10", "log1p", "log2", "max", "min", "pow", "random", "sign", "sin", "sinh", "sqrt", "tan", "tanh", "trunc", "play", "pounce", "dip", "dip2", "rotate", "rollup", "rolldown", "if-else", "ifte", "=", "==", "!=", ">", "<", ">=", "<=", "concat", "cons", "uncons", "push", "pop", "constrec", "linrec", "linrec5", "binrec", "dup2", "times", "map", "map2", "filter", "reduce", "split", "size", "depth", "stack-copy"]]);
 allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "compose": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
 allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
 allPassing &= testIt("4 dup drop", [4]);
@@ -139,6 +139,11 @@ allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [[3, 2, 1, 5], [6, 8, 7
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 ==] map", [[false, true, false, false, true, true, false, false]]);
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 *] map", [[6, 16, 10, 14, 20, 4, 18, 2]]);
 allPassing &= testIt("3 2 1 [1 2 3] [+] map", [[2, 4, 6]]);
+
+allPassing &= testIt("[4 2 5 7 10 2 9 4] [% 0 ==] map2", [[true, false, true, false]]);
+allPassing &= testIt("[1 2 3 4 5 6 7 8] [+] map2", [[3, 7, 11, 15]]);
+// map2 is not stack safe if you must reach under in your map2 phrase (although map can do this)
+// allPassing &= testIt("3 2 [1 2 3 4] [+ +] map2", [[5, 10]]);
 
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 !=] filter", [[3, 5, 7, 9, 1]]);
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [3 % 0 ==] filter", [[3, 9]]);
