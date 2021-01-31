@@ -142,6 +142,7 @@ allPassing &= testIt("3 2 1 [1 2 3] [+] map", [[2, 4, 6]]);
 
 allPassing &= testIt("[4 2 5 7 10 2 9 4] [% 0 ==] map2", [[true, false, true, false]]);
 allPassing &= testIt("[1 2 3 4 5 6 7 8] [+] map2", [[3, 7, 11, 15]]);
+allPassing &= testIt("[[1 2] [3 4] [5 6] [7 8]] [concat] map2", [[[1,2,3,4],[5,6,7,8]]]);
 // map2 is not stack safe if you must reach under in your map2 phrase (although map can do this)
 // allPassing &= testIt("3 2 [1 2 3 4] [+ +] map2", [[5, 10]]);
 
