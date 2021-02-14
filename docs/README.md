@@ -1,189 +1,217 @@
 # Pounce-lang Docs
+Syntax: the Pounce language is a concatinative language with a classically minimal syntax:
+ * Clear Space is defined as space, tab, or new-line
+ * Words are any series of visible characters, not including code comments, list delimiters or clear space
+ * a Phrase is a series of words or lists separated by clear space
+ * Code Comments are started with a `#` character and end with a new-line
+ * Lists are delimited by square brackets `[` and `]` and contain any number of words or lists
+ 
+Only the word `compose` is reserved and cannot be redefined.
 
 ## Core Words: definitions, usage and meaning
 Each core word is categorized and discussed in context of usage.
 
-### words
-This word lists all words in the core dictionary.
+Categories: Arithmetic, String, Stack, List, Flow and Introspection
+
+### words `[Introspection]`
+This word lists all words in the core dictionary with the exception of `compose`.
 [words word dup swap drop round + - / % * & | ^ ~ && || ! E LN10 LN2 LOG10E LOG2E PI SQRT1_2 SQRT2 abs acos acosh asin asinh atan atan2 atanh cbrt ceil cos cosh exp expm1 floor hypot log log10 log1p log2 max min pow random sign sin sinh sqrt tan tanh trunc play pounce dip dip2 rotate rollup rolldown if-else ifte = == != > < >= <= concat cons uncons push pop constrec linrec linrec5 binrec dup2 times map filter reduce split size depth stack-copy]
 
+### word `[Introspection]`
 
-### word
+### dup `[Stack]`
 
-### dup 
+### swap `[Stack]`
 
-### swap 
+### drop `[Stack]`
 
-### drop 
+### round `[Arithmetic]`
 
-### round 
+### + `[Arithmetic]`
 
-### + 
+### - `[Arithmetic]`
 
-### - 
+### / [Arithmetic]
 
-### / 
+### % [Arithmetic]
 
-### % 
+### * [Arithmetic]
 
-### * 
+### & [Arithmetic]
 
-### & 
+### | [Arithmetic]
 
-### | 
+### ^ [Arithmetic]
 
-### ^ 
+### ~ [Arithmetic]
 
-### ~ 
+### && [Arithmetic]
 
-### && 
+### || [Arithmetic]
 
-### || 
+### ! [Arithmetic]
 
-### ! 
+### E [Arithmetic]
 
-### E 
+### LN10 [Arithmetic]
 
-### LN10 
+### LN2 [Arithmetic]
 
-### LN2 
+### LOG10E [Arithmetic]
 
-### LOG10E 
+### LOG2E [Arithmetic]
 
-### LOG2E 
+### PI [Arithmetic]
 
-### PI 
+### SQRT1_2 [Arithmetic]
 
-### SQRT1_2 
+### SQRT2 [Arithmetic]
 
-### SQRT2 
+### abs [Arithmetic]
 
-### abs 
+### acos [Arithmetic]
 
-### acos 
+### acosh [Arithmetic]
 
-### acosh 
+### asin [Arithmetic]
 
-### asin 
+### asinh [Arithmetic]
 
-### asinh 
+### atan [Arithmetic]
 
-### atan 
+### atan2 [Arithmetic]
 
-### atan2 
+### atanh [Arithmetic]
 
-### atanh 
+### cbrt [Arithmetic]
 
-### cbrt 
+### ceil [Arithmetic]
 
-### ceil 
+### cos [Arithmetic]
 
-### cos 
+### cosh [Arithmetic]
 
-### cosh 
+### exp [Arithmetic]
 
-### exp 
+### expm1 [Arithmetic]
 
-### expm1 
+### floor [Arithmetic]
 
-### floor 
+### hypot [Arithmetic]
 
-### hypot 
+### log [Arithmetic]
 
-### log 
+### log10 [Arithmetic]
 
-### log10 
+### log1p [Arithmetic]
 
-### log1p 
+### log2 [Arithmetic]
 
-### log2 
+### max [Arithmetic]
 
-### max 
+### min [Arithmetic]
 
-### min 
+### pow [Arithmetic]
 
-### pow 
+### random [Arithmetic]
 
-### random 
+### sign [Arithmetic]
 
-### sign 
+### sin [Arithmetic]
 
-### sin 
+### sinh [Arithmetic]
 
-### sinh 
+### sqrt [Arithmetic]
 
-### sqrt 
+### tan [Arithmetic]
 
-### tan 
+### tanh [Arithmetic]
 
-### tanh 
+### trunc [Arithmetic]
 
-### trunc 
+### compose [Flow]
+The only reserved word in Pounce, `compose` is processed before runtime. It affects the word dictionary and it consumes its stack arguments. It can not be used in a list, so it must be used at the outer most (base) level of a program. 
+> [a phrase of words] [name-of-word] compose
 
-### play 
+> [1 +] [increment-by-one] compose
 
-### pounce 
+`compose`, stores a phrase of words as a named-word in the runtime word dictionary
 
-### dip 
+### play [Flow]
+The word 'play' concatinates words onto the running program. A list containing a phrase is dequoted prepended at the beginning of the program.
+> [a phrase of words] play
 
-### dip2 
+> [1 1 +] play # Yeilds `2` on the stack
 
-### rotate 
+`play` is equivalent to the Joy language word `i`
 
-### rollup 
+### pounce [Flow]
+The word `pounce` first moves stack values into the phrase and then concatinates the modified words onto the running program. A list of named stack references and a list containing a phrase to be dequoted and prepended at the beginning of the program.
+> [a etc] [a phrase of words] pounce
 
-### rolldown 
+> 3 2 [a b] [b a -] pounce # Yeilds `-1` on the stack
 
-### if-else 
 
-### ifte 
+### dip [Flow] 
 
-### = 
+### dip2 [Flow] 
 
-### == 
+### rotate [Stack]
 
-### != 
+### rollup [Stack]
 
-### > 
+### rolldown [Stack]
 
-### < 
+### if-else [Flow] 
 
-### >= 
+### ifte [Flow] 
 
-### <= 
+### = [Arithmetic]
 
-### concat 
+### == [Arithmetic]
 
-### cons 
+### != [Arithmetic]
 
-### uncons 
+### > [Arithmetic]
 
-### push 
+### < [Arithmetic]
 
-### pop 
+### >= [Arithmetic]
 
-### constrec 
+### <= [Arithmetic]
 
-### linrec 
+### concat [List] 
 
-### linrec5 
+### cons [List] 
 
-### binrec 
+### uncons [List] 
 
-### dup2 
+### push [List] 
 
-### times 
+### pop [List] 
 
-### map 
+### constrec [Flow] 
 
-### filter 
+### linrec [Flow] 
 
-### reduce 
+### linrec5 [Flow] 
 
-### split 
+### binrec [Flow] 
 
-### size 
+### dup2 `[Stack]`
 
-### depth 
+### times [Flow] 
 
-### stack-copy
+### map [List]
+
+### filter [List] 
+
+### reduce [List] 
+
+### split [List] 
+
+### size [List]
+
+### depth [Stack]
+
+### stack-copy [Stack]
