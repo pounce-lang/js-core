@@ -1,14 +1,24 @@
 const pinna = require('../dist/index').parse;
-const typeche = require('../dist/index').preProcessCheckTypes;
+const typecheck = require('../dist/index').preProcessCheckTypes;
 const coreWords = require('../dist/index').coreWordDictionary;
 
 
 let tests = [
-    // ['2 3 +', [{"type":"number","w":"+"}]],
+    ['2 3 +', [{"type":"number","w":"+"}]],
     ['2 abc +', [{"error":"An unexpected stack type of string with value 'abc' was encountered by +","word":"+","stackDepth":0,"expectedType":"number","encounteredType":"string","encounterdValue":"abc"}]],
     ['twelve 12 +', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by +","word":"+","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
-    // ['hello world', [{"type":"string","w":"hello"},{"type":"string","w":"world"}]],
-    // ['"hello world"', [{"type":"string","w":"hello world"}]],
+    ['hello world', [{"type":"string","w":"hello"},{"type":"string","w":"world"}]],
+    ['"hello world"', [{"type":"string","w":"hello world"}]],
+    ['2 3 -', [{"type":"number","w":"-"}]],
+    ['2 abc -', [{"error":"An unexpected stack type of string with value 'abc' was encountered by -","word":"-","stackDepth":0,"expectedType":"number","encounteredType":"string","encounterdValue":"abc"}]],
+    ['twelve 12 -', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by -","word":"-","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
+    ['2 3 *', [{"type":"number","w":"*"}]],
+    ['2 abc *', [{"error":"An unexpected stack type of string with value 'abc' was encountered by *","word":"*","stackDepth":0,"expectedType":"number","encounteredType":"string","encounterdValue":"abc"}]],
+    ['twelve 12 *', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by *","word":"*","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
+    ['2 3 /', [{"type":"number","w":"/"}]],
+    ['2 abc /', [{"error":"An unexpected stack type of string with value 'abc' was encountered by /","word":"/","stackDepth":0,"expectedType":"number","encounteredType":"string","encounterdValue":"abc"}]],
+    ['twelve 12 /', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by /","word":"/","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
+    ['2 0 /', [{"error":"Guard found that the static value 0 failed to pass its requirement [0 !=]"}]],
 ];
 
 function cmpLists(a, b) {
@@ -37,7 +47,7 @@ tests.forEach((test, i) => {
     try {
         //parse then typecheck
         const result_pl = pinna(ps);
-        const tc_result = typeche(result_pl, coreWords);
+        const tc_result = typecheck(result_pl, coreWords);
         testCount += 1;
         if (!deepCompare(tc_result, expected_stack)) {
             testsFailed += 1;

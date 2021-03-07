@@ -5,7 +5,7 @@ export declare type ValueStack = Word[];
 export declare type ProgramList = Word[];
 export declare type Signature = {
     type: string;
-    gaurd?: Word[];
+    guard?: Word[];
     use?: string;
 }[];
 export declare type WordSignature = Signature[];

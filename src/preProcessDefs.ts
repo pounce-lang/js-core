@@ -3,7 +3,7 @@ import * as r from 'ramda';
 import { ProgramList, WordSignature, Word } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { toPLOrNull, toStringOrNull, toArrOrNull } from './words/core';
-// import { parser as pinna, unParser as unPinna } from './parser/Pinna';
+import { unParser as unparse } from './parser/Pinna';
 
 // import {
 //   check,
@@ -35,15 +35,16 @@ export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [Pro
   }
   return [next_pl, r.mergeRight(coreWords, next_wd)];
 };
+type TypeListElement = {type: string, w: string, guard?: Word[], use?: string };
 
 const justTypes = (ws: WordSignature, w: Word) => {
-  const i = r.map((a) => ({type:a.type, w:w.toString()}), ws[0]);
+  const i = r.map((a) => ({...a, w:w.toString()}), ws[0]);
   const o = r.map((a) => ({type:a.type, w:w.toString()}), ws[1]);
   return [i, o];
 };
 
 export const preCheckTypes = (pl: ProgramList, wd: WordDictionary): (string[] | string) => {
-  const typelist: {type: string, w: string}[][][] = r.map((w: Word): {type: string, w: string}[][] => {
+  const typelist: TypeListElement[][][] = r.map((w: Word): TypeListElement[][] => {
     // string | number | Word[] | boolean | { [index: string]: Word }
     if (r.is(Boolean, w)) {
       return [[], [{type:"boolean", w: w.toString()}]];
@@ -80,6 +81,12 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary): (string[] | 
           let i = 0;
           while (r.length(topNstack) > 0 && allMatch) {
             if (r.takeLast(1, topNstack)[0].type === r.takeLast(1, input)[0].type) {
+              const inputGuard = sig[0][sig[0].length - 1 - i]?.guard;
+              if (inputGuard) {
+                if (inputGuard[1] === "!=" && r.takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
+                  return [{error:`Guard found that the static value ${r.takeLast(1, topNstack)[0].w.toString()} failed to pass its requirement [${unparse(inputGuard)}]`}];
+                }
+              }
               topNstack = r.dropLast(1, topNstack);
               input = r.dropLast(1, input);
               i += 1;

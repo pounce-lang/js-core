@@ -143,7 +143,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
-        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -155,7 +155,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '%': {
-        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());

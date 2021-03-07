@@ -2603,6 +2603,17 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
 function __generator(thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -2785,7 +2796,7 @@ var coreWords = {
         }
     },
     '/': {
-        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2798,7 +2809,7 @@ var coreWords = {
         }
     },
     '%': {
-        sig: [[{ type: 'number' }, { type: 'number', gaurd: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -4048,7 +4059,6 @@ var coreWords = {
     // // }
 };
 
-// import { parser as pinna, unParser as unPinna } from './parser/Pinna';
 // import {
 //   check,
 //       infer, match, 
@@ -4078,7 +4088,7 @@ var preProcessDefs = function (pl, coreWords) {
     return [next_pl, r.mergeRight(coreWords, next_wd)];
 };
 var justTypes = function (ws, w) {
-    var i = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[0]);
+    var i = r.map(function (a) { return (__assign(__assign({}, a), { w: w.toString() })); }, ws[0]);
     var o = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
     return [i, o];
 };
@@ -4109,6 +4119,7 @@ var preCheckTypes = function (pl, wd) {
     if (typelist) {
         //console.log("typelist", JSON.stringify(typelist));
         return r.reduce(function (acc, sig) {
+            var _a;
             if (r.is(Array, sig) && r.length(sig) === 2) {
                 var input = sig[0];
                 var inLength = r.length(input);
@@ -4120,6 +4131,12 @@ var preCheckTypes = function (pl, wd) {
                     var i = 0;
                     while (r.length(topNstack) > 0 && allMatch) {
                         if (r.takeLast(1, topNstack)[0].type === r.takeLast(1, input)[0].type) {
+                            var inputGuard = (_a = sig[0][sig[0].length - 1 - i]) === null || _a === void 0 ? void 0 : _a.guard;
+                            if (inputGuard) {
+                                if (inputGuard[1] === "!=" && r.takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
+                                    return [{ error: "Guard found that the static value " + r.takeLast(1, topNstack)[0].w.toString() + " failed to pass its requirement [" + unParser(inputGuard) + "]" }];
+                                }
+                            }
                             topNstack = r.dropLast(1, topNstack);
                             input = r.dropLast(1, input);
                             i += 1;
