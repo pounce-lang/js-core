@@ -1,4 +1,4 @@
-import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, reduce, length, remove, concat, keys, omit, path, filter } from 'ramda';
+import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, reduce, length, takeLast, dropLast, concat, keys, omit, path, filter } from 'ramda';
 import NP from 'number-precision';
 
 var pinnaParser = function () {
@@ -4071,48 +4071,72 @@ var preProcessDefs = function (pl, coreWords) {
     }
     return [next_pl, mergeRight(coreWords, next_wd)];
 };
-var justTypes = function (ws) {
-    var i = map(function (a) { return a.type; }, ws[0]);
-    var o = map(function (a) { return a.type; }, ws[1]);
+var justTypes = function (ws, w) {
+    var i = map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[0]);
+    var o = map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
     return [i, o];
 };
 var preCheckTypes = function (pl, wd) {
     var typelist = map(function (w) {
         // string | number | Word[] | boolean | { [index: string]: Word }
         if (is(Boolean, w)) {
-            return [[], ["boolean"]];
+            return [[], [{ type: "boolean", w: w.toString() }]];
         }
         if (is(Number, w)) {
-            return [[], ["number"]];
+            return [[], [{ type: "number", w: w.toString() }]];
         }
         if (is(String, w)) {
             //console.log("w", w);
             if (wd[w]) {
                 //console.log("w2", wd[w as string]);
-                return justTypes(wd[w].sig);
+                return justTypes(wd[w].sig, w);
             }
             else {
-                return [[], ["string"]];
+                return [[], [{ type: "string", w: w.toString() }]];
             }
         }
         if (is(Array, w)) {
-            return [[], ["any[]"]];
+            return [[], [{ type: "any[]", w: w.toString() }]];
         }
-        return [[], ["any"]];
+        return [[], [{ type: "any", w: w.toString() }]];
     }, pl);
     if (typelist) {
         //console.log("typelist", JSON.stringify(typelist));
         return reduce(function (acc, sig) {
             if (is(Array, sig) && length(sig) === 2) {
                 var input = sig[0];
-                if (length(input) > 0 && length(acc) >= length(input)) {
+                var inLength = length(input);
+                if (inLength > 0 && length(acc) >= inLength) {
                     // check expected input types
-                    console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
-                    acc = remove(length(input) * -1, length(input), acc);
+                    //console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
+                    var topNstack = takeLast(inLength, acc);
+                    var allMatch = true;
+                    var i = 0;
+                    while (length(topNstack) > 0 && allMatch) {
+                        if (takeLast(1, topNstack)[0].type === takeLast(1, input)[0].type) {
+                            topNstack = dropLast(1, topNstack);
+                            input = dropLast(1, input);
+                            i += 1;
+                        }
+                        else {
+                            allMatch = false;
+                        }
+                    }
+                    if (allMatch) {
+                        acc = dropLast(inLength, acc);
+                    }
+                    else {
+                        return [{ error: "An unexpected stack type of " + topNstack[topNstack.length - 1].type + " with value '" + topNstack[topNstack.length - 1].w + "' was encountered by " + input[input.length - 1].w,
+                                word: input[input.length - 1].w, stackDepth: i,
+                                expectedType: input[input.length - 1].type,
+                                encounteredType: topNstack[topNstack.length - 1].type,
+                                encounterdValue: topNstack[topNstack.length - 1].w
+                            }];
+                    }
                 }
                 var output = sig[1];
                 if (length(output) > 0) {
-                    console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
+                    //console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
                     return concat(acc, output);
                 }
             }

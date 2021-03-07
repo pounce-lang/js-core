@@ -4077,48 +4077,72 @@ var preProcessDefs = function (pl, coreWords) {
     }
     return [next_pl, r.mergeRight(coreWords, next_wd)];
 };
-var justTypes = function (ws) {
-    var i = r.map(function (a) { return a.type; }, ws[0]);
-    var o = r.map(function (a) { return a.type; }, ws[1]);
+var justTypes = function (ws, w) {
+    var i = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[0]);
+    var o = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
     return [i, o];
 };
 var preCheckTypes = function (pl, wd) {
     var typelist = r.map(function (w) {
         // string | number | Word[] | boolean | { [index: string]: Word }
         if (r.is(Boolean, w)) {
-            return [[], ["boolean"]];
+            return [[], [{ type: "boolean", w: w.toString() }]];
         }
         if (r.is(Number, w)) {
-            return [[], ["number"]];
+            return [[], [{ type: "number", w: w.toString() }]];
         }
         if (r.is(String, w)) {
             //console.log("w", w);
             if (wd[w]) {
                 //console.log("w2", wd[w as string]);
-                return justTypes(wd[w].sig);
+                return justTypes(wd[w].sig, w);
             }
             else {
-                return [[], ["string"]];
+                return [[], [{ type: "string", w: w.toString() }]];
             }
         }
         if (r.is(Array, w)) {
-            return [[], ["any[]"]];
+            return [[], [{ type: "any[]", w: w.toString() }]];
         }
-        return [[], ["any"]];
+        return [[], [{ type: "any", w: w.toString() }]];
     }, pl);
     if (typelist) {
         //console.log("typelist", JSON.stringify(typelist));
         return r.reduce(function (acc, sig) {
             if (r.is(Array, sig) && r.length(sig) === 2) {
                 var input = sig[0];
-                if (r.length(input) > 0 && r.length(acc) >= r.length(input)) {
+                var inLength = r.length(input);
+                if (inLength > 0 && r.length(acc) >= inLength) {
                     // check expected input types
-                    console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
-                    acc = r.remove(r.length(input) * -1, r.length(input), acc);
+                    //console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
+                    var topNstack = r.takeLast(inLength, acc);
+                    var allMatch = true;
+                    var i = 0;
+                    while (r.length(topNstack) > 0 && allMatch) {
+                        if (r.takeLast(1, topNstack)[0].type === r.takeLast(1, input)[0].type) {
+                            topNstack = r.dropLast(1, topNstack);
+                            input = r.dropLast(1, input);
+                            i += 1;
+                        }
+                        else {
+                            allMatch = false;
+                        }
+                    }
+                    if (allMatch) {
+                        acc = r.dropLast(inLength, acc);
+                    }
+                    else {
+                        return [{ error: "An unexpected stack type of " + topNstack[topNstack.length - 1].type + " with value '" + topNstack[topNstack.length - 1].w + "' was encountered by " + input[input.length - 1].w,
+                                word: input[input.length - 1].w, stackDepth: i,
+                                expectedType: input[input.length - 1].type,
+                                encounteredType: topNstack[topNstack.length - 1].type,
+                                encounterdValue: topNstack[topNstack.length - 1].w
+                            }];
+                    }
                 }
                 var output = sig[1];
                 if (r.length(output) > 0) {
-                    console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
+                    //console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
                     return r.concat(acc, output);
                 }
             }
