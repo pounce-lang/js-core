@@ -1,4 +1,5 @@
-import { ProgramList, ValueStack, WordSignature, Word } from "./types";
+// word dictionary types
+import { ProgramList, ValueStack, WordSignature } from "./types";
 
 export type WordValue = {
     sig?: WordSignature;

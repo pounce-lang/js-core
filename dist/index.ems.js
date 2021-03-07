@@ -1,6 +1,5 @@
-import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, keys, omit, path, filter } from 'ramda';
+import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, reduce, length, remove, concat, keys, omit, path, filter } from 'ramda';
 import NP from 'number-precision';
-import 'fbp-types';
 
 var pinnaParser = function () {
     var parser_actions = {
@@ -2634,6 +2633,7 @@ function __spreadArrays() {
     return r;
 }
 
+var seedrandom = require('seedrandom');
 var toNumOrNull = function (u) {
     return is(Number, u) ? u : null;
 };
@@ -3267,6 +3267,19 @@ var coreWords = {
             var b = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
             if (a !== null && b !== null) {
                 s.push(Math.pow(b, a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // seedrandom
+    'seedrandom': {
+        sig: [[{ type: 'number' }], []],
+        compose: function (s) {
+            var _a;
+            var a = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            if (a !== null) {
+                seedrandom(a.toString(10), { global: true });
                 return [s];
             }
             return [null];
@@ -4029,6 +4042,13 @@ var coreWords = {
     // // }
 };
 
+// import { parser as pinna, unParser as unPinna } from './parser/Pinna';
+// import {
+//   check,
+//       infer, match, 
+//   parse as fbpTypeParse,
+//   //    print, types 
+// } from "fbp-types";
 var preProcessDefs = function (pl, coreWords) {
     var defineWord = function (wd, key, val) {
         var new_word = {};
@@ -4051,8 +4071,72 @@ var preProcessDefs = function (pl, coreWords) {
     }
     return [next_pl, mergeRight(coreWords, next_wd)];
 };
+var justTypes = function (ws) {
+    var i = map(function (a) { return a.type; }, ws[0]);
+    var o = map(function (a) { return a.type; }, ws[1]);
+    return [i, o];
+};
+var preCheckTypes = function (pl, wd) {
+    var typelist = map(function (w) {
+        // string | number | Word[] | boolean | { [index: string]: Word }
+        if (is(Boolean, w)) {
+            return [[], ["boolean"]];
+        }
+        if (is(Number, w)) {
+            return [[], ["number"]];
+        }
+        if (is(String, w)) {
+            //console.log("w", w);
+            if (wd[w]) {
+                //console.log("w2", wd[w as string]);
+                return justTypes(wd[w].sig);
+            }
+            else {
+                return [[], ["string"]];
+            }
+        }
+        if (is(Array, w)) {
+            return [[], ["any[]"]];
+        }
+        return [[], ["any"]];
+    }, pl);
+    if (typelist) {
+        //console.log("typelist", JSON.stringify(typelist));
+        return reduce(function (acc, sig) {
+            if (is(Array, sig) && length(sig) === 2) {
+                var input = sig[0];
+                if (length(input) > 0 && length(acc) >= length(input)) {
+                    // check expected input types
+                    console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
+                    acc = remove(length(input) * -1, length(input), acc);
+                }
+                var output = sig[1];
+                if (length(output) > 0) {
+                    console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
+                    return concat(acc, output);
+                }
+            }
+            return null;
+        }, [], typelist);
+        //return typelist;
+    }
+    return "not implemented";
+};
+// const toTypeOrNull = <T extends unknown>(val: any, type: string) => {
+//   const t = fbpTypeParse(type);
+//   // console.log('*** t ***', t);
+//   // console.log('*** check(t, val) ***', check(t, val));
+//   if (check(t, val)) {
+//     if (type === 'string') {
+//       return toStringOrNull(val);
+//     }
+//     if (type === '(int | float)') {
+//       return toNumOrNull(val);
+//     }
+//   }
+//   return null;
+// }
 
-var parse = parser;
 var debugLevel = function (ics, logLevel) { return (ics.length <= logLevel); };
 // user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
 var debugCleanPL = function (pl) { return filter(function (w) { return (w !== "popInternalCallStack"); }, pl); };
@@ -4067,7 +4151,7 @@ function interpreter(pl_in, opt) {
             case 0:
                 wd_in = opt.wd ? opt.wd : coreWords;
                 internalCallStack = [];
-                _a = is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(is(String, pl_in) ? parse(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
+                _a = is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(is(String, pl_in) ? parser(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
                 s = [];
                 if (!((_j = opt) === null || _j === void 0 ? void 0 : _j.logLevel)) return [3 /*break*/, 2];
                 return [4 /*yield*/, { stack: s, prog: pl, active: true }];
@@ -4221,11 +4305,12 @@ var introspectWords = function () { return keys(omit(['popInternalCallStack'], c
 var introspectWord = function (wn) { return JSON.parse(JSON.stringify(path([wn], coreWords))); };
 
 // the Pounce language core module exposes these function
-var parse$1 = parser;
+var parse = parser;
 var unParse = unParser;
 var interpreter$1 = interpreter;
 var coreWordDictionary = coreWords;
 var purr$1 = purr;
 var preProcessDefines = preProcessDefs;
+var preProcessCheckTypes = preCheckTypes;
 
-export { coreWordDictionary, interpreter$1 as interpreter, parse$1 as parse, preProcessDefines, purr$1 as purr, unParse };
+export { coreWordDictionary, interpreter$1 as interpreter, parse, preProcessCheckTypes, preProcessDefines, purr$1 as purr, unParse };

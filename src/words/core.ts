@@ -1,8 +1,10 @@
 import * as r from "ramda";
-import { WordDictionary, WordValue } from "../WordDictionary.types";
+import { WordDictionary } from "../WordDictionary.types";
 import { ProgramList, Word } from '../types';
 import NP from 'number-precision';
 import { introspectWords, introspectWord } from "../interpreter";
+var seedrandom = require('seedrandom');
+
 
 export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
@@ -596,6 +598,18 @@ export const coreWords: WordDictionary = {
             const b = toNumOrNull(s?.pop());
             if (a !== null && b !== null) {
                 s.push(Math.pow(b, a));
+                return [s];
+            }
+            return [null];
+        }
+    },
+    // seedrandom
+    'seedrandom': {
+        sig: [[{ type: 'number' }], []],
+        compose: s => {
+            const a = toNumOrNull(s?.pop());
+            if (a !== null) {
+                seedrandom(a.toString(10), { global: true });
                 return [s];
             }
             return [null];

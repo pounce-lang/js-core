@@ -1,7 +1,7 @@
 {
   "name": "@pounce-lang/core",
-  "version": "2.0.6",
-  "description": "Pounce is a concatinative programming language. Its core includes a parser and interpreter, written in Javascript. Pounce is infulenced by Forth, Joy, Cat and Kitten.",
+  "version": "2.0.7",
+  "description": "Pounce is a concatenative programming language. Its core includes a parser and interpreter, written in Javascript. Pounce is influenced by Forth, Joy, Cat and Kitten.",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
   "files": [
@@ -12,7 +12,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "publish": "npm login; npm publish --access public",
-    "test": "node ./tests/index.js ; node ./tests/parser_test.js"
+    "test": "node ./tests/index.js ; node ./tests/parser_test.js; node ./tests/typecheck_test.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse",
@@ -28,6 +28,7 @@
     "fbp-types": "^0.3.1",
     "junify": "^1.0.2",
     "number-precision": "^1.4.0",
-    "ramda": "^0.26.1"
+    "ramda": "^0.26.1",
+    "seedrandom": "^3.0.5"
   }
 }

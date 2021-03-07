@@ -2,32 +2,8 @@ import * as r from 'ramda';
 import { ValueStack, ProgramList } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { coreWords, toPLOrNull, toStringOrNull, toArrOrNull, toNumOrNull } from './words/core';
-import { parser as pinna } from './parser/Pinna';
-import { preProcessDefs } from './preProcessDefs';
-import {
-  check,
-  //    infer, match, 
-  parse as fbpTypeParse,
-  //    print, types 
-} from "fbp-types";
-
-
-const toTypeOrNull = <T extends unknown>(val: any, type: string) => {
-  const t = fbpTypeParse(type);
-  // console.log('*** t ***', t);
-  // console.log('*** check(t, val) ***', check(t, val));
-  if (check(t, val)) {
-    if (type === 'string') {
-      return toStringOrNull(val);
-    }
-    if (type === '(int | float)') {
-      return toNumOrNull(val);
-    }
-  }
-  return null;
-}
-
-const parse = pinna;
+import { parser } from './parser/Pinna';
+import { preCheckTypes, preProcessDefs } from './preProcessDefs';
 
 const debugLevel = (ics: string[], logLevel: number) => (ics.length <= logLevel);
 // user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
@@ -42,7 +18,11 @@ export function* interpreter(
   // preProcess if needed 
   const wd_in = opt.wd ? opt.wd : coreWords;
   let internalCallStack = [];
-  let [pl, wd] = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parse(pl_in.toString()) : pl_in, wd_in);
+  let [pl, wd] = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parser(pl_in.toString()) : pl_in, wd_in);
+
+  // type check ahead
+  // console.log("preCheckTypes(pl, wd)", preCheckTypes(pl, wd));
+
   let s: ValueStack = [];
   opt?.logLevel ? yield { stack: s, prog: pl, active: true } : null;
   let w;
