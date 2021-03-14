@@ -1,5 +1,7 @@
 import { is, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, reduce, length, takeLast, dropLast, concat, keys, omit, path, filter } from 'ramda';
 import NP from 'number-precision';
+import Prando from 'prando';
+import { print, infer, match, parse as parse$1 } from 'fbp-types';
 
 var pinnaParser = function () {
     var parser_actions = {
@@ -2644,7 +2646,7 @@ function __spreadArrays() {
     return r;
 }
 
-var seedrandom = require('seedrandom');
+var rng;
 var toNumOrNull = function (u) {
     return is(Number, u) ? u : null;
 };
@@ -2763,7 +2765,7 @@ var coreWords = {
         }
     },
     '+': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
         compose: function (s) {
             var _a, _b;
             // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), '(int | float)');
@@ -3290,7 +3292,9 @@ var coreWords = {
             var _a;
             var a = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
             if (a !== null) {
-                seedrandom(a.toString(10), { global: true });
+                rng = new Prando(a);
+                // rng_first = prng_alea(, {state: true});
+                // SR.seedrandom(a.toString(10), { global: true });
                 return [s];
             }
             return [null];
@@ -3300,7 +3304,7 @@ var coreWords = {
     'random': {
         sig: [[], [{ type: 'number' }]],
         compose: function (s) {
-            s.push(Math.random());
+            s.push(rng.next());
             return [s];
         }
     },
@@ -3396,7 +3400,7 @@ var coreWords = {
         }
     },
     'play': {
-        sig: [[{ type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
+        sig: [[{ type: 'any[]', use: 'run!' }], []],
         compose: function (s, pl) {
             var _a;
             var block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -4053,12 +4057,6 @@ var coreWords = {
     // // }
 };
 
-// import {
-//   check,
-//       infer, match, 
-//   parse as fbpTypeParse,
-//   //    print, types 
-// } from "fbp-types";
 var preProcessDefs = function (pl, coreWords) {
     var defineWord = function (wd, key, val) {
         var new_word = {};
@@ -4093,7 +4091,8 @@ var preCheckTypes = function (pl, wd) {
             return [[], [{ type: "boolean", w: w.toString() }]];
         }
         if (is(Number, w)) {
-            return [[], [{ type: "number", w: w.toString() }]];
+            var t = print(infer(w));
+            return [[], [{ type: t, w: w.toString() }]];
         }
         if (is(String, w)) {
             //console.log("w", w);
@@ -4124,7 +4123,8 @@ var preCheckTypes = function (pl, wd) {
                     var allMatch = true;
                     var i = 0;
                     while (length(topNstack) > 0 && allMatch) {
-                        if (takeLast(1, topNstack)[0].type === takeLast(1, input)[0].type) {
+                        console.log(takeLast(1, topNstack)[0].type, takeLast(1, input)[0].type);
+                        if (match(parse$1(takeLast(1, topNstack)[0].type), parse$1(takeLast(1, input)[0].type))) {
                             var inputGuard = (_a = sig[0][sig[0].length - 1 - i]) === null || _a === void 0 ? void 0 : _a.guard;
                             if (inputGuard) {
                                 if (inputGuard[1] === "!=" && takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {

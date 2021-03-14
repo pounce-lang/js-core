@@ -3,8 +3,8 @@ import { WordDictionary } from "../WordDictionary.types";
 import { ProgramList, Word } from '../types';
 import NP from 'number-precision';
 import { introspectWords, introspectWord } from "../interpreter";
-var seedrandom = require('seedrandom');
-
+import Prando from 'prando';
+let rng: { next: () => number };
 
 export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
@@ -118,7 +118,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '+': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
         compose: s => {
             // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), '(int | float)');
             const b = toNumOrNull(s?.pop());
@@ -609,7 +609,9 @@ export const coreWords: WordDictionary = {
         compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
-                seedrandom(a.toString(10), { global: true });
+                rng = new Prando(a);
+                // rng_first = prng_alea(, {state: true});
+                // SR.seedrandom(a.toString(10), { global: true });
                 return [s];
             }
             return [null];
@@ -619,7 +621,7 @@ export const coreWords: WordDictionary = {
     'random': {
         sig: [[], [{ type: 'number' }]],
         compose: s => {
-            s.push(Math.random());
+            s.push(rng.next());
             return [s];
         }
     },
@@ -708,7 +710,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'play': {
-        sig: [[{ type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
+        sig: [[{ type: 'any[]', use: 'run!' }], []],
         compose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             if (block) {

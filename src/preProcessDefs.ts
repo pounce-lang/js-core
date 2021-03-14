@@ -5,12 +5,14 @@ import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { toPLOrNull, toStringOrNull, toArrOrNull } from './words/core';
 import { unParser as unparse } from './parser/Pinna';
 
-// import {
-//   check,
-//       infer, match, 
-//   parse as fbpTypeParse,
-//   //    print, types 
-// } from "fbp-types";
+import {
+  //check,
+    infer, 
+    match, 
+    parse,
+    print, 
+    //types 
+} from "fbp-types";
 
 export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [ProgramList, WordDictionary] => {
 
@@ -50,7 +52,8 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary): (string[] | 
       return [[], [{type:"boolean", w: w.toString()}]];
     }
     if (r.is(Number, w)) {
-      return [[], [{type:"number", w: w.toString()}]];
+      const t = print(infer (w));
+      return [[], [{type:t, w: w.toString()}]];
     }
     if (r.is(String, w)) {
       //console.log("w", w);
@@ -80,7 +83,8 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary): (string[] | 
           let allMatch = true;
           let i = 0;
           while (r.length(topNstack) > 0 && allMatch) {
-            if (r.takeLast(1, topNstack)[0].type === r.takeLast(1, input)[0].type) {
+            console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
+            if (match(parse(r.takeLast(1, topNstack)[0].type), parse(r.takeLast(1, input)[0].type))) {
               const inputGuard = sig[0][sig[0].length - 1 - i]?.guard;
               if (inputGuard) {
                 if (inputGuard[1] === "!=" && r.takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
