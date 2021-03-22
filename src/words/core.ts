@@ -1143,6 +1143,39 @@ export const coreWords: WordDictionary = {
             return [s];
         }
     },
+    'outAt': {
+        compose: s => {
+            const i = toNumOrNull(s?.pop());
+            const arr = toArrOrNull(s[s.length - 1]);
+            if (i !== null && arr && arr.length - 1 >= i) {
+                s.push(arr[i]);
+            }
+            else {
+                console.error("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+                return [null]
+            }
+            return [s];
+        }
+    },
+    'inAt': {
+        compose: s => {
+            const i = toNumOrNull(s?.pop());
+            const ele = toWordOrNull(s?.pop());
+            let arr: Word[] = toArrOrNull(s?.pop());
+            if (i !== null && ele && arr && arr.length - 1 >= i) {
+                arr[i] = ele;
+                s.push(arr);
+            }
+            else {
+                console.error("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+                return [null]
+            }
+            return [s];
+        }
+    },
+    
     'depth': {
         compose: s => {
             s.push(s.length);

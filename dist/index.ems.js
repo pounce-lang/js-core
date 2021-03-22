@@ -3847,6 +3847,40 @@ var coreWords = {
             return [s];
         }
     },
+    'outAt': {
+        compose: function (s) {
+            var _a;
+            var i = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var arr = toArrOrNull(s[s.length - 1]);
+            if (i !== null && arr && arr.length - 1 >= i) {
+                s.push(arr[i]);
+            }
+            else {
+                console.error("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+                return [null];
+            }
+            return [s];
+        }
+    },
+    'inAt': {
+        compose: function (s) {
+            var _a, _b, _c;
+            var i = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var ele = toWordOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            var arr = toArrOrNull((_c = s) === null || _c === void 0 ? void 0 : _c.pop());
+            if (i !== null && ele && arr && arr.length - 1 >= i) {
+                arr[i] = ele;
+                s.push(arr);
+            }
+            else {
+                console.error("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+                return [null];
+            }
+            return [s];
+        }
+    },
     'depth': {
         compose: function (s) {
             s.push(s.length);
