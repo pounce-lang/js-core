@@ -45,14 +45,14 @@ const justTypes = (ws: WordSignature, w: Word) => {
   return [i, o];
 };
 
-export const preCheckTypes = (pl: ProgramList, wd: WordDictionary): (string[] | string) => {
+export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
   const typelist: TypeListElement[][][] = r.map((w: Word): TypeListElement[][] => {
     // string | number | Word[] | boolean | { [index: string]: Word }
     if (r.is(Boolean, w)) {
       return [[], [{type:"boolean", w: w.toString()}]];
     }
     if (r.is(Number, w)) {
-      const t = print(infer (w));
+      const t = "(int | float)"; // print(infer (w));
       return [[], [{type:t, w: w.toString()}]];
     }
     if (r.is(String, w)) {
@@ -66,7 +66,12 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary): (string[] | 
       }
     }
     if (r.is(Array, w)) {
-      return [[], [{type:"any[]", w: w.toString()}]];
+      const wl = w as Word[];
+      // const arrayTypesResult = preCheckTypes(wl, wd);
+      const arrayTypesResult = print(infer (w));
+      console.log("arrayTypesResult", arrayTypesResult);
+      // return [[], [{type: `array${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
+      return [[], [{type: arrayTypesResult, w: `[${unparse(wl)}]`}]];
     }
     return [[], [{type:"any", w: w.toString()}]];
   }, pl);

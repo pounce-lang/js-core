@@ -2779,7 +2779,7 @@ var coreWords = {
         }
     },
     '-': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2792,7 +2792,7 @@ var coreWords = {
         }
     },
     '/': {
-        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2805,7 +2805,7 @@ var coreWords = {
         }
     },
     '%': {
-        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2818,7 +2818,7 @@ var coreWords = {
         }
     },
     '*': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2832,7 +2832,7 @@ var coreWords = {
     },
     // bitwise on integers
     '&': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2845,7 +2845,7 @@ var coreWords = {
         }
     },
     '|': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2858,7 +2858,7 @@ var coreWords = {
         }
     },
     '^': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2871,7 +2871,7 @@ var coreWords = {
         }
     },
     '~': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }], [{ type: 'int' }]],
         compose: function (s) {
             var _a;
             var a = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -4125,7 +4125,7 @@ var preCheckTypes = function (pl, wd) {
             return [[], [{ type: "boolean", w: w.toString() }]];
         }
         if (is(Number, w)) {
-            var t = print(infer(w));
+            var t = "(int | float)"; // print(infer (w));
             return [[], [{ type: t, w: w.toString() }]];
         }
         if (is(String, w)) {
@@ -4139,7 +4139,12 @@ var preCheckTypes = function (pl, wd) {
             }
         }
         if (is(Array, w)) {
-            return [[], [{ type: "any[]", w: w.toString() }]];
+            var wl = w;
+            // const arrayTypesResult = preCheckTypes(wl, wd);
+            var arrayTypesResult = print(infer(w));
+            console.log("arrayTypesResult", arrayTypesResult);
+            // return [[], [{type: `array${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
+            return [[], [{ type: arrayTypesResult, w: "[" + unParser(wl) + "]" }]];
         }
         return [[], [{ type: "any", w: w.toString() }]];
     }, pl);

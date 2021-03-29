@@ -131,7 +131,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '-': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -143,7 +143,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
-        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!=']}], [{ type: '(int | float)' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -155,7 +155,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '%': {
-        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!=']}], [{ type: '(int | float)' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -167,7 +167,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '*': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -180,7 +180,7 @@ export const coreWords: WordDictionary = {
     },
     // bitwise on integers
     '&': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -192,7 +192,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '|': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -204,7 +204,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '^': {
-        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -216,7 +216,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '~': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'int' }], [{ type: 'int' }]],
         compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
