@@ -21,7 +21,13 @@ let tests = [
     ['twelve 12 /', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by /","word":"/","stackDepth":1,"expectedType":"(int | float)","encounteredType":"string","encounterdValue":"twelve"}]],
     ['2 0 /', [{"error":"Guard found that the static value 0 failed to pass its requirement [0 !=]"}]],
     ['[]', [{"type":"[]","w":"[]"}]],
+    ['[][]', [{"type":"[]","w":"[]"},{"type":"[]","w":"[]"}]],
     ['[1 2 3]', [{"type":"float[3]","w":"[1 2 3]"}]],
+    ['[[]]', [{"type":"[][1]","w":"[[]]"}]],
+    ['[[[]]]', [{"type":"[][1][1]","w":"[[[]]]"}]],
+    ['[a[b b2[c c2]d]e]', [{"type":"[string, [string, string, string[2], string], string]","w":"[a [b b2 [c c2] d] e]"}]],
+    ['[[][]]', [{"type":"[][2]","w":"[[] []]"}]],
+    ['[a[b b2]c c2[d]e]', [{"type":"[string, string[1], string, string[1], string]","w":"[a [b] c [d] e]"}]],
 ];
 
 function cmpLists(a, b) {
