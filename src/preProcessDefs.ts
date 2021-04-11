@@ -69,7 +69,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
       const wl = w as Word[];
       // const arrayTypesResult = preCheckTypes(wl, wd);
       const arrayTypesResult = print(infer (w));
-      console.log("arrayTypesResult", arrayTypesResult);
+      // console.log("arrayTypesResult", arrayTypesResult);
       // return [[], [{type: `array${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
       return [[], [{type: arrayTypesResult, w: `[${unparse(wl)}]`}]];
     }
@@ -88,7 +88,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
           let allMatch = true;
           let i = 0;
           while (r.length(topNstack) > 0 && allMatch) {
-            console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
+            // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
             if (match(parse(r.takeLast(1, topNstack)[0].type), parse(r.takeLast(1, input)[0].type))) {
               const inputGuard = sig[0][sig[0].length - 1 - i]?.guard;
               if (inputGuard) {

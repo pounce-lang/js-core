@@ -60,6 +60,7 @@ allPassing &= testIt("497 seedrandom random", [0.5311601270295587]);
 allPassing &= testIt("129 seedrandom random random", [0.5081206358755288,0.5000708460575135]);
 allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
+allPassing &= testIt("[5 8] dup pop 2 + push", [[5, 8], [5, 10]]);
 allPassing &= testIt("3 2 7 [+] dip -", [-2]);
 allPassing &= testIt("3 2 7 rotate", [7, 2, 3]);
 allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
@@ -139,6 +140,7 @@ allPassing &= testIt("[1 2 c] d 2 inAt", [[1, 2, 'd']]);
 allPassing &= testIt("[1 2] 5 inAt", null);
 allPassing &= testIt("[1 88 3] 2 1 inAt", [[1, 2, 3]]);
 
+allPassing &= testIt("[1 66 3] dup 1 outAt 2 - 1 inAt", [[1, 66, 3], [1, 64, 3]]);
 
 allPassing &= testIt("[1 2] [3] 4 depth", [[1, 2], [3], 4, 3]);
 allPassing &= testIt("[1 2] [3] 4 stack-copy", [[1, 2], [3], 4, [[1, 2], [3], 4]]);

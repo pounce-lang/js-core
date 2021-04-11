@@ -27,7 +27,7 @@ let tests = [
     ['[[[]]]', [{"type":"[][1][1]","w":"[[[]]]"}]],
     ['[a[b b2[c c2]d]e]', [{"type":"[string, [string, string, string[2], string], string]","w":"[a [b b2 [c c2] d] e]"}]],
     ['[[][]]', [{"type":"[][2]","w":"[[] []]"}]],
-    ['[a[b b2]c c2[d]e]', [{"type":"[string, string[1], string, string[1], string]","w":"[a [b] c [d] e]"}]],
+    ['[a[b b2]c c2[d]e]', [{"type":"[string, string[2], string, string, string[1], string]","w":"[a [b b2] c c2 [d] e]"}]],
 ];
 
 function cmpLists(a, b) {
@@ -45,7 +45,7 @@ function cmpLists(a, b) {
     return same;
 }
 
-console.log('Starting typecheck tests:');
+console.log('Starting type check tests:');
 let testCount = 0;
 let testsFailed = 0;
 tests.forEach((test, i) => {

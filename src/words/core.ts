@@ -87,7 +87,8 @@ export const coreWords: WordDictionary = {
     },
     'dup': {
         sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
-        compose: s => { s.push(s[s.length - 1]); return [s]; }
+        compose: s => { s.push(clone(s[s.length - 1])); return [s]; }
+        // s => { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'swap': {
@@ -143,7 +144,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!=']}], [{ type: '(int | float)' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -155,7 +156,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '%': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!=']}], [{ type: '(int | float)' }]],
+        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -1175,7 +1176,7 @@ export const coreWords: WordDictionary = {
             return [s];
         }
     },
-    
+
     'depth': {
         compose: s => {
             s.push(s.length);
@@ -1386,3 +1387,56 @@ export const coreWords: WordDictionary = {
     // // }
 
 };
+
+function cloneItem(item: Word) {
+    // return cloneObject(item);
+    if (item !== undefined) {
+        return JSON.parse(JSON.stringify(item));
+    }
+    return item;
+}
+
+const clone = <T>(source: T): T => {
+    if (source === null) return source
+  
+    if (source instanceof Date) return new Date(source.getTime()) as any
+  
+    if (source instanceof Array) return source.map((item: any) => clone<any>(item)) as any
+  
+    if (typeof source === 'object' && source !== {}) {
+      const clonnedObj = { ...(source as { [key: string]: any }) } as { [key: string]: any }
+      Object.keys(clonnedObj).forEach(prop => {
+        clonnedObj[prop] = clone<any>(clonnedObj[prop])
+      })
+  
+      return clonnedObj as T
+    }
+  
+    return source
+  }
+
+// function deepClone<T extends object>(value: T): T {
+//     if (typeof value !== 'object' || value === null) {
+//       return value;
+//     }
+  
+//     if (value instanceof Set) {
+//       return new Set(Array.from(value, deepClone)) as T;
+//     }
+  
+//     if (value instanceof Map) {
+//       return new Map(Array.from(value, ([k, v]) => [k, deepClone(v)])) as T;
+//     }
+  
+//     if (value instanceof Date) {
+//       return new Date(value) as T;
+//     }
+  
+//     if (value instanceof RegExp) {
+//       return new RegExp(value.source, value.flags) as T;
+//     }
+  
+//     return Object.keys(value).reduce((acc, key) => {
+//       return Object.assign(acc, { [key]: deepClone(value[key]) });
+//     }, (Array.isArray(value) ? [] : {}) as T);
+//   }

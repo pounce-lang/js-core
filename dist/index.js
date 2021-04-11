@@ -2738,7 +2738,8 @@ var coreWords = {
     },
     'dup': {
         sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
-        compose: function (s) { s.push(s[s.length - 1]); return [s]; }
+        compose: function (s) { s.push(clone(s[s.length - 1])); return [s]; }
+        // s => { s.push(s[s.length - 1]); return [s]; }
     },
     //    'dup': s => { s.push(JSON.parse(JSON.stringify(s[s.length - 1]))); return [s]; },
     'swap': {
@@ -4096,6 +4097,42 @@ var coreWords = {
     // //     'definition': ['process-reduce', 'teardown-reduce']
     // // }
 };
+var clone = function (source) {
+    if (source === null)
+        return source;
+    if (source instanceof Date)
+        return new Date(source.getTime());
+    if (source instanceof Array)
+        return source.map(function (item) { return clone(item); });
+    if (typeof source === 'object' && source !== {}) {
+        var clonnedObj_1 = __assign({}, source);
+        Object.keys(clonnedObj_1).forEach(function (prop) {
+            clonnedObj_1[prop] = clone(clonnedObj_1[prop]);
+        });
+        return clonnedObj_1;
+    }
+    return source;
+};
+// function deepClone<T extends object>(value: T): T {
+//     if (typeof value !== 'object' || value === null) {
+//       return value;
+//     }
+//     if (value instanceof Set) {
+//       return new Set(Array.from(value, deepClone)) as T;
+//     }
+//     if (value instanceof Map) {
+//       return new Map(Array.from(value, ([k, v]) => [k, deepClone(v)])) as T;
+//     }
+//     if (value instanceof Date) {
+//       return new Date(value) as T;
+//     }
+//     if (value instanceof RegExp) {
+//       return new RegExp(value.source, value.flags) as T;
+//     }
+//     return Object.keys(value).reduce((acc, key) => {
+//       return Object.assign(acc, { [key]: deepClone(value[key]) });
+//     }, (Array.isArray(value) ? [] : {}) as T);
+//   }
 
 var preProcessDefs = function (pl, coreWords) {
     var defineWord = function (wd, key, val) {
@@ -4148,7 +4185,7 @@ var preCheckTypes = function (pl, wd) {
             var wl = w;
             // const arrayTypesResult = preCheckTypes(wl, wd);
             var arrayTypesResult = fbpTypes.print(fbpTypes.infer(w));
-            console.log("arrayTypesResult", arrayTypesResult);
+            // console.log("arrayTypesResult", arrayTypesResult);
             // return [[], [{type: `array${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
             return [[], [{ type: arrayTypesResult, w: "[" + unParser(wl) + "]" }]];
         }
@@ -4168,7 +4205,7 @@ var preCheckTypes = function (pl, wd) {
                     var allMatch = true;
                     var i = 0;
                     while (r.length(topNstack) > 0 && allMatch) {
-                        console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
+                        // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
                         if (fbpTypes.match(fbpTypes.parse(r.takeLast(1, topNstack)[0].type), fbpTypes.parse(r.takeLast(1, input)[0].type))) {
                             var inputGuard = (_a = sig[0][sig[0].length - 1 - i]) === null || _a === void 0 ? void 0 : _a.guard;
                             if (inputGuard) {
