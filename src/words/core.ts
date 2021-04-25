@@ -108,7 +108,7 @@ export const coreWords: WordDictionary = {
     'round': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: s => {
-            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), '(int | float)');
+            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), 'number');
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
             if (a !== null && b !== null) {
@@ -119,9 +119,9 @@ export const coreWords: WordDictionary = {
         }
     },
     '+': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: s => {
-            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), '(int | float)');
+            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), 'number');
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
             if (a !== null && b !== null) {
@@ -132,7 +132,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '-': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -144,7 +144,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -156,7 +156,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '%': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -168,7 +168,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '*': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());

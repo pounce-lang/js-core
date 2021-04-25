@@ -7,7 +7,6 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var r = require('ramda');
 var NP = _interopDefault(require('number-precision'));
 var Prando = _interopDefault(require('prando'));
-var fbpTypes = require('fbp-types');
 
 var pinnaParser = function () {
     var parser_actions = {
@@ -2761,7 +2760,7 @@ var coreWords = {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
-            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), '(int | float)');
+            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), 'number');
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
             var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
             if (a !== null && b !== null) {
@@ -2772,10 +2771,10 @@ var coreWords = {
         }
     },
     '+': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
-            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), '(int | float)');
+            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), 'number');
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
             var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
             if (a !== null && b !== null) {
@@ -2786,7 +2785,7 @@ var coreWords = {
         }
     },
     '-': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2799,7 +2798,7 @@ var coreWords = {
         }
     },
     '/': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2812,7 +2811,7 @@ var coreWords = {
         }
     },
     '%': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)', guard: [0, '!='] }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -2825,7 +2824,7 @@ var coreWords = {
         }
     },
     '*': {
-        sig: [[{ type: '(int | float)' }, { type: '(int | float)' }], [{ type: '(int | float)' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         compose: function (s) {
             var _a, _b;
             var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -4157,9 +4156,13 @@ var preProcessDefs = function (pl, coreWords) {
     return [next_pl, r.mergeRight(coreWords, next_wd)];
 };
 var justTypes = function (ws, w) {
-    var i = r.map(function (a) { return (__assign(__assign({}, a), { w: w.toString() })); }, ws[0]);
-    var o = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
-    return [i, o];
+    var inTypes = r.map(function (a) { return (__assign(__assign({}, a), { w: w.toString() })); }, ws[0]);
+    var outTypes = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
+    return [inTypes, outTypes];
+};
+// [a b c] false [b == ||] reduce
+var matchTypes = function (a, b) {
+    return a === b;
 };
 var preCheckTypes = function (pl, wd) {
     var typelist = r.map(function (w) {
@@ -4168,7 +4171,7 @@ var preCheckTypes = function (pl, wd) {
             return [[], [{ type: "boolean", w: w.toString() }]];
         }
         if (r.is(Number, w)) {
-            var t = "(int | float)"; // print(infer (w));
+            var t = "number"; // print(infer (w));
             return [[], [{ type: t, w: w.toString() }]];
         }
         if (r.is(String, w)) {
@@ -4183,11 +4186,13 @@ var preCheckTypes = function (pl, wd) {
         }
         if (r.is(Array, w)) {
             var wl = w;
-            // const arrayTypesResult = preCheckTypes(wl, wd);
-            var arrayTypesResult = fbpTypes.print(fbpTypes.infer(w));
+            var arrayTypesResult = preCheckTypes(wl, wd);
             // console.log("arrayTypesResult", arrayTypesResult);
-            // return [[], [{type: `array${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
-            return [[], [{ type: arrayTypesResult, w: "[" + unParser(wl) + "]" }]];
+            // return [[], [{type: `${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
+            ///if (r.is(Array, arrayTypesResult)) {
+            return [[], [{ type: unParser([arrayTypesResult]), w: unParser([w]) }]];
+            ///}
+            // return [arrayTypesResult as any[]]; //, w: `[${unparse(wl)}]`}]];
         }
         return [[], [{ type: "any", w: w.toString() }]];
     }, pl);
@@ -4206,7 +4211,7 @@ var preCheckTypes = function (pl, wd) {
                     var i = 0;
                     while (r.length(topNstack) > 0 && allMatch) {
                         // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
-                        if (fbpTypes.match(fbpTypes.parse(r.takeLast(1, topNstack)[0].type), fbpTypes.parse(r.takeLast(1, input)[0].type))) {
+                        if (matchTypes(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type)) {
                             var inputGuard = (_a = sig[0][sig[0].length - 1 - i]) === null || _a === void 0 ? void 0 : _a.guard;
                             if (inputGuard) {
                                 if (inputGuard[1] === "!=" && r.takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
@@ -4245,20 +4250,6 @@ var preCheckTypes = function (pl, wd) {
     }
     return "not implemented";
 };
-// const toTypeOrNull = <T extends unknown>(val: any, type: string) => {
-//   const t = fbpTypeParse(type);
-//   // console.log('*** t ***', t);
-//   // console.log('*** check(t, val) ***', check(t, val));
-//   if (check(t, val)) {
-//     if (type === 'string') {
-//       return toStringOrNull(val);
-//     }
-//     if (type === '(int | float)') {
-//       return toNumOrNull(val);
-//     }
-//   }
-//   return null;
-// }
 
 var debugLevel = function (ics, logLevel) { return (ics.length <= logLevel); };
 // user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 

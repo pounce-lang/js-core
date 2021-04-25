@@ -3,16 +3,7 @@ import * as r from 'ramda';
 import { ProgramList, WordSignature, Word } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { toPLOrNull, toStringOrNull, toArrOrNull } from './words/core';
-import { unParser as unparse } from './parser/Pinna';
-
-import {
-  //check,
-    infer, 
-    match, 
-    parse,
-    print, 
-    //types 
-} from "fbp-types";
+import { unParser as unparse, parser } from './parser/Pinna';
 
 export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [ProgramList, WordDictionary] => {
 
@@ -40,9 +31,17 @@ export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [Pro
 type TypeListElement = {type: string, w: string, guard?: Word[], use?: string };
 
 const justTypes = (ws: WordSignature, w: Word) => {
-  const i = r.map((a) => ({...a, w:w.toString()}), ws[0]);
-  const o = r.map((a) => ({type:a.type, w:w.toString()}), ws[1]);
-  return [i, o];
+  const inTypes = r.map((a) => ({...a, w:w.toString()}), ws[0]);
+  const outTypes = r.map((a) => ({type:a.type, w:w.toString()}), ws[1]);
+  return [inTypes, outTypes];
+};
+
+// [a b c] false [b == ||] reduce
+const matchTypes = (a: string, b: string) => {
+  if (a !== b) {
+    //console.log(a, "not == to ", b, "<--- maybe work to do?");
+  }
+  return a === b;
 };
 
 export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
@@ -52,7 +51,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
       return [[], [{type:"boolean", w: w.toString()}]];
     }
     if (r.is(Number, w)) {
-      const t = "(int | float)"; // print(infer (w));
+      const t = "number"; // print(infer (w));
       return [[], [{type:t, w: w.toString()}]];
     }
     if (r.is(String, w)) {
@@ -67,17 +66,20 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
     }
     if (r.is(Array, w)) {
       const wl = w as Word[];
-      // const arrayTypesResult = preCheckTypes(wl, wd);
-      const arrayTypesResult = print(infer (w));
+      const arrayTypesResult = preCheckTypes(wl, wd);
       // console.log("arrayTypesResult", arrayTypesResult);
-      // return [[], [{type: `array${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
-      return [[], [{type: arrayTypesResult, w: `[${unparse(wl)}]`}]];
+      // return [[], [{type: `${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
+      ///if (r.is(Array, arrayTypesResult)) {
+        return [[], [{type: unparse([arrayTypesResult]), w: unparse([w])}]];
+      ///}
+      // return [arrayTypesResult as any[]]; //, w: `[${unparse(wl)}]`}]];
     }
     return [[], [{type:"any", w: w.toString()}]];
   }, pl);
+
   if (typelist) {
     //console.log("typelist", JSON.stringify(typelist));
-    return r.reduce((acc, sig) => {
+    return r.reduce((acc, sig: TypeListElement[][]) => {
       if (r.is(Array, sig) && r.length(sig) === 2) {
         let input = sig[0];
         const inLength = r.length(input);
@@ -89,7 +91,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
           let i = 0;
           while (r.length(topNstack) > 0 && allMatch) {
             // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
-            if (match(parse(r.takeLast(1, topNstack)[0].type), parse(r.takeLast(1, input)[0].type))) {
+            if (matchTypes(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type)) {
               const inputGuard = sig[0][sig[0].length - 1 - i]?.guard;
               if (inputGuard) {
                 if (inputGuard[1] === "!=" && r.takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
@@ -131,18 +133,3 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
   }
   return "not implemented";
 };
-
-  // const toTypeOrNull = <T extends unknown>(val: any, type: string) => {
-  //   const t = fbpTypeParse(type);
-  //   // console.log('*** t ***', t);
-  //   // console.log('*** check(t, val) ***', check(t, val));
-  //   if (check(t, val)) {
-  //     if (type === 'string') {
-  //       return toStringOrNull(val);
-  //     }
-  //     if (type === '(int | float)') {
-  //       return toNumOrNull(val);
-  //     }
-  //   }
-  //   return null;
-  // }
