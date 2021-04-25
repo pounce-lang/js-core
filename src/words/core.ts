@@ -3,6 +3,7 @@ import { WordDictionary } from "../WordDictionary.types";
 import { ProgramList, Word } from '../types';
 import NP from 'number-precision';
 import { introspectWords, introspectWord } from "../interpreter";
+import { unParser as unparse } from "../parser/Pinna";
 import Prando from 'prando';
 let rng: { next: () => number };
 
@@ -834,6 +835,16 @@ export const coreWords: WordDictionary = {
                 if (c !== null && d !== null) {
                     s.push(c === d);
                 }
+                else {
+                    const e = toPLOrNull(top);
+                    const f = toPLOrNull(s[s.length - 1]);
+                    if (e !== null && f !== null) {
+                        s.push(unparse(e) === unparse(f));
+                    }
+                    else {
+                        s.push(false);
+                    }
+                }
             }
             return [s];
         }
@@ -846,64 +857,127 @@ export const coreWords: WordDictionary = {
             const num_a = toNumOrNull(a);
             if (num_a !== null && num_b !== null) {
                 s.push(num_a === num_b);
+                return [s];
             }
-            else {
-                const str_b = toStringOrNull(b);
-                const str_a = toStringOrNull(a);
-                if (str_a !== null && str_b !== null) {
-                    s.push(str_a === str_b);
-                }
+            const str_b = toStringOrNull(b);
+            const str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a === str_b);
+                return [s];
             }
+            const e = toPLOrNull(a);
+            const f = toPLOrNull(b);
+            if (e !== null && f !== null) {
+                s.push(unparse(e) === unparse(f));
+                return [s];
+            }
+            s.push(false);
             return [s];
         }
     },
     '!=': {
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
-            if (a !== null && b !== null) {
-                s.push(a !== b);
+            const b = s?.pop();
+            const a = s?.pop();
+            const num_b = toNumOrNull(b);
+            const num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a !== num_b);
+                return [s];
             }
+            const str_b = toStringOrNull(b);
+            const str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a !== str_b);
+                return [s];
+            }
+            const e = toPLOrNull(a);
+            const f = toPLOrNull(b);
+            if (e !== null && f !== null) {
+                s.push(unparse(e) !== unparse(f));
+                return [s];
+            }
+            s.push(true);
             return [s];
         }
     },
     '>': {
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
-            if (a !== null && b !== null) {
-                s.push(a > b);
+            const b = s?.pop();
+            const a = s?.pop();
+            const num_b = toNumOrNull(b);
+            const num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a > num_b);
+                return [s];
             }
+            const str_b = toStringOrNull(b);
+            const str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) > 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },
     '<': {
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
-            if (a !== null && b !== null) {
-                s.push(a < b);
+            const b = s?.pop();
+            const a = s?.pop();
+            const num_b = toNumOrNull(b);
+            const num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a < num_b);
+                return [s];
             }
+            const str_b = toStringOrNull(b);
+            const str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) < 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },
     '>=': {
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
-            if (a !== null && b !== null) {
-                s.push(a >= b);
+            const b = s?.pop();
+            const a = s?.pop();
+            const num_b = toNumOrNull(b);
+            const num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a >= num_b);
+                return [s];
             }
+            const str_b = toStringOrNull(b);
+            const str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) >= 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },
     '<=': {
         compose: s => {
-            const b = toNumOrNull(s?.pop());
-            const a = toNumOrNull(s?.pop());
-            if (a !== null && b !== null) {
-                s.push(a <= b);
+            const b = s?.pop();
+            const a = s?.pop();
+            const num_b = toNumOrNull(b);
+            const num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a <= num_b);
+                return [s];
             }
+            const str_b = toStringOrNull(b);
+            const str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) <= 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },

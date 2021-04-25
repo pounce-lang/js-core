@@ -3523,6 +3523,16 @@ var coreWords = {
                 if (c !== null && d !== null) {
                     s.push(c === d);
                 }
+                else {
+                    var e = toPLOrNull(top);
+                    var f = toPLOrNull(s[s.length - 1]);
+                    if (e !== null && f !== null) {
+                        s.push(unParser(e) === unParser(f));
+                    }
+                    else {
+                        s.push(false);
+                    }
+                }
             }
             return [s];
         }
@@ -3536,69 +3546,132 @@ var coreWords = {
             var num_a = toNumOrNull(a);
             if (num_a !== null && num_b !== null) {
                 s.push(num_a === num_b);
+                return [s];
             }
-            else {
-                var str_b = toStringOrNull(b);
-                var str_a = toStringOrNull(a);
-                if (str_a !== null && str_b !== null) {
-                    s.push(str_a === str_b);
-                }
+            var str_b = toStringOrNull(b);
+            var str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a === str_b);
+                return [s];
             }
+            var e = toPLOrNull(a);
+            var f = toPLOrNull(b);
+            if (e !== null && f !== null) {
+                s.push(unParser(e) === unParser(f));
+                return [s];
+            }
+            s.push(false);
             return [s];
         }
     },
     '!=': {
         compose: function (s) {
             var _a, _b;
-            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
-            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
-            if (a !== null && b !== null) {
-                s.push(a !== b);
+            var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
+            var a = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
+            var num_b = toNumOrNull(b);
+            var num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a !== num_b);
+                return [s];
             }
+            var str_b = toStringOrNull(b);
+            var str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a !== str_b);
+                return [s];
+            }
+            var e = toPLOrNull(a);
+            var f = toPLOrNull(b);
+            if (e !== null && f !== null) {
+                s.push(unParser(e) !== unParser(f));
+                return [s];
+            }
+            s.push(true);
             return [s];
         }
     },
     '>': {
         compose: function (s) {
             var _a, _b;
-            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
-            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
-            if (a !== null && b !== null) {
-                s.push(a > b);
+            var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
+            var a = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
+            var num_b = toNumOrNull(b);
+            var num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a > num_b);
+                return [s];
             }
+            var str_b = toStringOrNull(b);
+            var str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) > 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },
     '<': {
         compose: function (s) {
             var _a, _b;
-            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
-            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
-            if (a !== null && b !== null) {
-                s.push(a < b);
+            var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
+            var a = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
+            var num_b = toNumOrNull(b);
+            var num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a < num_b);
+                return [s];
             }
+            var str_b = toStringOrNull(b);
+            var str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) < 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },
     '>=': {
         compose: function (s) {
             var _a, _b;
-            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
-            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
-            if (a !== null && b !== null) {
-                s.push(a >= b);
+            var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
+            var a = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
+            var num_b = toNumOrNull(b);
+            var num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a >= num_b);
+                return [s];
             }
+            var str_b = toStringOrNull(b);
+            var str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) >= 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },
     '<=': {
         compose: function (s) {
             var _a, _b;
-            var b = toNumOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
-            var a = toNumOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
-            if (a !== null && b !== null) {
-                s.push(a <= b);
+            var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
+            var a = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
+            var num_b = toNumOrNull(b);
+            var num_a = toNumOrNull(a);
+            if (num_a !== null && num_b !== null) {
+                s.push(num_a <= num_b);
+                return [s];
             }
+            var str_b = toStringOrNull(b);
+            var str_a = toStringOrNull(a);
+            if (str_a !== null && str_b !== null) {
+                s.push(str_a.localeCompare(str_b) <= 0);
+                return [s];
+            }
+            s.push(null);
             return [s];
         }
     },

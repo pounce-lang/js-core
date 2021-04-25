@@ -69,12 +69,35 @@ allPassing &= testIt("true [5] [7] if-else", [5]);
 allPassing &= testIt("false [5] [7] if-else", [7]);
 allPassing &= testIt("false [5] [7 3 [+] play] if-else", [10]);
 allPassing &= testIt("2 1 [>] [5] [7] ifte", [5]);
+allPassing &= testIt("2 2 [>] [5] [7] ifte", [7]);
+allPassing &= testIt("z w [>] [5] [7] ifte", [5]);
+allPassing &= testIt("a b [>] [5] [7] ifte", [7]);
+allPassing &= testIt("a a [>] [5] [7] ifte", [7]);
+allPassing &= testIt("2 1 [<] [true] [false] ifte", [false]);
+allPassing &= testIt("2 2 [<] [true] [false] ifte", [false]);
+allPassing &= testIt("z w [<] [true] [false] ifte", [false]);
+allPassing &= testIt("a b [<] [true] [false] ifte", [true]);
+allPassing &= testIt("a a [<] [true] [false] ifte", [false]);
+allPassing &= testIt("2 1 >=", [true]);
+allPassing &= testIt("2 2 >=", [true]);
+allPassing &= testIt("z w >=", [true]);
+allPassing &= testIt("a b >=", [false]);
+allPassing &= testIt("a a >=", [true]);
+allPassing &= testIt("2 1 <=", [false]);
+allPassing &= testIt("2 2 <=", [true]);
+allPassing &= testIt("z w <=", [false]);
+allPassing &= testIt("a b <=", [true]);
+allPassing &= testIt("a a <=", [true]);
 allPassing &= testIt("2 1 [=] [5] [7] ifte", [2, 7]);
 allPassing &= testIt("0 0 [=] [5] [7] ifte", [0, 5]);
 allPassing &= testIt("2 1 [==] [5] [7] ifte", [7]);
 allPassing &= testIt("a b =", ['a', false]);
+allPassing &= testIt("5 b =", [5, false]);
+allPassing &= testIt("a [a] =", ['a', false]);
 allPassing &= testIt("b b =", ['b', true]);
 allPassing &= testIt("a b ==", [false]);
+allPassing &= testIt("4 b ==", [false]);
+allPassing &= testIt("[a] a ==", [false]);
 allPassing &= testIt("b b ==", [true]);
 allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
@@ -168,12 +191,20 @@ allPassing &= testIt("[3 8 5 7 10 2 9 1] [7 > ] filter", [[8, 10, 9]]);
 
 allPassing &= testIt("[3 8 5 4 10 2 9 1] 0 [+] reduce", [42]);
 allPassing &= testIt("[3 8 5 4 10 2 9 1] 0 [2 * +] reduce", [84]);
+allPassing &= testIt("[4 2] false [dup == ||] reduce", [true]);
+allPassing &= testIt("[4 2 a] false [dup == ||] reduce", [true]);
+allPassing &= testIt("[4 2 'string'] false [dup == ||] reduce", [true]);
+allPassing &= testIt("[4 2.1 'string' [4] [a [b]]] false [dup == ||] reduce", [true]);
 
 
 allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
 [size 1 <=] [] [uncons [>] split] [concat] binrec
 `, [[1, 2, 3, 4, 5, 5, 6, 7, 8, 9]]);
+allPassing &= testIt(`
+[f d b c a h b j e g] 
+[size 1 <=] [] [uncons [>] split] [concat] binrec
+`, [["a","b","b","c","d","e","f","g","h","j"]]);
 
 allPassing &= testIt("0 0 [a b] [a b +] pounce", [0]);
 allPassing &= testIt("0 [a] [a] pounce", [0]);
