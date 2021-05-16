@@ -4421,13 +4421,19 @@ function interpreter(pl_in, opt) {
                 _p.sent();
                 _p.label = 19;
             case 19:
-                if (!(cycles >= maxCycles || internalCallStack.length >= 1000)) return [3 /*break*/, 21];
-                return [4 /*yield*/, { stack: s, prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "maxCycles or callStack size exceeded: this may be an infinite loop" }];
+                if (!(cycles >= maxCycles)) return [3 /*break*/, 21];
+                return [4 /*yield*/, { stack: s, prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "maxCycles size exceeded: this may be an infinite loop" }];
             case 20:
                 _p.sent();
                 _p.label = 21;
-            case 21: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
+            case 21:
+                if (!(internalCallStack.length >= 1000)) return [3 /*break*/, 23];
+                return [4 /*yield*/, { stack: s, prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "callStack size exceeded: this may be an infinite loop" }];
             case 22:
+                _p.sent();
+                _p.label = 23;
+            case 23: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
+            case 24:
                 _p.sent();
                 return [2 /*return*/];
         }
@@ -4460,7 +4466,7 @@ function purr(pl, wd, cycleLimit) {
                             }
                         }
                     }
-                    else if (w !== undefined) {
+                    else if (w !== undefined && s !== null) {
                         if (is(Array, w)) {
                             s.push([].concat(w));
                         }

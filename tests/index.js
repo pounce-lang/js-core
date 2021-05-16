@@ -26,21 +26,52 @@ const testIt = (p, expected_result) => {
     console.error("parse error:", p);
     return false;
   }
-  // console.log("parser result:", pp);
   if (!pp) {
     console.error("no parse result:", p);
     return false;
   }
-  const test = interpreter(p);
-  result = test.next();
-  while (result.value && result.value.active) {
-    result = test.next();
+  let wd;
+  try {
+    [pp, wd] = preProcessDefs(pp, coreWords);
+  }
+  catch (e) {
+    console.error("preProcessDefs error:", p);
+    return false;
+  }
+  if (!wd) {
+    console.error("no preProcessDefs result:", p);
+    return false;
+  }
+  const itest = interpreter(p);
+  let iresult = itest.next();
+  while (iresult.value && iresult.value.active) {
+    iresult = itest.next();
   }
   const str_exp = JSON.stringify(expected_result);
-  const str_res = JSON.stringify(result.value ? result.value.stack : "error");
+  const str_res = JSON.stringify(iresult.value ? iresult.value.stack : "error");
   if (str_exp === str_res) {
-    return true;
+    try {
+      const ptest = purr(pp, wd);
+      if (!ptest) {
+        console.error("purr null result:", test);
+        return false;
+      }
+      let presult = ptest.next();
+      while (presult.value && presult.value.active) {
+        presult = ptest.next();
+      }
+      const str_exp2 = JSON.stringify(expected_result);
+      const str_res2 = JSON.stringify(presult.value ? presult.value.stack : "error");
+      if (str_exp2 === str_res2) {
+        return true;
+      }
+    }
+    catch (e) {
+      console.error("purr error:", e, p);
+      return false;
+    }
   }
+
   console.error("failed test for:", p);
   console.error("Expected result", str_exp);
   console.error("Erroneously got", str_res);
@@ -53,11 +84,11 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words","word","dup","swap","drop","round","+","-","/","%","*","&","|","^","~","&&","||","!","E","LN10","LN2","LOG10E","LOG2E","PI","SQRT1_2","SQRT2","abs","acos","acosh","asin","asinh","atan","atan2","atanh","cbrt","ceil","cos","cosh","exp","expm1","floor","hypot","log","log10","log1p","log2","max","min","pow","seedrandom","random","sign","sin","sinh","sqrt","tan","tanh","trunc","play","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","dup2","times","map","map2","filter","reduce","split","size","outAt","inAt","depth","stack-copy"]]);
+allPassing &= testIt("words", [["words", "word", "dup", "swap", "drop", "round", "+", "-", "/", "%", "*", "&", "|", "^", "~", "&&", "||", "!", "E", "LN10", "LN2", "LOG10E", "LOG2E", "PI", "SQRT1_2", "SQRT2", "abs", "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh", "cbrt", "ceil", "cos", "cosh", "exp", "expm1", "floor", "hypot", "log", "log10", "log1p", "log2", "max", "min", "pow", "seedrandom", "random", "sign", "sin", "sinh", "sqrt", "tan", "tanh", "trunc", "play", "pounce", "dip", "dip2", "rotate", "rollup", "rolldown", "if-else", "ifte", "=", "==", "!=", ">", "<", ">=", "<=", "concat", "cons", "uncons", "push", "pop", "constrec", "linrec", "linrec5", "binrec", "dup2", "times", "map", "map2", "filter", "reduce", "split", "size", "outAt", "inAt", "depth", "stack-copy"]]);
 allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }]], "compose": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
 allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
 allPassing &= testIt("497 seedrandom random", [0.5311601270295587]);
-allPassing &= testIt("129 seedrandom random random", [0.5081206358755288,0.5000708460575135]);
+allPassing &= testIt("129 seedrandom random random", [0.5081206358755288, 0.5000708460575135]);
 allPassing &= testIt("4 dup drop", [4]);
 allPassing &= testIt("[5 8] dup drop pop swap pop swap drop swap +", [13]);
 allPassing &= testIt("[5 8] dup pop 2 + push", [[5, 8], [5, 10]]);
@@ -189,7 +220,7 @@ allPassing &= testIt("3 2 1 [1 2 3] [+] map", [[2, 4, 6]]);
 
 allPassing &= testIt("[4 2 5 7 10 2 9 4] [% 0 ==] map2", [[true, false, true, false]]);
 allPassing &= testIt("[1 2 3 4 5 6 7 8] [+] map2", [[3, 7, 11, 15]]);
-allPassing &= testIt("[[1 2] [3 4] [5 6] [7 8]] [concat] map2", [[[1,2,3,4],[5,6,7,8]]]);
+allPassing &= testIt("[[1 2] [3 4] [5 6] [7 8]] [concat] map2", [[[1, 2, 3, 4], [5, 6, 7, 8]]]);
 // map2 is not stack safe if you must reach under in your map2 phrase (although map can do this)
 // allPassing &= testIt("3 2 [1 2 3 4] [+ +] map2", [[5, 10]]);
 
@@ -213,7 +244,7 @@ allPassing &= testIt(`
 allPassing &= testIt(`
 [f d b c a h b j e g] 
 [size 1 <=] [] [uncons [>] split] [concat] binrec
-`, [["a","b","b","c","d","e","f","g","h","j"]]);
+`, [["a", "b", "b", "c", "d", "e", "f", "g", "h", "j"]]);
 
 allPassing &= testIt("0 0 [a b] [a b +] pounce", [0]);
 allPassing &= testIt("0 [a] [a] pounce", [0]);

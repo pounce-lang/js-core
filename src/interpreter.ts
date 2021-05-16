@@ -72,8 +72,11 @@ export function* interpreter(
     console.log("s has null");
     yield { stack: [], prog: pl, active: false, internalCallStack: [...internalCallStack], error: "a word did not find required data on the stack" };
   }
-  if (cycles >= maxCycles || internalCallStack.length >= 1000) {
-    yield { stack: s, prog: pl, active: false, internalCallStack: [...internalCallStack], error: "maxCycles or callStack size exceeded: this may be an infinite loop" };
+  if (cycles >= maxCycles) {
+    yield { stack: s, prog: pl, active: false, internalCallStack: [...internalCallStack], error: "maxCycles size exceeded: this may be an infinite loop" };
+  }
+  if (internalCallStack.length >= 1000) {
+    yield { stack: s, prog: pl, active: false, internalCallStack: [...internalCallStack], error: "callStack size exceeded: this may be an infinite loop" };
   }
   yield { stack: s, prog: pl, active: false };
 }
@@ -104,7 +107,7 @@ export function* purr(
         }
       }
     }
-    else if (w !== undefined) {
+    else if (w !== undefined && s !== null) {
       if (r.is(Array, w)) {
         s.push([].concat(w));
       }
