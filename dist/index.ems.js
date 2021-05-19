@@ -3400,7 +3400,7 @@ var coreWords = {
         }
     },
     'play': {
-        sig: [[{ type: 'any[]', use: 'run!' }], []],
+        sig: [[{ type: 'A', use: 'run!' }], [{ type: "runOf A" }]],
         compose: function (s, pl) {
             var _a;
             var block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3414,7 +3414,7 @@ var coreWords = {
         }
     },
     'pounce': {
-        sig: [[{ type: 'Args extends (list<string>)', use: 'pop-each!' }, { type: 'P extends (list<words>)', use: 'run!' }], [{ type: 'result(P)' }]],
+        sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
         compose: function (s, pl) {
             var _a, _b;
             var words = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3431,7 +3431,7 @@ var coreWords = {
         }
     },
     'dip': {
-        sig: [[{ type: 'A' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'A' }]],
+        sig: [[{ type: 'A' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }, { type: 'A' }]],
         compose: function (s, pl) {
             var _a, _b;
             var block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3447,7 +3447,7 @@ var coreWords = {
         }
     },
     'dip2': {
-        sig: [[{ type: 'a' }, { type: 'b' }, { type: 'list<word>', use: 'run' }], [{ type: 'run-result' }, { type: 'a' }, { type: 'b' }]],
+        sig: [[{ type: 'A' }, { type: 'B' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }, { type: 'A' }, { type: 'B' }]],
         compose: function (s, pl) {
             var _a, _b, _c;
             var block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3477,6 +3477,7 @@ var coreWords = {
         compose: [['swap'], 'dip', 'swap']
     },
     'if-else': {
+        sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'B', use: 'run!' }], [{ type: 'runOf A | B' }]],
         compose: function (s, pl) {
             var _a, _b, _c;
             var else_block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3505,10 +3506,10 @@ var coreWords = {
         }
     },
     'ifte': {
-        // expects: [{ desc: 'conditional', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }, { desc: 'then clause', ofType: 'list' }], effects: [-3], tests: [], desc: 'conditionally play the first or second quotation',
         compose: [['play'], 'dip2', 'if-else']
     },
     '=': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'A' }, { type: 'boolean' }]],
         compose: function (s) {
             var _a;
             var top = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3538,6 +3539,7 @@ var coreWords = {
         }
     },
     '==': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var _a, _b;
             var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3565,6 +3567,7 @@ var coreWords = {
         }
     },
     '!=': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var _a, _b;
             var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3592,6 +3595,7 @@ var coreWords = {
         }
     },
     '>': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var _a, _b;
             var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3613,6 +3617,7 @@ var coreWords = {
         }
     },
     '<': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var _a, _b;
             var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3634,6 +3639,7 @@ var coreWords = {
         }
     },
     '>=': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var _a, _b;
             var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3655,6 +3661,7 @@ var coreWords = {
         }
     },
     '<=': {
+        sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
         compose: function (s) {
             var _a, _b;
             var b = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3676,6 +3683,7 @@ var coreWords = {
         }
     },
     'concat': {
+        sig: [[{ type: 'list' }, { type: 'list' }], [{ type: 'list' }]],
         compose: function (s) {
             var _a, _b;
             var b = toArrOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3687,6 +3695,7 @@ var coreWords = {
         }
     },
     'cons': {
+        sig: [[{ type: 'any' }, { type: 'list' }], [{ type: 'list' }]],
         compose: function (s) {
             var _a, _b;
             var b = toArrOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3698,6 +3707,7 @@ var coreWords = {
         }
     },
     'uncons': {
+        sig: [[{ type: 'list' }], [{ type: 'any' }, { type: 'list' }]],
         compose: function (s) {
             var _a;
             var arr = toArrOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3708,6 +3718,7 @@ var coreWords = {
         }
     },
     'push': {
+        sig: [[{ type: 'list' }], [{ type: 'any' }, { type: 'list' }]],
         compose: function (s) {
             var _a, _b;
             var item = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
@@ -3719,6 +3730,7 @@ var coreWords = {
         }
     },
     'pop': {
+        sig: [[{ type: 'list' }], [{ type: 'list' }, { type: 'any' }]],
         compose: function (s) {
             var _a;
             var arr = toArrOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3730,11 +3742,11 @@ var coreWords = {
     },
     'constrec': {
         sig: [[
-                { type: 'Initial extends (list<words>)' },
-                { type: 'Increment extends (list<words>)' },
-                { type: 'Condition extends (list<words>)' },
-                { type: 'Recurse extends (list<words>)' },
-                { type: 'Final extends (list<words>)' }
+                { type: 'initial extends (list<words>)' },
+                { type: 'increment extends (list<words>)' },
+                { type: 'condition extends (list<words>)' },
+                { type: 'recurse extends (list<words>)' },
+                { type: 'final extends (list<words>)' }
             ], []],
         compose: function (s, pl) {
             var _a, _b, _c, _d, _e;
@@ -3753,10 +3765,10 @@ var coreWords = {
     },
     'linrec': {
         sig: [[
-                { type: 'TermTest extends (list<words>)' },
-                { type: 'Terminal extends (list<words>)' },
-                { type: 'Recurse extends (list<words>)' },
-                { type: 'Final extends (list<words>)' }
+                { type: 'termTest extends (list<words>)' },
+                { type: 'terminal extends (list<words>)' },
+                { type: 'recurse extends (list<words>)' },
+                { type: 'final extends (list<words>)' }
             ], []],
         compose: function (s, pl) {
             var _a, _b, _c, _d;
@@ -3779,11 +3791,11 @@ var coreWords = {
     },
     'linrec5': {
         sig: [[
-                { type: 'Init extends (list<words>)' },
-                { type: 'TermTest extends (list<words>)' },
-                { type: 'Terminal extends (list<words>)' },
-                { type: 'Recurse extends (list<words>)' },
-                { type: 'Final extends (list<words>)' }
+                { type: 'init extends (list<words>)' },
+                { type: 'termTest extends (list<words>)' },
+                { type: 'terminal extends (list<words>)' },
+                { type: 'recurse extends (list<words>)' },
+                { type: 'final extends (list<words>)' }
             ], []],
         compose: function (s, pl) {
             var _a, _b, _c, _d, _e;
@@ -3807,10 +3819,10 @@ var coreWords = {
     },
     'binrec': {
         sig: [[
-                { type: 'TermTest extends (list<words>)' },
-                { type: 'Terminal extends (list<words>)' },
-                { type: 'Recurse extends (list<words>)' },
-                { type: 'Final extends (list<words>)' }
+                { type: 'termTest extends (list<words>)' },
+                { type: 'terminal extends (list<words>)' },
+                { type: 'recurse extends (list<words>)' },
+                { type: 'final extends (list<words>)' }
             ], []],
         compose: function (s, pl) {
             var _a, _b, _c, _d;
@@ -3832,7 +3844,7 @@ var coreWords = {
         }
     },
     'dup2': {
-        sig: [[{ type: 'A', use: 'observe' }, { type: 'B', use: 'observe' }], [{ type: 'A' }, { type: 'B' }]],
+        sig: [[{ type: 'A', use: 'observe' }, { type: 'B', use: 'observe' }], [{ type: 'A' }, { type: 'B' }, { type: 'A' }, { type: 'B' }]],
         compose: [['dup'], 'dip', 'dup', ['swap'], 'dip']
     },
     'times': {
@@ -3841,9 +3853,9 @@ var coreWords = {
     },
     'map': {
         sig: [
-            [{ type: 'ValueList extends (list<words>)' },
-                { type: 'Phrase extends (list<words>)' }],
-            [{ type: 'ResultValueList extends (list<words>)' }]
+            [{ type: 'valueList extends (list<words>)' },
+                { type: 'phrase extends (list<words>)' }],
+            [{ type: 'resultValueList extends (list<words>)' }]
         ],
         compose: [["list", "phrase"], [
                 [[], "list"],
@@ -3855,9 +3867,9 @@ var coreWords = {
     },
     'map2': {
         sig: [
-            [{ type: 'ValueList extends (list<words>)' },
-                { type: 'Phrase extends (list<words>)' }],
-            [{ type: 'ResultValueList extends (list<words>)' }]
+            [{ type: 'valueList extends (list<words>)' },
+                { type: 'phrase extends (list<words>)' }],
+            [{ type: 'resultValueList extends (list<words>)' }]
         ],
         compose: [["list", "phrase"],
             [
@@ -3873,9 +3885,9 @@ var coreWords = {
     },
     'filter': {
         sig: [
-            [{ type: 'ValueList extends (list<words>)' },
-                { type: 'Phrase extends (list<words>)' }],
-            [{ type: 'ResultValueList extends (list<words>)' }]
+            [{ type: 'valueList extends (list<words>)' },
+                { type: 'phrase extends (list<words>)' }],
+            [{ type: 'resultValueList extends (list<words>)' }]
         ],
         compose: [["list", "phrase"], [
                 [[], "list"],
@@ -3887,10 +3899,10 @@ var coreWords = {
     },
     'reduce': {
         sig: [
-            [{ type: 'ValueList extends (list<words>)' },
-                { type: 'Accumulater (word)' },
-                { type: 'Phrase extends (list<words>)' }],
-            [{ type: 'ResultValueList extends (list<words>)' }]
+            [{ type: 'valueList extends (list<words>)' },
+                { type: 'accumulater (word)' },
+                { type: 'phrase extends (list<words>)' }],
+            [{ type: 'resultValueList extends (list<words>)' }]
         ],
         compose: [["list", "acc", "phrase"], [
                 ["acc", "list"],
@@ -3901,6 +3913,7 @@ var coreWords = {
             ], "pounce"]
     },
     'split': {
+        sig: [[{ type: "any" }, { type: "list" }, { type: "list" }], [{ type: "list" }, { type: "list" }]],
         compose: [["cutVal", "theList", "operator"], [
                 [], [], "cutVal", "theList",
                 'size',
@@ -3912,6 +3925,7 @@ var coreWords = {
             ], "pounce"]
     },
     'size': {
+        sig: [[{ type: "list" }], [{ type: "list" }, { type: "number" }]],
         compose: function (s) {
             var arr = toArrOrNull(s[s.length - 1]);
             if (arr) {

@@ -35,10 +35,8 @@ let tests = [
     ['a 2 cc rotate', [{"type":"string","w":"cc"}, {"type":"number","w":"2"}, {"type":"string","w":"a"}]],
     ['3.14 2 "3" rollup', [{"type":"string","w":"3"}, {"type":"number","w":"3.14"}, {"type":"number","w":"2"}]],
     ['a 3.14 "c3p0" rolldown', [{"type":"number","w":"3.14"}, {"type":"string","w":"c3p0"}, {"type":"string","w":"a"}]],
-    // ['a 3.14 drop', [{"type":"string","w":"a"}]],
+    // ['a 3 drop', [{"type":"string","w":"a"}]],
 ];
-// 'rolldown': {
-//     sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'B' }, { type: 'C' }, { type: 'A' }]],
 
 function cmpLists(a, b) {
     let same = true;
