@@ -2736,7 +2736,7 @@ var coreWords = {
         }
     },
     'dup': {
-        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
+        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A', use: 'observe' }, { type: 'A' }]],
         compose: function (s) { s.push(clone(s[s.length - 1])); return [s]; }
         // s => { s.push(s[s.length - 1]); return [s]; }
     },
@@ -2753,7 +2753,7 @@ var coreWords = {
         }
     },
     'drop': {
-        sig: [[{ type: 'any' }], []],
+        sig: [[{ type: 'A' }], []],
         compose: function (s) { var _a; (_a = s) === null || _a === void 0 ? void 0 : _a.pop(); return [s]; }
     },
     'round': {
@@ -4233,6 +4233,16 @@ var justTypes = function (ws, w) {
     var outTypes = r.map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
     return [inTypes, outTypes];
 };
+var isGeneric = function (t) { return (t === t.toUpperCase()); };
+var bindSigToType = function (sig, toType, genType) {
+    // console.log(genType, " is bound to ", toType);
+    return r.map(function (ele) {
+        if (ele.type === genType.type) {
+            ele = toType;
+        }
+        return ele;
+    }, sig);
+};
 // [a b c] false [b == ||] reduce
 var matchTypes = function (a, b) {
     return a === b;
@@ -4284,6 +4294,10 @@ var preCheckTypes = function (pl, wd) {
                     var i = 0;
                     while (r.length(topNstack) > 0 && allMatch) {
                         // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
+                        if (isGeneric(r.takeLast(1, input)[0].type)) {
+                            sig[1] = bindSigToType(sig[1], r.takeLast(1, topNstack)[0], r.takeLast(1, input)[0]);
+                            input = bindSigToType(input, r.takeLast(1, topNstack)[0], r.takeLast(1, input)[0]);
+                        }
                         if (matchTypes(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type)) {
                             var inputGuard = (_a = sig[0][sig[0].length - 1 - i]) === null || _a === void 0 ? void 0 : _a.guard;
                             if (inputGuard) {
@@ -4303,7 +4317,8 @@ var preCheckTypes = function (pl, wd) {
                         acc = r.dropLast(inLength, acc);
                     }
                     else {
-                        return [{ error: "An unexpected stack type of " + topNstack[topNstack.length - 1].type + " with value '" + topNstack[topNstack.length - 1].w + "' was encountered by " + input[input.length - 1].w,
+                        return [{
+                                error: "An unexpected stack type of " + topNstack[topNstack.length - 1].type + " with value '" + topNstack[topNstack.length - 1].w + "' was encountered by " + input[input.length - 1].w,
                                 word: input[input.length - 1].w, stackDepth: i,
                                 expectedType: input[input.length - 1].type,
                                 encounteredType: topNstack[topNstack.length - 1].type,

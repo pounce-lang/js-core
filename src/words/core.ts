@@ -87,7 +87,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'dup': {
-        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A' }]],
+        sig: [[{ type: 'A', use: 'observe' }], [{ type: 'A', use: 'observe' }, { type: 'A' }]],
         compose: s => { s.push(clone(s[s.length - 1])); return [s]; }
         // s => { s.push(s[s.length - 1]); return [s]; }
     },
@@ -103,7 +103,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'drop': {
-        sig: [[{ type: 'any' }], []],
+        sig: [[{ type: 'A' }], []],
         compose: s => { s?.pop(); return [s]; }
     },
     'round': {

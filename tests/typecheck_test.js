@@ -28,10 +28,17 @@ let tests = [
     ['[[[]]]', [{"type":"[{type:[{type:[] w:[]}] w:[[]]}]","w":"[[[]]]"}]],
     ['[a[b b2]]', [{"type":"[{type:string w:a} {type:[{type:string w:b} {type:string w:b2}] w:[b b2]}]","w":"[a [b b2]]"}]],
     ['[a[b b2]] 7', [{"type":"[{type:string w:a} {type:[{type:string w:b} {type:string w:b2}] w:[b b2]}]","w":"[a [b b2]]"},{"type":"number","w":"7"}]],
-    // ['[a[b b2[c c2]d]e]', [{"type":"[string, [string, string, string[2], string], string]","w":"[a [b b2 [c c2] d] e]"}]],
-    // ['[[][]]', [{"type":"[][2]","w":"[[] []]"}]],
-    // ['[a[b b2]c c2[d]e]', [{"type":"[string, string[2], string, string, string[1], string]","w":"[a [b b2] c c2 [d] e]"}]],
+    ['[a[b b2[c c2]d]e]', [{"type":"[{type:string w:a} {type:[{type:string w:b} {type:string w:b2} {type:[{type:string w:c} {type:string w:c2}] w:[c c2]} {type:string w:d}] w:[b b2 [c c2] d]} {type:string w:e}]","w":"[a [b b2 [c c2] d] e]"}]],
+    ['[[][]]', [{"type":"[{type:[] w:[]} {type:[] w:[]}]","w":"[[] []]"}]],
+    ['[a[b b2]c c2[d]e]', [{"type":"[{type:string w:a} {type:[{type:string w:b} {type:string w:b2}] w:[b b2]} {type:string w:c} {type:string w:c2} {type:[{type:string w:d}] w:[d]} {type:string w:e}]","w":"[a [b b2] c c2 [d] e]"}]],
+    ['a 2 swap dup', [{"type":"number","w":"2"}, {"type":"string","w":"a"}, {"type":"string","w":"a"}]],
+    ['a 2 cc rotate', [{"type":"string","w":"cc"}, {"type":"number","w":"2"}, {"type":"string","w":"a"}]],
+    ['3.14 2 "3" rollup', [{"type":"string","w":"3"}, {"type":"number","w":"3.14"}, {"type":"number","w":"2"}]],
+    ['a 3.14 "c3p0" rolldown', [{"type":"number","w":"3.14"}, {"type":"string","w":"c3p0"}, {"type":"string","w":"a"}]],
+    // ['a 3.14 drop', [{"type":"string","w":"a"}]],
 ];
+// 'rolldown': {
+//     sig: [[{ type: 'A' }, { type: 'B' }, { type: 'C' }], [{ type: 'B' }, { type: 'C' }, { type: 'A' }]],
 
 function cmpLists(a, b) {
     let same = true;
