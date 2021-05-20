@@ -2,7 +2,6 @@ import * as r from "ramda";
 import { WordDictionary } from "../WordDictionary.types";
 import { ProgramList, Word } from '../types';
 import NP from 'number-precision';
-import { introspectWords, introspectWord } from "../interpreter";
 import { unParser as unparse } from "../parser/Pinna";
 import Prando from 'prando';
 let rng: { next: () => number };
@@ -791,7 +790,7 @@ export const coreWords: WordDictionary = {
         compose: [['swap'], 'dip', 'swap']
     },
     'if-else': {
-        sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'B', use: 'run!' }], [{ type: 'runOf A | B' }]],
+        sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'A', use: 'run!' }], [{ type: 'A' }]],
         compose: (s, pl) => {
             const else_block = toPLOrNull(s?.pop());
             const then_block = toPLOrNull(s?.pop());
@@ -1211,7 +1210,7 @@ export const coreWords: WordDictionary = {
     },
 
     'split': {
-        sig: [[{type:"any"}, {type:"list"}, {type:"list"}], [{type:"list"}, {type:"list"}]],
+        sig: [[{type:"any"}, {type:"list"}, {type:"[{type:boolean}]"}], [{type:"list"}, {type:"list"}]],
         compose: [["cutVal", "theList", "operator"], [
             [], [], "cutVal", "theList",
             'size',
@@ -1476,14 +1475,16 @@ export const coreWords: WordDictionary = {
 
 };
 
-function cloneItem(item: Word) {
-    // return cloneObject(item);
-    if (item !== undefined) {
-        return JSON.parse(JSON.stringify(item));
-    }
-    return item;
-}
+// function cloneItem(item: Word) {
+//     // return cloneObject(item);
+//     if (item !== undefined) {
+//         return JSON.parse(JSON.stringify(item));
+//     }
+//     return item;
+// }
 
+const introspectWords = () => r.keys(r.omit(['popInternalCallStack'], coreWords));
+const introspectWord = (wn: string) => JSON.parse(JSON.stringify(r.path([wn], coreWords)));
 const clone = <T>(source: T): T => {
     if (source === null) return source
   

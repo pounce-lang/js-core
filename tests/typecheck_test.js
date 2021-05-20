@@ -5,6 +5,9 @@ const coreWords = require('../dist/index').coreWordDictionary;
 
 let tests = [
     ['2', [{"type":"number","w":"2"}]],
+    ['true', [{"type":"boolean","w":"true"}]],
+    ['false', [{"type":"boolean","w":"false"}]],
+    ['"abc"', [{"type":"string","w":"abc"}]],
     ['2 3 +', [{"type":"number","w":"+"}]],
     ['2 abc +', [{"error":"An unexpected stack type of string with value 'abc' was encountered by +","word":"+","stackDepth":0,"expectedType":"number","encounteredType":"string","encounterdValue":"abc"}]],
     ['twelve 12 +', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by +","word":"+","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
@@ -35,7 +38,15 @@ let tests = [
     ['a 2 cc rotate', [{"type":"string","w":"cc"}, {"type":"number","w":"2"}, {"type":"string","w":"a"}]],
     ['3.14 2 "3" rollup', [{"type":"string","w":"3"}, {"type":"number","w":"3.14"}, {"type":"number","w":"2"}]],
     ['a 3.14 "c3p0" rolldown', [{"type":"number","w":"3.14"}, {"type":"string","w":"c3p0"}, {"type":"string","w":"a"}]],
-    // ['a 3 drop', [{"type":"string","w":"a"}]],
+    ['[a] 3 dup2', [{"type":"[{type:string w:a}]","w":"[a]"},{"type":"number","w":"3"},{"type":"[{type:string w:a}]","w":"[a]"},{"type":"number","w":"3"}]],
+    ['a 3 dup2', [{"type":"string","w":"a"}, {"type":"number","w":"3"},{"type":"string","w":"a"}, {"type":"number","w":"3"}]],
+    ['a 3 drop', [{"type":"string","w":"a"}]],
+    ['3 3 =', [{"type":"number","w":"3"},{"type":"boolean","w":"="}]],
+    ['5 5 ==', [{"type":"boolean","w":"=="}]],
+    ['true [a] [a] if-else', [{ "type": "[{type:string w:a}]", "w": "[a]" }]],
+    // // need to type check 'play' // ['[true] [a] [a] ifte', [{ "type": "[{type:string w:a}]", "w": "[a]" }]],
+    // ['3 [a b c] [<] split', [{ "type": "[{type:string w:a}]", "w": "[a]" }]],
+
 ];
 
 function cmpLists(a, b) {
@@ -64,7 +75,7 @@ tests.forEach((test, i) => {
     try {
         //parse then typecheck
         const result_pl = pinna(ps);
-        const tc_result = typecheck(result_pl, coreWords);
+        const tc_result = typecheck(result_pl, coreWords, false);
         testCount += 1;
         if (!deepCompare(tc_result, expected_stack)) {
             testsFailed += 1;

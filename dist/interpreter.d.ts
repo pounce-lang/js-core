@@ -35,5 +35,3 @@ export declare function purr(pl: ProgramList, wd: WordDictionary, cycleLimit?: n
     active: boolean;
     cyclesConsumed?: undefined;
 }, void, unknown>;
-export declare const introspectWords: () => (string | number)[];
-export declare const introspectWord: (wn: string) => any;

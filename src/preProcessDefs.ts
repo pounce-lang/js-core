@@ -4,9 +4,14 @@ import { ProgramList, WordSignature, Word } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { toPLOrNull, toStringOrNull, toArrOrNull } from './words/core';
 import { unParser as unparse, parser } from './parser/Pinna';
+var verbose = false;
+const log = (logging:boolean, ...args: any) => {
+  if (logging) {
+    console.log(args);
+  }
+};
 
 export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [ProgramList, WordDictionary] => {
-
   const defineWord = (wd: WordDictionary, key: string, val: WordValue): WordDictionary => {
     let new_word: WordDictionary = {};
     new_word[key] = val;
@@ -38,7 +43,7 @@ const justTypes = (ws: WordSignature, w: Word) => {
 
 const isGeneric = (t: string): boolean => (t === t.toUpperCase());
 const bindSigToType = (sig: TypeListElement[], toType: TypeListElement, genType: TypeListElement) => {
-  // console.log(genType, " is bound to ", toType);
+  log(verbose, genType, " is bound to ", toType);
   return r.map((ele: TypeListElement) => {
     if (ele.type === genType.type) {
       ele = toType;
@@ -50,12 +55,13 @@ const bindSigToType = (sig: TypeListElement[], toType: TypeListElement, genType:
 // [a b c] false [b == ||] reduce
 const matchTypes = (a: string, b: string) => {
   if (a !== b) {
-    // console.log(a, "not == to ", b, "<--- maybe work to do?");
+    log(verbose, a, "not == to ", b, "<--- maybe work to do?");
   }
   return a === b;
 };
 
-export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
+export const preCheckTypes = (pl: ProgramList, wd: WordDictionary, logging: boolean = false) => {
+  verbose = logging;
   const typelist: TypeListElement[][][] = r.map((w: Word): TypeListElement[][] => {
     // string | number | Word[] | boolean | { [index: string]: Word }
     if (r.is(Boolean, w)) {
@@ -66,9 +72,9 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
       return [[], [{ type: t, w: w.toString() }]];
     }
     if (r.is(String, w)) {
-      //console.log("w", w);
+      log(verbose, "w", w);
       if (wd[w as string]) {
-        //console.log("w2", wd[w as string]);
+        log(verbose, "w2", wd[w as string]);
         return justTypes(wd[w as string].sig, w);
       }
       else {
@@ -78,7 +84,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
     if (r.is(Array, w)) {
       const wl = w as Word[];
       const arrayTypesResult = preCheckTypes(wl, wd);
-      // console.log("arrayTypesResult", arrayTypesResult);
+      log(verbose, "arrayTypesResult", arrayTypesResult);
       // return [[], [{type: `${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
       ///if (r.is(Array, arrayTypesResult)) {
       return [[], [{ type: unparse([arrayTypesResult]), w: unparse([w]) }]];
@@ -89,19 +95,19 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
   }, pl);
 
   if (typelist) {
-    //console.log("typelist", JSON.stringify(typelist));
+    log(verbose, "typelist", JSON.stringify(typelist));
     return r.reduce((acc, sig: TypeListElement[][]) => {
       if (r.is(Array, sig) && r.length(sig) === 2) {
         let input = sig[0];
         const inLength = r.length(input);
         if (inLength > 0 && r.length(acc) >= inLength) {
           // check expected input types
-          //console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
+          log(verbose, "acc", JSON.stringify(acc), "input", JSON.stringify(input));
           let topNstack = r.takeLast(inLength, acc);
           let allMatch = true;
           let i = 0;
           while (r.length(topNstack) > 0 && allMatch) {
-            // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
+            log(verbose, r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
             if (isGeneric(r.takeLast(1, input)[0].type)) {
               sig[1] = bindSigToType(sig[1], r.takeLast(1, topNstack)[0], r.takeLast(1, input)[0]);
               input = bindSigToType(input, r.takeLast(1, topNstack)[0], r.takeLast(1, input)[0]);
@@ -113,6 +119,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
                   return [{ error: `Guard found that the static value ${r.takeLast(1, topNstack)[0].w.toString()} failed to pass its requirement [${unparse(inputGuard)}]` }];
                 }
               }
+              log(verbose, "***", topNstack, input);
               topNstack = r.dropLast(1, topNstack);
               input = r.dropLast(1, input);
               i += 1;
@@ -122,6 +129,7 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
             }
           }
           if (allMatch) {
+            log(verbose, "---", inLength, acc);
             acc = r.dropLast(inLength, acc);
           }
           else {
@@ -136,13 +144,11 @@ export const preCheckTypes = (pl: ProgramList, wd: WordDictionary) => {
         }
         const output = sig[1];
         if (r.length(output) > 0) {
-          //console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
+          log(verbose, "acc", JSON.stringify(acc), "output", JSON.stringify(output));
           return r.concat(acc, output);
         }
-
-
       }
-      return null;
+      return acc;
 
     }, [], typelist);
     //return typelist;

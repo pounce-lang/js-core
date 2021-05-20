@@ -3483,7 +3483,7 @@ var coreWords = {
         compose: [['swap'], 'dip', 'swap']
     },
     'if-else': {
-        sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'B', use: 'run!' }], [{ type: 'runOf A | B' }]],
+        sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'A', use: 'run!' }], [{ type: 'A' }]],
         compose: function (s, pl) {
             var _a, _b, _c;
             var else_block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
@@ -3919,7 +3919,7 @@ var coreWords = {
             ], "pounce"]
     },
     'split': {
-        sig: [[{ type: "any" }, { type: "list" }, { type: "list" }], [{ type: "list" }, { type: "list" }]],
+        sig: [[{ type: "any" }, { type: "list" }, { type: "[{type:boolean}]" }], [{ type: "list" }, { type: "list" }]],
         compose: [["cutVal", "theList", "operator"], [
                 [], [], "cutVal", "theList",
                 'size',
@@ -4183,6 +4183,15 @@ var coreWords = {
     // //     'definition': ['process-reduce', 'teardown-reduce']
     // // }
 };
+// function cloneItem(item: Word) {
+//     // return cloneObject(item);
+//     if (item !== undefined) {
+//         return JSON.parse(JSON.stringify(item));
+//     }
+//     return item;
+// }
+var introspectWords = function () { return r.keys(r.omit(['popInternalCallStack'], coreWords)); };
+var introspectWord = function (wn) { return JSON.parse(JSON.stringify(r.path([wn], coreWords))); };
 var clone = function (source) {
     if (source === null)
         return source;
@@ -4220,6 +4229,16 @@ var clone = function (source) {
 //     }, (Array.isArray(value) ? [] : {}) as T);
 //   }
 
+var verbose = false;
+var log = function (logging) {
+    var args = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        args[_i - 1] = arguments[_i];
+    }
+    if (logging) {
+        console.log(args);
+    }
+};
 var preProcessDefs = function (pl, coreWords) {
     var defineWord = function (wd, key, val) {
         var new_word = {};
@@ -4249,7 +4268,7 @@ var justTypes = function (ws, w) {
 };
 var isGeneric = function (t) { return (t === t.toUpperCase()); };
 var bindSigToType = function (sig, toType, genType) {
-    // console.log(genType, " is bound to ", toType);
+    log(verbose, genType, " is bound to ", toType);
     return r.map(function (ele) {
         if (ele.type === genType.type) {
             ele = toType;
@@ -4259,9 +4278,14 @@ var bindSigToType = function (sig, toType, genType) {
 };
 // [a b c] false [b == ||] reduce
 var matchTypes = function (a, b) {
+    if (a !== b) {
+        log(verbose, a, "not == to ", b, "<--- maybe work to do?");
+    }
     return a === b;
 };
-var preCheckTypes = function (pl, wd) {
+var preCheckTypes = function (pl, wd, logging) {
+    if (logging === void 0) { logging = false; }
+    verbose = logging;
     var typelist = r.map(function (w) {
         // string | number | Word[] | boolean | { [index: string]: Word }
         if (r.is(Boolean, w)) {
@@ -4272,9 +4296,9 @@ var preCheckTypes = function (pl, wd) {
             return [[], [{ type: t, w: w.toString() }]];
         }
         if (r.is(String, w)) {
-            //console.log("w", w);
+            log(verbose, "w", w);
             if (wd[w]) {
-                //console.log("w2", wd[w as string]);
+                log(verbose, "w2", wd[w]);
                 return justTypes(wd[w].sig, w);
             }
             else {
@@ -4284,7 +4308,7 @@ var preCheckTypes = function (pl, wd) {
         if (r.is(Array, w)) {
             var wl = w;
             var arrayTypesResult = preCheckTypes(wl, wd);
-            // console.log("arrayTypesResult", arrayTypesResult);
+            log(verbose, "arrayTypesResult", arrayTypesResult);
             // return [[], [{type: `${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
             ///if (r.is(Array, arrayTypesResult)) {
             return [[], [{ type: unParser([arrayTypesResult]), w: unParser([w]) }]];
@@ -4294,7 +4318,7 @@ var preCheckTypes = function (pl, wd) {
         return [[], [{ type: "any", w: w.toString() }]];
     }, pl);
     if (typelist) {
-        //console.log("typelist", JSON.stringify(typelist));
+        log(verbose, "typelist", JSON.stringify(typelist));
         return r.reduce(function (acc, sig) {
             var _a;
             if (r.is(Array, sig) && r.length(sig) === 2) {
@@ -4302,12 +4326,12 @@ var preCheckTypes = function (pl, wd) {
                 var inLength = r.length(input);
                 if (inLength > 0 && r.length(acc) >= inLength) {
                     // check expected input types
-                    //console.log("acc", JSON.stringify(acc), "input", JSON.stringify(input));
+                    log(verbose, "acc", JSON.stringify(acc), "input", JSON.stringify(input));
                     var topNstack = r.takeLast(inLength, acc);
                     var allMatch = true;
                     var i = 0;
                     while (r.length(topNstack) > 0 && allMatch) {
-                        // console.log(r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
+                        log(verbose, r.takeLast(1, topNstack)[0].type, r.takeLast(1, input)[0].type);
                         if (isGeneric(r.takeLast(1, input)[0].type)) {
                             sig[1] = bindSigToType(sig[1], r.takeLast(1, topNstack)[0], r.takeLast(1, input)[0]);
                             input = bindSigToType(input, r.takeLast(1, topNstack)[0], r.takeLast(1, input)[0]);
@@ -4319,6 +4343,7 @@ var preCheckTypes = function (pl, wd) {
                                     return [{ error: "Guard found that the static value " + r.takeLast(1, topNstack)[0].w.toString() + " failed to pass its requirement [" + unParser(inputGuard) + "]" }];
                                 }
                             }
+                            log(verbose, "***", topNstack, input);
                             topNstack = r.dropLast(1, topNstack);
                             input = r.dropLast(1, input);
                             i += 1;
@@ -4328,6 +4353,7 @@ var preCheckTypes = function (pl, wd) {
                         }
                     }
                     if (allMatch) {
+                        log(verbose, "---", inLength, acc);
                         acc = r.dropLast(inLength, acc);
                     }
                     else {
@@ -4342,11 +4368,11 @@ var preCheckTypes = function (pl, wd) {
                 }
                 var output = sig[1];
                 if (r.length(output) > 0) {
-                    //console.log("acc", JSON.stringify(acc), "output", JSON.stringify(output));
+                    log(verbose, "acc", JSON.stringify(acc), "output", JSON.stringify(output));
                     return r.concat(acc, output);
                 }
             }
-            return null;
+            return acc;
         }, [], typelist);
         //return typelist;
     }
@@ -4523,8 +4549,6 @@ function purr(pl, wd, cycleLimit) {
         }
     });
 }
-var introspectWords = function () { return r.keys(r.omit(['popInternalCallStack'], coreWords)); };
-var introspectWord = function (wn) { return JSON.parse(JSON.stringify(r.path([wn], coreWords))); };
 
 // the Pounce language core module exposes these function
 var parse = parser;
