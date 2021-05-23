@@ -4256,8 +4256,13 @@ var preProcessDefs = function (pl, coreWords) {
     return [next_pl, mergeRight(coreWords, next_wd)];
 };
 var justTypes = function (ws, w) {
-    var inTypes = map(function (a) { return (__assign(__assign({}, a), { w: w.toString() })); }, ws[0]);
-    var outTypes = map(function (a) { return ({ type: a.type, w: w.toString() }); }, ws[1]);
+    var inTypes = map(function (a) { return (__assign({}, a
+    //    , w: w.toString() 
+    )); }, ws[0]);
+    var outTypes = map(function (a) { return ({
+        type: a.type
+        //    , w: w.toString() 
+    }); }, ws[1]);
     return [inTypes, outTypes];
 };
 var isGeneric = function (t) { return (t === t.toUpperCase()); };
@@ -4279,40 +4284,53 @@ var matchTypes = function (a, b) {
 };
 var preCheckTypes = function (pl, wd, logging) {
     if (logging === void 0) { logging = false; }
-    verbose = logging;
+    // verbose = logging;
     var typelist = map(function (w) {
-        // string | number | Word[] | boolean | { [index: string]: Word }
         if (is(Boolean, w)) {
-            return [[], [{ type: "boolean", w: w.toString() }]];
+            return [[], [{
+                        type: "boolean"
+                        //  , w: w.toString() 
+                    }]];
         }
         if (is(Number, w)) {
             var t = "number"; // print(infer (w));
-            return [[], [{ type: t, w: w.toString() }]];
+            return [[], [{
+                        type: t
+                        // , w: w.toString() 
+                    }]];
         }
         if (is(String, w)) {
-            log(verbose, "w", w);
+            log(logging, "w", w);
             if (wd[w]) {
-                log(verbose, "w2", wd[w]);
-                return justTypes(wd[w].sig, w);
+                log(logging, "w2", wd[w]);
+                return justTypes(wd[w].sig);
             }
             else {
-                return [[], [{ type: "string", w: w.toString() }]];
+                return [[], [{
+                            type: "string"
+                            //  , w: w.toString() 
+                        }]];
             }
         }
         if (is(Array, w)) {
             var wl = w;
             var arrayTypesResult = preCheckTypes(wl, wd);
-            log(verbose, "arrayTypesResult", arrayTypesResult);
+            log(logging, "arrayTypesResult", arrayTypesResult);
             // return [[], [{type: `${JSON.stringify(arrayTypesResult)}`, w: w.toString()}]];
             ///if (r.is(Array, arrayTypesResult)) {
-            return [[], [{ type: unParser([arrayTypesResult]), w: unParser([w]) }]];
+            return [[], [{ type: unParser([arrayTypesResult])
+                        //  , w: unparse([w]) 
+                    }]];
             ///}
             // return [arrayTypesResult as any[]]; //, w: `[${unparse(wl)}]`}]];
         }
-        return [[], [{ type: "any", w: w.toString() }]];
+        return [[], [{
+                    type: "any"
+                    //  , w: w.toString() 
+                }]];
     }, pl);
     if (typelist) {
-        log(verbose, "typelist", JSON.stringify(typelist));
+        log(logging, "typelist", JSON.stringify(typelist));
         return reduce(function (acc, sig) {
             var _a;
             if (is(Array, sig) && length(sig) === 2) {
@@ -4320,24 +4338,25 @@ var preCheckTypes = function (pl, wd, logging) {
                 var inLength = length(input);
                 if (inLength > 0 && length(acc) >= inLength) {
                     // check expected input types
-                    log(verbose, "acc", JSON.stringify(acc), "input", JSON.stringify(input));
+                    log(logging, "acc", JSON.stringify(acc), "input", JSON.stringify(input));
                     var topNstack = takeLast(inLength, acc);
                     var allMatch = true;
                     var i = 0;
                     while (length(topNstack) > 0 && allMatch) {
-                        log(verbose, takeLast(1, topNstack)[0].type, takeLast(1, input)[0].type);
+                        log(logging, takeLast(1, topNstack)[0].type, takeLast(1, input)[0].type);
                         if (isGeneric(takeLast(1, input)[0].type)) {
                             sig[1] = bindSigToType(sig[1], takeLast(1, topNstack)[0], takeLast(1, input)[0]);
                             input = bindSigToType(input, takeLast(1, topNstack)[0], takeLast(1, input)[0]);
                         }
                         if (matchTypes(takeLast(1, topNstack)[0].type, takeLast(1, input)[0].type)) {
                             var inputGuard = (_a = sig[0][sig[0].length - 1 - i]) === null || _a === void 0 ? void 0 : _a.guard;
-                            if (inputGuard) {
-                                if (inputGuard[1] === "!=" && takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
-                                    return [{ error: "Guard found that the static value " + takeLast(1, topNstack)[0].w.toString() + " failed to pass its requirement [" + unParser(inputGuard) + "]" }];
-                                }
-                            }
-                            log(verbose, "***", topNstack, input);
+                            // // after word removal input Guards need reworking
+                            // if (inputGuard) {
+                            //   if (inputGuard[1] === "!=" && r.takeLast(1, topNstack)[0].w.toString() === inputGuard[0].toString()) {
+                            //     return [{ error: `Guard found that the static value ${r.takeLast(1, topNstack)[0].w.toString()} failed to pass its requirement [${unparse(inputGuard)}]` }];
+                            //   }
+                            // }
+                            log(logging, "***", topNstack, input);
                             topNstack = dropLast(1, topNstack);
                             input = dropLast(1, input);
                             i += 1;
@@ -4347,22 +4366,21 @@ var preCheckTypes = function (pl, wd, logging) {
                         }
                     }
                     if (allMatch) {
-                        log(verbose, "---", inLength, acc);
+                        log(logging, "---", inLength, acc);
                         acc = dropLast(inLength, acc);
                     }
                     else {
                         return [{
-                                error: "An unexpected stack type of " + topNstack[topNstack.length - 1].type + " with value '" + topNstack[topNstack.length - 1].w + "' was encountered by " + input[input.length - 1].w,
-                                word: input[input.length - 1].w, stackDepth: i,
+                                error: "An unexpected stack type of '" + topNstack[topNstack.length - 1].type + "' was encountered!",
+                                // word: input[input.length - 1].w, stackDepth: i,
                                 expectedType: input[input.length - 1].type,
                                 encounteredType: topNstack[topNstack.length - 1].type,
-                                encounterdValue: topNstack[topNstack.length - 1].w
                             }];
                     }
                 }
                 var output = sig[1];
                 if (length(output) > 0) {
-                    log(verbose, "acc", JSON.stringify(acc), "output", JSON.stringify(output));
+                    log(logging, "acc", JSON.stringify(acc), "output", JSON.stringify(output));
                     return concat(acc, output);
                 }
             }
