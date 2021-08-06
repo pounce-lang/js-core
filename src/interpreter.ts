@@ -1,20 +1,107 @@
 import * as r from 'ramda';
-import { ValueStack, ProgramList } from './types';
+import { ValueStack, ProgramList, Word } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { coreWords, toPLOrNull, toStringOrNull, toArrOrNull, toNumOrNull } from './words/core';
 import { parser } from './parser/Pinna';
-import { preCheckTypes, preProcessDefs } from './preProcessDefs';
+import { preProcessDefs } from './preProcessDefs';
 
 const debugLevel = (ics: string[], logLevel: number) => (ics.length <= logLevel);
 // user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
 const debugCleanPL = (pl: ProgramList) => r.filter((w) => (w !== "popInternalCallStack"), pl);
+const startsWith = (s: string, patt: string) => s.indexOf(patt) === 0;
+const isCap = (s: string) => s.search(/[A-Z]/) === 0;
 
-// purr
+const typeStr = (w: Word) => {
+  if (r.is(String, w) 
+  && !startsWith(w as string, "number_t") 
+  && !startsWith(w as string, "boolean_t") 
+  && !startsWith(w as string, "any_t")
+  && !isCap(w as string)) {
+    return "string_t";
+  }
+  if (r.is(Number, w)) {
+    return "number_t";
+  }
+  if (r.is(Boolean, w)) {
+    return "boolean_t";
+  }
+  console.log("typeStr ?? ", w)
+  return w;
+};
+
+export function typeCheck(
+  pl: ProgramList,
+  wd: WordDictionary,
+) {
+  let s: ValueStack = [];
+  let w: Word;
+  let concreteTypes: {[index: string]: Word} = {};
+  let errorMsg = "";
+  while ((w = pl.shift()) !== undefined) {
+    let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
+    if (wds) {
+      if (typeof wds.typeCompose === 'function') {
+        console.log("compose types0 ", w, s, pl);
+        [s, pl = pl] = wds.typeCompose(s, pl);
+      }
+      else if (wds.typeCompose === 'compose' && typeof wds.compose === 'function') {
+        console.log("compose types1 ", w, s, pl);
+        [s, pl = pl] = wds.compose(s, pl);
+      }
+      else {
+        const plist = toPLOrNull(wds.compose);
+        if (plist) {
+          pl.unshift(...plist);
+        }
+      }
+    }
+    else if (w !== undefined && s !== null) {
+      if (r.is(String, w) && startsWith(w as string, '-any_t')) {
+        let attachTo: string = w as string;
+        attachTo = attachTo.substr(-1, 1);
+        if (isCap(attachTo)) {
+          console.log("attach concrete type to ", attachTo, w, s, pl);
+          concreteTypes[attachTo] = s.pop();
+        }
+        else {
+          s.pop();
+        }
+      }
+      else if (r.is(String, w) && startsWith(w as string, '-number_t')) {
+        if (s.pop() !== 'number_t') errorMsg += " number_t was expected!";
+      }
+      else if (r.is(String, w) && startsWith(w as string, '-string_t')) {
+        if (s.pop() !== 'string_t') errorMsg += " string_t was expected!";
+      }
+      else if (r.is(String, w) && isCap(w as string)) {
+        console.log("time to substitute in ", concreteTypes[w as string], " for ", w);
+        console.log("s and pl: ",s , pl);
+        s.push(concreteTypes[w as string]);
+      }
+      else if (r.is(Array, w)) {
+        // s.push([].concat(w));
+        s.push(typeCheck([].concat(w), wd)); // copy of type checked 'w'
+      }
+      else {
+        s.push(typeStr(w));
+      }
+    }
+  }
+  if (pl.length > 0) {
+    return [];
+  }
+  else {
+    return s;
+  }
+}
+
+
+// a slow purr (due to run-time type-checking)
 export function* interpreter(
   pl_in: ProgramList | string,
   opt: { logLevel: number, yieldOnId: boolean, maxCycles?: number, wd?: WordDictionary } =
     { logLevel: 0, yieldOnId: false }
-) {
+) : {} {
   // preProcess if needed 
   const wd_in = opt.wd ? opt.wd : coreWords;
   let internalCallStack = [];

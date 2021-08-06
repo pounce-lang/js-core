@@ -4,48 +4,58 @@ const coreWords = require('../dist/index').coreWordDictionary;
 
 
 let tests = [
-    ['2', [{"type":"number"}]],
-    ['true', [{"type":"boolean"}]],
-    ['false', [{"type":"boolean"}]],
-    ['"abc"', [{"type":"string"}]],
-    ['2 3 +', [{"type":"number"}]],
-    ['2 abc +', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['twelve 12 +', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['hello world', [{"type":"string"},{"type":"string"}]],
-    ['"hello world"', [{"type":"string"}]],
-    ['2 3 -', [{"type":"number"}]],
-    ['2 abc -', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['twelve 12 -', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['2 3 *', [{"type":"number"}]],
-    ['2 3 * 6 -', [{"type":"number"}]],
-    ['2 abc *', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    // ['twelve 12 *', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by *","word":"*","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
-    ['2 3 /', [{"type":"number"}]],
-    // ['2 abc /', [{"error":"An unexpected stack type of string with value 'abc' was encountered by /","word":"/","stackDepth":0,"expectedType":"number","encounteredType":"string","encounterdValue":"abc"}]],
-    // ['twelve 12 /', [{"error":"An unexpected stack type of string with value 'twelve' was encountered by /","word":"/","stackDepth":1,"expectedType":"number","encounteredType":"string","encounterdValue":"twelve"}]],
-    // ['2 0 /', [{"error":"Guard found that the static value 0 failed to pass its requirement [0 !=]"}]],
-    ['[]', [{"type":"[]"}]],
-    ['[][]', [{"type":"[]"},{"type":"[]"}]],
-    ['[1 2 3]', [{"type":"[{type:number} {type:number} {type:number}]"}]],
-    ['[[]]', [{"type":"[{type:[]}]"}]],
-    ['[[[]]]', [{"type":"[{type:[{type:[]}]}]"}]],
-    ['[a[b b2]]', [{"type":"[{type:string} {type:[{type:string} {type:string}]}]"}]],
-    ['[a[b b2]] 7', [{"type":"[{type:string} {type:[{type:string} {type:string}]}]"},{"type":"number"}]],
-    ['[a[b b2[c c2]d]e]', [{"type":"[{type:string} {type:[{type:string} {type:string} {type:[{type:string} {type:string}]} {type:string}]} {type:string}]"}]],
-    ['[[][]]', [{"type":"[{type:[]} {type:[]}]"}]],
-    ['[a[b b2]c c2[d]e]', [{"type":"[{type:string} {type:[{type:string} {type:string}]} {type:string} {type:string} {type:[{type:string}]} {type:string}]"}]],
-    ['a 2 swap dup', [{"type":"number"}, {"type":"string"}, {"type":"string"}]],
-    ['a 2 cc rotate', [{"type":"string"}, {"type":"number"}, {"type":"string"}]],
-    ['3.14 2 "3" rollup', [{"type":"string"}, {"type":"number"}, {"type":"number"}]],
-    ['a 3.14 "c3p0" rolldown', [{"type":"number"}, {"type":"string"}, {"type":"string"}]],
-    ['[a] 3 dup2', [{"type":"[{type:string}]"},{"type":"number"},{"type":"[{type:string}]"},{"type":"number"}]],
-    ['a 3 dup2', [{"type":"string"}, {"type":"number"},{"type":"string"}, {"type":"number"}]],
-    ['a 3 drop', [{"type":"string"}]],
-    ['3 3 =', [{"type":"number"},{"type":"boolean"}]],
-    ['5 5 ==', [{"type":"boolean"}]],
-    ['true [a] [b] if-else', [{ "type": "[{type:string}]"}]],
-    // // need to type check 'play' // ['[true] [a] [a] ifte', [{ "type": "[{type:string}]" }]],
-    // ['3 [a b c] [<] split', [{ "type": "[{type:string}]" }]],
+    ['2', ["number_t"]],
+    ['true', ["boolean_t"]],
+    ['false', ["boolean_t"]],
+    ['"abc"', ["string_t"]],
+    ['2 3 +', ["number_t"]],
+    ['2 3 + -4 +', ["number_t"]],
+    // // ['2 abc +', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['twelve 12 +', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['hello world', ["string_t","string_t"]],
+    ['"hello world"', ["string_t"]],
+    // // ['2 3 -', ["number_t"]],
+    // // ['2 abc -', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['twelve 12 -', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['2 3 *', ["number_t"]],
+    // // ['2 3 * 6 -', ["number_t"]],
+    // // ['2 abc *', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['twelve 12 *', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['2 3 /', ["number_t"]],
+    // // ['2 abc /', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['twelve 12 /', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
+    // // ['2 0 /', [{"error":"Guard found that the static value 0 failed to pass its requirement [0 !=]"}]],
+    ['[]', [[]]],
+    ['[][]', [[],[]]],
+    ['[2 4 7]', [["number_t","number_t","number_t"]]],
+    ['[[]]', [[[]]]],
+    ['[[[]]]', [[[[]]]]],
+    // // ['[a[b b2]]', [{"type":"["string_t" {type:["string_t" "string_t"]}]"}]],
+    // // ['[a[b b2]] 7', [{"type":"["string_t" {type:["string_t" "string_t"]}]"},"number_t"]],
+    // // ['[a[b b2[c c2]d]e]', [{"type":"["string_t" {type:["string_t" "string_t" {type:["string_t" "string_t"]} "string_t"]} "string_t"]"}]],
+    // // ['[a[b b2]c c2[d]e]', [{"type":"["string_t" {type:["string_t" "string_t"]} "string_t" "string_t" {type:["string_t"]} "string_t"]"}]],
+    ['a 2 swap', ["number_t","string_t"]],
+    ['a 2 swap dup', ["number_t","string_t","string_t"]],
+    ['[a] 2 swap dup', ["number_t",["string_t"],["string_t"]]],
+    ['3 2 a [+] dip', ["number_t","string_t"]],
+    ['3 a [2 +] dip', ["number_t","string_t"]],
+    ['d 2 a [swap] dip', ["number_t","string_t","string_t"]],    
+        
+    ['3 2 5 rotate', ["number_t", "number_t", "number_t"]],
+    ['aa cc 3 rotate', ["number_t", "string_t", "string_t"]],
+    ['3 2 "3" rollup', ["string_t", "number_t", "number_t"]],
+    ['a 3.14 "c3p0" rolldown', ["number_t", "string_t", "string_t"]],
+    ['2 a [dup] dip', ["number_t","number_t","string_t"]],
+    ['[a] 3 dup2', [["string_t"],"number_t",["string_t"],"number_t"]],
+    // ['a 3 dup2', ["string_t", "number_t","string_t", "number_t"]],
+    // ['a 3 drop', ["string_t"]],
+    // ['3 3 =', ["number_t",{"type":"boolean"}]],
+    // ['5 5 ==', [{"type":"boolean"}]],
+    // ['true [a] [b] if-else', [{ "type": "["string_t"]"}]],
+    // ['2 3 [+] play', [{ "type": "{type:number}"}]],
+    // need to type check 'play' 
+    // ['[true] [a] [a] ifte', [{ "type": "["string_t"]" }]],
+    // ['3 [a b c] [<] split', [{ "type": "["string_t"]" }]],
 
 ];
 
@@ -75,7 +85,8 @@ tests.forEach((test, i) => {
     try {
         //parse then typecheck
         const result_pl = pinna(ps);
-        const tc_result = typecheck(result_pl, coreWords, false);
+        // console.log("calling typeCheck with ", result_pl);
+        const tc_result = typecheck(result_pl, coreWords);
         testCount += 1;
         if (!deepCompare(tc_result, expected_stack)) {
             testsFailed += 1;
@@ -215,3 +226,7 @@ function deepCompare() {
 
     return true;
 }
+
+
+// const isCap = (s) => s.search(/[A-Z]/) === 0;
+// console.log(isCap("A"));
