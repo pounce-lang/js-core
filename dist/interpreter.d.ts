@@ -1,6 +1,6 @@
 import { ValueStack, ProgramList, Word } from './types';
 import { WordDictionary } from "./WordDictionary.types";
-export declare function typeCheck(pl: ProgramList, wd: WordDictionary): ValueStack;
+export declare function typeCheck(pl: ProgramList, wd: WordDictionary, level: number): ValueStack;
 export declare function interpreter(pl_in: ProgramList | string, opt?: {
     logLevel: number;
     yieldOnId: boolean;

@@ -29,9 +29,21 @@ const typeStr = (w: Word) => {
   return w;
 };
 
+const checkForType = (s:ValueStack, ts: string): string => {
+  const top = s.pop();
+  if (top === undefined) {
+    return "none";
+  }
+  if (top !== ts){ 
+    return "mismatch number_t was expected!";
+  }
+  return "match";
+};
+
 export function typeCheck(
   pl: ProgramList,
   wd: WordDictionary,
+  level: number
 ) {
   let s: ValueStack = [];
   let w: Word;
@@ -68,10 +80,28 @@ export function typeCheck(
         }
       }
       else if (r.is(String, w) && startsWith(w as string, '-number_t')) {
-        if (s.pop() !== 'number_t') errorMsg += " number_t was expected!";
+        const match = checkForType(s, "number_t");
+        console.log("-number_t ->", match);
+        if (match === "none" && level !== 0) {
+          s.push("-number_t");
+          return s;
+        }
       }
       else if (r.is(String, w) && startsWith(w as string, '-string_t')) {
-        if (s.pop() !== 'string_t') errorMsg += " string_t was expected!";
+        const match = checkForType(s, "string_t");
+        console.log("-string_t ->", match);
+        if (match === "none" && level !== 0) {
+          s.push("-string_t");
+          return s;
+        }
+      }
+      else if (r.is(String, w) && startsWith(w as string, '-boolean_t')) {
+        const match = checkForType(s, "boolean_t");
+        console.log("-boolean_t ->", match);
+        if (match === "none" && level !== 0) {
+          s.push("-boolean_t");
+          return s;
+        }
       }
       else if (r.is(String, w) && isCap(w as string)) {
         console.log("time to substitute in ", concreteTypes[w as string], " for ", w);
@@ -80,7 +110,8 @@ export function typeCheck(
       }
       else if (r.is(Array, w)) {
         // s.push([].concat(w));
-        s.push(typeCheck([].concat(w), wd)); // copy of type checked 'w'
+        console.log("recursive call for array ->", w);
+        s.push(typeCheck([].concat(w), wd, level+1)); // copy of type checked 'w'
       }
       else {
         s.push(typeStr(w));
@@ -88,7 +119,7 @@ export function typeCheck(
     }
   }
   if (pl.length > 0) {
-    return [];
+    return [s, pl];
   }
   else {
     return s;

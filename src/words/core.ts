@@ -8,6 +8,8 @@ let rng: { next: () => number };
 
 const toNumTypeOrNull = (u: any): number | null =>
     r.is(Number, u) || u === "number_t" ? u : null;
+const toBoolTypeOrNull = (u: any): boolean | null =>
+    r.is(Boolean, u) || u === "boolean_t" ? u : null;
 
 export const toNumOrNull = (u: any): number | null =>
     r.is(Number, u) ? u : null;
@@ -70,7 +72,7 @@ const subInWD = (localWD: { [index: string]: Word }, words: Word[]): Word[] => {
 export const coreWords: WordDictionary = {
     'words': {
         sig: [[], [{ type: 'list' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s) => {
             s.push(introspectWords());
             return [s];
@@ -79,7 +81,7 @@ export const coreWords: WordDictionary = {
     // introspectWord
     'word': {
         sig: [[{ type: 'list<string>)' }], [{ type: 'record' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const phrase = toArrOfStrOrNull(s?.pop());
             const wordName = toStringOrNull(phrase[0]);
@@ -103,10 +105,6 @@ export const coreWords: WordDictionary = {
             console.log("'dup' compose virtual type ");
             s.push("-any_t A", "A", "A");
             return [s];
-
-            // const typesSig: Word[] = ["-any_t A", "A", "A"];
-            // pl = typesSig.concat(pl); 
-            // return [s, pl];
         },
 		compose: s => { s.push(clone(s[s.length - 1])); return [s]; }
         // s => { s.push(s[s.length - 1]); return [s]; }
@@ -122,20 +120,20 @@ export const coreWords: WordDictionary = {
             const top = s?.pop();
             const under = s?.pop();
             if (top === undefined && under === undefined) {
-                console.log("swap virtual types");
+                console.log("'swap' virtual types");
                 s.push("-any_t A");
-                s.push("-any_t B");   
+                s.push("-any_t B");
                 s.push("A");
-                s.push("B");   
+                s.push("B");
             }
             else if (under === undefined) {
-                console.log("swap one known type", top);
+                console.log("'swap' one known type", top);
                 s.push(top);
-                s.push("-any_t A");    
-                s.push("A");    
+                s.push("-any_t A");
+                s.push("A");
             }
             else {
-                console.log("swap known types", top, under);
+                console.log("'swap' known types", top, under);
                 s.push(top);
                 s.push(under);
             }
@@ -151,12 +149,20 @@ export const coreWords: WordDictionary = {
     },
     'drop': {
         sig: [[{ type: 'A' }], []],
-        typeCompose: (s) => [s],
+        typeCompose: s => { 
+            const a = s?.pop();
+            if (a === undefined) {
+                console.log("'drop' virtual type");
+                s.push("-any_t");
+            } 
+            console.log("'drop' concrete type", a);
+            return [s];
+        },
 		compose: s => { s?.pop(); return [s]; }
     },
     'round': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), 'number');
             const b = toNumOrNull(s?.pop());
@@ -201,7 +207,7 @@ export const coreWords: WordDictionary = {
     },
     '-': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-		typeCompose: (s) => [s],
+		typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -214,7 +220,7 @@ export const coreWords: WordDictionary = {
     },
     '/': {
         sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -227,7 +233,7 @@ export const coreWords: WordDictionary = {
     },
     '%': {
         sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -240,7 +246,7 @@ export const coreWords: WordDictionary = {
     },
     '*': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -254,7 +260,7 @@ export const coreWords: WordDictionary = {
     // bitwise on integers
     '&': {
         sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -267,7 +273,7 @@ export const coreWords: WordDictionary = {
     },
     '|': {
         sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -280,7 +286,7 @@ export const coreWords: WordDictionary = {
     },
     '^': {
         sig: [[{ type: 'int' }, { type: 'int' }], [{ type: 'int' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -293,7 +299,7 @@ export const coreWords: WordDictionary = {
     },
     '~': {
         sig: [[{ type: 'int' }], [{ type: 'int' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -305,7 +311,7 @@ export const coreWords: WordDictionary = {
     },
     '&&': {
         sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toBoolOrNull(s?.pop());
             const a = toBoolOrNull(s?.pop());
@@ -318,7 +324,7 @@ export const coreWords: WordDictionary = {
     },
     '||': {
         sig: [[{ type: 'boolean' }, { type: 'boolean' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toBoolOrNull(s?.pop());
             const a = toBoolOrNull(s?.pop());
@@ -331,7 +337,7 @@ export const coreWords: WordDictionary = {
     },
     '!': {
         sig: [[{ type: 'boolean' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toBoolOrNull(s?.pop());
             if (a !== null) {
@@ -344,7 +350,7 @@ export const coreWords: WordDictionary = {
     // Math.E
     'E': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.E);
             return [s];
@@ -353,7 +359,7 @@ export const coreWords: WordDictionary = {
     // Math.LN10
     'LN10': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.LN10);
             return [s];
@@ -362,7 +368,7 @@ export const coreWords: WordDictionary = {
     // Math.LN2
     'LN2': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.LN2);
             return [s];
@@ -371,7 +377,7 @@ export const coreWords: WordDictionary = {
     // Math.LOG10E
     'LOG10E': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.LOG10E);
             return [s];
@@ -380,7 +386,7 @@ export const coreWords: WordDictionary = {
     // Math.LOG2E
     'LOG2E': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.LOG2E);
             return [s];
@@ -389,7 +395,7 @@ export const coreWords: WordDictionary = {
     // Math.PI
     'PI': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.PI);
             return [s];
@@ -398,7 +404,7 @@ export const coreWords: WordDictionary = {
     // Math.SQRT1_2
     'SQRT1_2': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.SQRT1_2);
             return [s];
@@ -407,7 +413,7 @@ export const coreWords: WordDictionary = {
     // Math.SQRT2
     'SQRT2': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(Math.SQRT2);
             return [s];
@@ -416,7 +422,7 @@ export const coreWords: WordDictionary = {
     // Math.abs()
     'abs': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -429,7 +435,7 @@ export const coreWords: WordDictionary = {
     // Math.acos()
     'acos': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -442,7 +448,7 @@ export const coreWords: WordDictionary = {
     // Math.acosh()
     'acosh': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -455,7 +461,7 @@ export const coreWords: WordDictionary = {
     // Math.asin()
     'asin': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -468,7 +474,7 @@ export const coreWords: WordDictionary = {
     // Math.asinh()
     'asinh': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -481,7 +487,7 @@ export const coreWords: WordDictionary = {
     // Math.atan()
     'atan': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -494,7 +500,7 @@ export const coreWords: WordDictionary = {
     // Math.atan2()
     'atan2': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             const b = toNumOrNull(s?.pop());
@@ -508,7 +514,7 @@ export const coreWords: WordDictionary = {
     // Math.atanh()
     'atanh': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -521,7 +527,7 @@ export const coreWords: WordDictionary = {
     // Math.cbrt()
     'cbrt': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -534,7 +540,7 @@ export const coreWords: WordDictionary = {
     // Math.ceil()
     'ceil': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -547,7 +553,7 @@ export const coreWords: WordDictionary = {
     // Math.cos()
     'cos': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -560,7 +566,7 @@ export const coreWords: WordDictionary = {
     // Math.cosh()
     'cosh': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -573,7 +579,7 @@ export const coreWords: WordDictionary = {
     // Math.exp()
     'exp': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -586,7 +592,7 @@ export const coreWords: WordDictionary = {
     // Math.expm1()
     'expm1': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -599,7 +605,7 @@ export const coreWords: WordDictionary = {
     // Math.floor()
     'floor': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -612,7 +618,7 @@ export const coreWords: WordDictionary = {
     // Math.hypot()
     'hypot': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -625,7 +631,7 @@ export const coreWords: WordDictionary = {
     // Math.log()
     'log': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -638,7 +644,7 @@ export const coreWords: WordDictionary = {
     // Math.log10()
     'log10': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -651,7 +657,7 @@ export const coreWords: WordDictionary = {
     // Math.log1p()
     'log1p': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -664,7 +670,7 @@ export const coreWords: WordDictionary = {
     // Math.log2()
     'log2': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -677,7 +683,7 @@ export const coreWords: WordDictionary = {
     // Math.max()
     'max': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -690,7 +696,7 @@ export const coreWords: WordDictionary = {
     // Math.min()
     'min': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -703,7 +709,7 @@ export const coreWords: WordDictionary = {
     // Math.pow()
     'pow': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             const b = toNumOrNull(s?.pop());
@@ -717,7 +723,7 @@ export const coreWords: WordDictionary = {
     // seedrandom
     'seedrandom': {
         sig: [[{ type: 'number' }], []],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -732,7 +738,7 @@ export const coreWords: WordDictionary = {
     // Math.random()
     'random': {
         sig: [[], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(rng.next());
             return [s];
@@ -741,7 +747,7 @@ export const coreWords: WordDictionary = {
     // Math.sign()
     'sign': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -754,7 +760,7 @@ export const coreWords: WordDictionary = {
     // Math.sin()
     'sin': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -767,7 +773,7 @@ export const coreWords: WordDictionary = {
     // Math.sinh()
     'sinh': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -780,7 +786,7 @@ export const coreWords: WordDictionary = {
     // Math.sqrt()
     'sqrt': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -793,7 +799,7 @@ export const coreWords: WordDictionary = {
     // Math.tan()
     'tan': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -806,7 +812,7 @@ export const coreWords: WordDictionary = {
     // Math.tanh()
     'tanh': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -819,7 +825,7 @@ export const coreWords: WordDictionary = {
     // Math.trunc()
     'trunc': {
         sig: [[{ type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
             if (a !== null) {
@@ -831,7 +837,18 @@ export const coreWords: WordDictionary = {
     },
     'play': {
         sig: [[{ type: 'A', use: 'run!' }], [{ type: "A", use: 'run'}]],
-        typeCompose: (s) => [s],
+        typeCompose: (s, pl) => {
+            const block = toPLOrNull(s?.pop());
+            if (block !== null) {
+                console.log("'play' compose known type ", block);
+                pl = block.concat(pl);
+            }
+            else {
+                console.log("'play' compose virtyal type ", block);
+                pl.unshift(block);
+            }
+            return [s, pl];
+        },
 		compose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             if (block) {
@@ -845,7 +862,7 @@ export const coreWords: WordDictionary = {
     },
     'pounce': {
         sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s, pl) => {
             const words = toPLOrNull(s?.pop());
             const argList = toArrOfStrOrNull(s?.pop());
@@ -896,7 +913,7 @@ export const coreWords: WordDictionary = {
     },
     'dip2': {
         sig: [[{ type: 'A' }, { type: 'B' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }, { type: 'A' }, { type: 'B' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             const item2 = s?.pop();
@@ -929,7 +946,31 @@ export const coreWords: WordDictionary = {
     },
     'if-else': {
         sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'A', use: 'run!' }], [{ type: 'A' }]],
-        typeCompose: (s) => [s],
+        typeCompose: (s, pl) => {
+            const else_block = toPLOrNull(s?.pop());
+            const then_block = toPLOrNull(s?.pop());
+            const condition = toBoolTypeOrNull(s?.pop());
+            if (condition === null && then_block === null && else_block === null) {
+                s.push("-boolean_t", "-any_t A", "-any_t A", "A");
+                return [s];
+            }
+            if (condition === null && then_block === null && else_block !== null) {
+                s.push("-boolean_t", "-any_t A", else_block);
+                pl.unshift("play");
+                return [s];
+            }
+            if (condition === null && then_block !== null && else_block !== null) {
+                s.push("-boolean_t", then_block );
+                pl.unshift("play");
+                return [s];
+            }
+            if (condition !== null && then_block !== null && else_block !== null) {
+                s.push( then_block );
+                pl.unshift("play");
+                return [s];
+            }
+            return [s, pl];
+        },
 		compose: (s, pl) => {
             const else_block = toPLOrNull(s?.pop());
             const then_block = toPLOrNull(s?.pop());
@@ -957,12 +998,34 @@ export const coreWords: WordDictionary = {
         }
     },
     'ifte': {
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: [['play'], 'dip2', 'if-else']
     },
     '=': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'A' }, { type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: s => {
+            const a = s?.pop();
+            const b = s?.pop();
+            if (a === undefined && b === undefined) {
+                console.log("'=' virtual types");
+                s.push("-any_t A");
+                s.push("-any_t");
+                s.push("A");
+                s.push("boolean_t");
+            }
+            else if (b === undefined) {
+                console.log("'=' one known type", a);
+                s.push(a);
+                s.push("-any_t");
+                s.push("boolean_t");
+            }
+            else {
+                console.log("'=' two known types", a, b);
+                s.push(a);
+                s.push("boolean_t");
+            }
+            return [s];
+        },
 		compose: s => {
             const top = s?.pop();
             const b = toNumOrNull(top);
@@ -992,7 +1055,26 @@ export const coreWords: WordDictionary = {
     },
     '==': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: s => {
+            const a = s?.pop();
+            const b = s?.pop();
+            if (a === undefined && b === undefined) {
+                console.log("'==' virtual types");
+                s.push("-any_t");
+                s.push("-any_t");
+                s.push("boolean_t");
+            }
+            else if (b === undefined) {
+                console.log("'==' one known type", a);
+                s.push("-any_t");
+                s.push("boolean_t");
+            }
+            else {
+                console.log("'==' two known types", a, b);
+                s.push("boolean_t");
+            }
+            return [s];
+        },
 		compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -1020,7 +1102,7 @@ export const coreWords: WordDictionary = {
     },
     '!=': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -1048,7 +1130,7 @@ export const coreWords: WordDictionary = {
     },
     '>': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -1070,7 +1152,7 @@ export const coreWords: WordDictionary = {
     },
     '<': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -1092,7 +1174,7 @@ export const coreWords: WordDictionary = {
     },
     '>=': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -1114,7 +1196,7 @@ export const coreWords: WordDictionary = {
     },
     '<=': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = s?.pop();
             const a = s?.pop();
@@ -1136,7 +1218,7 @@ export const coreWords: WordDictionary = {
     },
     'concat': {
         sig: [[{ type: 'list' }, { type: 'list' }], [{ type: 'list' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toArrOrNull(s?.pop());
             const a = toArrOrNull(s?.pop());
@@ -1148,7 +1230,7 @@ export const coreWords: WordDictionary = {
     },
     'cons': {
         sig: [[{ type: 'any' }, { type: 'list' }], [{ type: 'list' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const b = toArrOrNull(s?.pop());
             const a = s?.pop();
@@ -1160,7 +1242,7 @@ export const coreWords: WordDictionary = {
     },
     'uncons': {
         sig: [[{ type: 'list' }], [{ type: 'any' }, { type: 'list' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
@@ -1171,7 +1253,7 @@ export const coreWords: WordDictionary = {
     },
     'push': {
         sig: [[{ type: 'list' }], [{ type: 'any' }, { type: 'list' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const item = s?.pop();
             const arr = toArrOrNull(s?.pop());
@@ -1183,7 +1265,7 @@ export const coreWords: WordDictionary = {
     },
     'pop': {
         sig: [[{ type: 'list' }], [{ type: 'list' }, { type: 'any' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
@@ -1200,7 +1282,7 @@ export const coreWords: WordDictionary = {
             { type: 'recurse extends (list<words>)' },
             { type: 'final extends (list<words>)' }
         ], []],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s, pl) => {
             // initial increment condition recurse final constrec
             const final = toPLOrNull(s?.pop());
@@ -1225,7 +1307,7 @@ export const coreWords: WordDictionary = {
             { type: 'recurse extends (list<words>)' },
             { type: 'final extends (list<words>)' }
         ], []],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s, pl) => {
             // termtest && terminal && recurse && final linrec 
             const final = toPLOrNull(s?.pop());
@@ -1252,7 +1334,7 @@ export const coreWords: WordDictionary = {
             { type: 'recurse extends (list<words>)' },
             { type: 'final extends (list<words>)' }
         ], []],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s, pl) => {
             // termtest && terminal && recurse && final linrec 
             const final = toPLOrNull(s?.pop());
@@ -1279,7 +1361,7 @@ export const coreWords: WordDictionary = {
             { type: 'recurse extends (list<words>)' },
             { type: 'final extends (list<words>)' }
         ], []],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: (s, pl) => {
             // termtest && terminal && recurse && final binrec 
             const final = toPLOrNull(s?.pop());
@@ -1300,7 +1382,7 @@ export const coreWords: WordDictionary = {
     },
     'times': {
         sig: [[{ type: 'P extends (list<words>)', use: 'runs' }, { type: 'int as n' }], [{ type: 'P n times' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: ['dup', 0, '>', [1, '-', 'swap', 'dup', 'dip2', 'swap', 'times'], ['drop', 'drop'], 'if-else']
     },
     'map': {
@@ -1308,7 +1390,7 @@ export const coreWords: WordDictionary = {
             [{ type: 'valueList extends (list<words>)' },
             { type: 'phrase extends (list<words>)' }],
             [{ type: 'resultValueList extends (list<words>)' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: [["list", "phrase"], [
             [[], "list"],
             ['size', 0, '<='],
@@ -1322,7 +1404,7 @@ export const coreWords: WordDictionary = {
             [{ type: 'valueList extends (list<words>)' },
             { type: 'phrase extends (list<words>)' }],
             [{ type: 'resultValueList extends (list<words>)' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
         compose:
             [["list", "phrase"],
             [
@@ -1341,7 +1423,7 @@ export const coreWords: WordDictionary = {
             [{ type: 'valueList extends (list<words>)' },
             { type: 'phrase extends (list<words>)' }],
             [{ type: 'resultValueList extends (list<words>)' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: [["list", "phrase"], [
             [[], "list"],
             ['size', 0, '<='],
@@ -1356,7 +1438,7 @@ export const coreWords: WordDictionary = {
             { type: 'accumulater (word)' },
             { type: 'phrase extends (list<words>)' }],
             [{ type: 'resultValueList extends (list<words>)' }]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: [["list", "acc", "phrase"], [
             ["acc", "list"],
             ['size', 0, '<='],
@@ -1368,7 +1450,7 @@ export const coreWords: WordDictionary = {
 
     'split': {
         sig: [[{type:"any"}, {type:"list"}, {type:"[{type:boolean}]"}], [{type:"list"}, {type:"list"}]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: [["cutVal", "theList", "operator"], [
             [], [], "cutVal", "theList",
             'size',
@@ -1381,7 +1463,7 @@ export const coreWords: WordDictionary = {
     },
     'size': {
         sig: [[{type:"list"}], [{type:"list"}, {type:"number"}]],
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const arr = toArrOrNull(s[s.length - 1]);
             if (arr) {
@@ -1391,7 +1473,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'outAt': {
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const i = toNumOrNull(s?.pop());
             const arr = toArrOrNull(s[s.length - 1]);
@@ -1407,7 +1489,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'inAt': {
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             const i = toNumOrNull(s?.pop());
             const ele = toWordOrNull(s?.pop());
@@ -1426,21 +1508,21 @@ export const coreWords: WordDictionary = {
     },
 
     'depth': {
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push(s.length);
             return [s];
         }
     },
     'stack-copy': {
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: s => {
             s.push([...s]);
             return [s];
         }
     },
     'popInternalCallStack': {
-        typeCompose: (s) => [s],
+        typeCompose: "compose",
 		compose: []
     }
     // // 'import': {
