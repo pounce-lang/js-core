@@ -8,7 +8,7 @@ const coreWords = require('../dist/index').coreWordDictionary;
 
 const runDebug = (p, debugLevel = 10) => {
   const test2 = interpreter(p, { logLevel: debugLevel });
-  result2 = test2.next();
+  let result2 = test2.next();
   console.error(result2.value);
   while (result2.value && result2.value.active) {
     result2 = test2.next();
@@ -84,9 +84,9 @@ const testIt = (p, expected_result) => {
 
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words", "word", "dup", "swap", "drop", "round", "+", "-", "/", "%", "*", "&", "|", "^", "~", "&&", "||", "!", "E", "LN10", "LN2", "LOG10E", "LOG2E", "PI", "SQRT1_2", "SQRT2", "abs", "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh", "cbrt", "ceil", "cos", "cosh", "exp", "expm1", "floor", "hypot", "log", "log10", "log1p", "log2", "max", "min", "pow", "seedrandom", "random", "sign", "sin", "sinh", "sqrt", "tan", "tanh", "trunc", "play", "pounce", "dip", "dip2", "rotate", "rollup", "rolldown", "if-else", "ifte", "=", "==", "!=", ">", "<", ">=", "<=", "concat", "cons", "uncons", "push", "pop", "constrec", "linrec", "linrec5", "binrec", "dup2", "times", "map", "map2", "filter", "reduce", "split", "size", "outAt", "inAt", "depth", "stack-copy"]]);
-allPassing &= testIt("[dup2] word", [{ "sig": [[{ "type": "A", "use": "observe" }, { "type": "B", "use": "observe" }], [{ "type": "A" }, { "type": "B" }, { "type": "A" }, { "type": "B" }]], "compose": [["dup"], "dip", "dup", ["swap"], "dip"] }]);
-allPassing &= testIt("[word] word", [{ "sig": [[{ "type": "list<string>)" }], [{ "type": "record" }]] }]);
+allPassing &= testIt("words", [["words","word","dup","dup2","swap","drop","round","+","-","/","%","*","&","|","^","~","&&","||","!","E","LN10","LN2","LOG10E","LOG2E","PI","SQRT1_2","SQRT2","abs","acos","acosh","asin","asinh","atan","atan2","atanh","cbrt","ceil","cos","cosh","exp","expm1","floor","hypot","log","log10","log1p","log2","max","min","pow","seedrandom","random","sign","sin","sinh","sqrt","tan","tanh","trunc","play","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","times","map","map2","filter","reduce","split","size","outAt","inAt","depth","stack-copy"]]);
+allPassing &= testIt("[dup2] word", [{"sig":[[{"type":"A","use":"observe"},{"type":"B","use":"observe"}],[{"type":"A"},{"type":"B"},{"type":"A"},{"type":"B"}]],"typeCompose":"compose","compose":[["dup"],"dip","dup",["swap"],"dip"]}]);
+allPassing &= testIt("[word] word", [{"sig":[[{"type":"list<string>)"}],[{"type":"record"}]],"typeCompose":"compose"}]);
 allPassing &= testIt("497 seedrandom random", [0.5311601270295587]);
 allPassing &= testIt("129 seedrandom random random", [0.5081206358755288, 0.5000708460575135]);
 allPassing &= testIt("4 dup drop", [4]);

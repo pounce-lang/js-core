@@ -98,11 +98,11 @@ export const coreWords: WordDictionary = {
         (s, pl) => {
             const a = s?.pop();
             if (a !== undefined) {
-                console.log("'dup' compose known type ", a);
+                // * // console.log("'dup' compose known type ", a);
                 s.push(a, a);
                 return [s];
             }
-            console.log("'dup' compose virtual type ");
+            // * // console.log("'dup' compose virtual type ");
             s.push("-any_t A", "A", "A");
             return [s];
         },
@@ -120,20 +120,20 @@ export const coreWords: WordDictionary = {
             const top = s?.pop();
             const under = s?.pop();
             if (top === undefined && under === undefined) {
-                console.log("'swap' virtual types");
+                // * // console.log("'swap' virtual types");
                 s.push("-any_t A");
                 s.push("-any_t B");
                 s.push("A");
                 s.push("B");
             }
             else if (under === undefined) {
-                console.log("'swap' one known type", top);
+                // * // console.log("'swap' one known type", top);
                 s.push(top);
                 s.push("-any_t A");
                 s.push("A");
             }
             else {
-                console.log("'swap' known types", top, under);
+                // * // console.log("'swap' known types", top, under);
                 s.push(top);
                 s.push(under);
             }
@@ -152,10 +152,10 @@ export const coreWords: WordDictionary = {
         typeCompose: s => { 
             const a = s?.pop();
             if (a === undefined) {
-                console.log("'drop' virtual type");
+                // * // console.log("'drop' virtual type");
                 s.push("-any_t");
             } 
-            console.log("'drop' concrete type", a);
+            // * // console.log("'drop' concrete type", a);
             return [s];
         },
 		compose: s => { s?.pop(); return [s]; }
@@ -176,8 +176,7 @@ export const coreWords: WordDictionary = {
     },
     '+': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        typeCompose: (s) => {
-            // const b = <number | null>toTypeOrNull<number | null>(s?.pop(), 'number');
+        typeCompose: s => {
             const b = toNumTypeOrNull(s?.pop());
             const a = toNumTypeOrNull(s?.pop());
             if (a !== null && b !== null) {
@@ -207,7 +206,23 @@ export const coreWords: WordDictionary = {
     },
     '-': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-		typeCompose: "compose",
+		typeCompose:  s => {
+            const b = toNumTypeOrNull(s?.pop());
+            const a = toNumTypeOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push("number_t");
+                return [s];
+            }
+            if (b !== null) {
+                s.push("-number_t");
+                s.push("number_t");
+                return [s];
+            }
+            s.push("-number_t");
+            s.push("-number_t");
+            s.push("number_t");
+            return [s];
+        },
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -220,7 +235,23 @@ export const coreWords: WordDictionary = {
     },
     '/': {
         sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
-        typeCompose: "compose",
+        typeCompose:  s => {
+            const b = toNumTypeOrNull(s?.pop());
+            const a = toNumTypeOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push("number_t");
+                return [s];
+            }
+            if (b !== null) {
+                s.push("-number_t");
+                s.push("number_t");
+                return [s];
+            }
+            s.push("-number_t");
+            s.push("-number_t");
+            s.push("number_t");
+            return [s];
+        },
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -233,7 +264,23 @@ export const coreWords: WordDictionary = {
     },
     '%': {
         sig: [[{ type: 'number' }, { type: 'number', guard: [0, '!='] }], [{ type: 'number' }]],
-        typeCompose: "compose",
+        typeCompose:  s => {
+            const b = toNumTypeOrNull(s?.pop());
+            const a = toNumTypeOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push("number_t");
+                return [s];
+            }
+            if (b !== null) {
+                s.push("-number_t");
+                s.push("number_t");
+                return [s];
+            }
+            s.push("-number_t");
+            s.push("-number_t");
+            s.push("number_t");
+            return [s];
+        },
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -246,7 +293,23 @@ export const coreWords: WordDictionary = {
     },
     '*': {
         sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
-        typeCompose: "compose",
+        typeCompose:  s => {
+            const b = toNumTypeOrNull(s?.pop());
+            const a = toNumTypeOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push("number_t");
+                return [s];
+            }
+            if (b !== null) {
+                s.push("-number_t");
+                s.push("number_t");
+                return [s];
+            }
+            s.push("-number_t");
+            s.push("-number_t");
+            s.push("number_t");
+            return [s];
+        },
 		compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -840,11 +903,11 @@ export const coreWords: WordDictionary = {
         typeCompose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             if (block !== null) {
-                console.log("'play' compose known type ", block);
+                // * // console.log("'play' compose known type ", block);
                 pl = block.concat(pl);
             }
             else {
-                console.log("'play' compose virtyal type ", block);
+                // * // console.log("'play' compose virtyal type ", block);
                 pl.unshift(block);
             }
             return [s, pl];
@@ -888,7 +951,7 @@ export const coreWords: WordDictionary = {
         typeCompose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             const item = s?.pop();
-            console.log("typeCompose dip", block, item);
+            // * // console.log("typeCompose dip", block, item);
             pl = [item].concat(pl);
             if (block) {
                 pl = block.concat(pl);
@@ -1007,20 +1070,20 @@ export const coreWords: WordDictionary = {
             const a = s?.pop();
             const b = s?.pop();
             if (a === undefined && b === undefined) {
-                console.log("'=' virtual types");
+                // * // console.log("'=' virtual types");
                 s.push("-any_t A");
                 s.push("-any_t");
                 s.push("A");
                 s.push("boolean_t");
             }
             else if (b === undefined) {
-                console.log("'=' one known type", a);
+                // * // console.log("'=' one known type", a);
                 s.push(a);
                 s.push("-any_t");
                 s.push("boolean_t");
             }
             else {
-                console.log("'=' two known types", a, b);
+                // * // console.log("'=' two known types", a, b);
                 s.push(a);
                 s.push("boolean_t");
             }
@@ -1059,18 +1122,18 @@ export const coreWords: WordDictionary = {
             const a = s?.pop();
             const b = s?.pop();
             if (a === undefined && b === undefined) {
-                console.log("'==' virtual types");
+                // * // console.log("'==' virtual types");
                 s.push("-any_t");
                 s.push("-any_t");
                 s.push("boolean_t");
             }
             else if (b === undefined) {
-                console.log("'==' one known type", a);
+                // * // console.log("'==' one known type", a);
                 s.push("-any_t");
                 s.push("boolean_t");
             }
             else {
-                console.log("'==' two known types", a, b);
+                // * // console.log("'==' two known types", a, b);
                 s.push("boolean_t");
             }
             return [s];

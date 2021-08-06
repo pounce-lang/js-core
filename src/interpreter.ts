@@ -25,7 +25,7 @@ const typeStr = (w: Word) => {
   if (r.is(Boolean, w)) {
     return "boolean_t";
   }
-  console.log("typeStr ?? ", w)
+  // * // console.log("typeStr ?? ", w)
   return w;
 };
 
@@ -53,11 +53,11 @@ export function typeCheck(
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
       if (typeof wds.typeCompose === 'function') {
-        console.log("compose types0 ", w, s, pl);
+        // * // console.log("compose types0 ", w, s, pl);
         [s, pl = pl] = wds.typeCompose(s, pl);
       }
       else if (wds.typeCompose === 'compose' && typeof wds.compose === 'function') {
-        console.log("compose types1 ", w, s, pl);
+        // * // console.log("compose types1 ", w, s, pl);
         [s, pl = pl] = wds.compose(s, pl);
       }
       else {
@@ -72,7 +72,7 @@ export function typeCheck(
         let attachTo: string = w as string;
         attachTo = attachTo.substr(-1, 1);
         if (isCap(attachTo)) {
-          console.log("attach concrete type to ", attachTo, w, s, pl);
+          // * // console.log("attach concrete type to ", attachTo, w, s, pl);
           concreteTypes[attachTo] = s.pop();
         }
         else {
@@ -81,7 +81,7 @@ export function typeCheck(
       }
       else if (r.is(String, w) && startsWith(w as string, '-number_t')) {
         const match = checkForType(s, "number_t");
-        console.log("-number_t ->", match);
+        // * // console.log("-number_t ->", match);
         if (match === "none" && level !== 0) {
           s.push("-number_t");
           return s;
@@ -89,7 +89,7 @@ export function typeCheck(
       }
       else if (r.is(String, w) && startsWith(w as string, '-string_t')) {
         const match = checkForType(s, "string_t");
-        console.log("-string_t ->", match);
+        // * // console.log("-string_t ->", match);
         if (match === "none" && level !== 0) {
           s.push("-string_t");
           return s;
@@ -97,20 +97,20 @@ export function typeCheck(
       }
       else if (r.is(String, w) && startsWith(w as string, '-boolean_t')) {
         const match = checkForType(s, "boolean_t");
-        console.log("-boolean_t ->", match);
+        // * // console.log("-boolean_t ->", match);
         if (match === "none" && level !== 0) {
           s.push("-boolean_t");
           return s;
         }
       }
       else if (r.is(String, w) && isCap(w as string)) {
-        console.log("time to substitute in ", concreteTypes[w as string], " for ", w);
-        console.log("s and pl: ",s , pl);
+        // * // console.log("time to substitute in ", concreteTypes[w as string], " for ", w);
+        // * // console.log("s and pl: ",s , pl);
         s.push(concreteTypes[w as string]);
       }
       else if (r.is(Array, w)) {
         // s.push([].concat(w));
-        console.log("recursive call for array ->", w);
+        // * // console.log("recursive call for array ->", w);
         s.push(typeCheck([].concat(w), wd, level+1)); // copy of type checked 'w'
       }
       else {
