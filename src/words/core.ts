@@ -976,7 +976,20 @@ export const coreWords: WordDictionary = {
     },
     'dip2': {
         sig: [[{ type: 'A' }, { type: 'B' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }, { type: 'A' }, { type: 'B' }]],
-        typeCompose: "compose",
+        typeCompose: (s, pl) => {
+            const block = toPLOrNull(s?.pop());
+            const item1 = s?.pop();
+            const item2 = s?.pop();
+            // * // console.log("typeCompose dip", block, item);
+            pl = [item2, item1].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        },
 		compose: (s, pl) => {
             const block = toPLOrNull(s?.pop());
             const item2 = s?.pop();

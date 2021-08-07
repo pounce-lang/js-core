@@ -64,8 +64,9 @@ let tests = [
     ['2 3 [[[+] play] play] play', ["number_t"]], 
     ['true [a] [b] if-else', ["string_t"]],
     ['3 true [1 +] [2 +] if-else', ["number_t"]],
-    // // ['[true] [a] [a] ifte', ["string_t"]],
-    // // ['3 [a b c] [<] split', ["string_t"]],
+    ['true [a] [b] if-else', ["string_t"]],
+    // ['[true] [a] [a] ifte', ["string_t"]],
+    // ['3 [a b c] [<] split', ["string_t"]],
 
 ];
 

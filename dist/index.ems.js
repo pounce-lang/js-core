@@ -3673,7 +3673,21 @@ var coreWords = {
     },
     'dip2': {
         sig: [[{ type: 'A' }, { type: 'B' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }, { type: 'A' }, { type: 'B' }]],
-        typeCompose: "compose",
+        typeCompose: function (s, pl) {
+            var _a, _b, _c;
+            var block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
+            var item1 = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
+            var item2 = (_c = s) === null || _c === void 0 ? void 0 : _c.pop();
+            // * // console.log("typeCompose dip", block, item);
+            pl = [item2, item1].concat(pl);
+            if (block) {
+                pl = block.concat(pl);
+            }
+            else {
+                pl.unshift(block);
+            }
+            return [s, pl];
+        },
         compose: function (s, pl) {
             var _a, _b, _c;
             var block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
