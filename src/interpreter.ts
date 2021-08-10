@@ -41,10 +41,11 @@ const checkForType = (s:ValueStack, ts: string): string => {
 };
 
 export function typeCheck(
-  pl: ProgramList,
+  orig_pl: ProgramList,
   wd: WordDictionary,
-  level: number
+  level: number = 0
 ) {
+  let pl = [...orig_pl];
   let s: ValueStack = [];
   let w: Word;
   let concreteTypes: {[index: string]: Word} = {};
@@ -52,13 +53,19 @@ export function typeCheck(
   while ((w = pl.shift()) !== undefined) {
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
+      if (level > 0) {
+        s.push(w);
+        return s;
+      }
       if (typeof wds.typeCompose === 'function') {
-        // * // console.log("compose types0 ", w, s, pl);
-        [s, pl = pl] = wds.typeCompose(s, pl);
+        // * // console.log("compose types0A ", w, s, pl);
+        [s, pl = pl] = wds.typeCompose(s, pl, wd);
+        // * // console.log("compose types0B ", w, s, pl);
       }
       else if (wds.typeCompose === 'compose' && typeof wds.compose === 'function') {
-        // * // console.log("compose types1 ", w, s, pl);
+        // * // console.log("compose types1A ", w, s, pl);
         [s, pl = pl] = wds.compose(s, pl);
+        // * // console.log("compose types1B ", w, s, pl);
       }
       else {
         const plist = toPLOrNull(wds.compose);
@@ -110,7 +117,7 @@ export function typeCheck(
       }
       else if (r.is(Array, w)) {
         // s.push([].concat(w));
-        // * // console.log("recursive call for array ->", w);
+        // * // console.log("recursive call to level %d, for array ->", (level+1), w);
         s.push(typeCheck([].concat(w), wd, level+1)); // copy of type checked 'w'
       }
       else {

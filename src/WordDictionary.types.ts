@@ -3,7 +3,7 @@ import { ProgramList, ValueStack, TypeList, TypeStack, WordSignature } from "./t
 
 export type WordValue = {
     sig?: WordSignature;
-    typeCompose: string | ProgramList | ((s: ValueStack, pl: ProgramList) =>
+    typeCompose: string | ProgramList | ((s: ValueStack, pl: ProgramList, wd?: WordDictionary) =>
     [ValueStack, ProgramList?]); 
     compose: ProgramList | ((s: ValueStack, pl: ProgramList) =>
         [ValueStack, ProgramList?]);

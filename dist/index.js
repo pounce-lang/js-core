@@ -2651,6 +2651,29 @@ function __spreadArrays() {
     return r;
 }
 
+var compareObjects = function (a, b) {
+    if (a === b)
+        return true;
+    if (typeof a != 'object' || typeof b != 'object' || a == null || b == null)
+        return false;
+    var keysA = Object.keys(a), keysB = Object.keys(b);
+    if (keysA.length != keysB.length)
+        return false;
+    for (var _i = 0, keysA_1 = keysA; _i < keysA_1.length; _i++) {
+        var key = keysA_1[_i];
+        if (!keysB.includes(key))
+            return false;
+        if (typeof a[key] === 'function' || typeof b[key] === 'function') {
+            if (a[key].toString() != b[key].toString())
+                return false;
+        }
+        else {
+            if (!compareObjects(a[key], b[key]))
+                return false;
+        }
+    }
+    return true;
+};
 var rng;
 var toNumTypeOrNull = function (u) {
     return r.is(Number, u) || u === "number_t" ? u : null;
@@ -3727,29 +3750,38 @@ var coreWords = {
     },
     'if-else': {
         sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'A', use: 'run!' }], [{ type: 'A' }]],
-        typeCompose: function (s, pl) {
+        typeCompose: function (s, pl, wd) {
             var _a, _b, _c;
             var else_block = toPLOrNull((_a = s) === null || _a === void 0 ? void 0 : _a.pop());
             var then_block = toPLOrNull((_b = s) === null || _b === void 0 ? void 0 : _b.pop());
+            // * // console.log("'if-else' clauses ", then_block, else_block);
             var condition = toBoolTypeOrNull((_c = s) === null || _c === void 0 ? void 0 : _c.pop());
             if (condition === null && then_block === null && else_block === null) {
                 s.push("-boolean_t", "-any_t A", "-any_t A", "A");
-                return [s];
+                return [s, pl];
             }
             if (condition === null && then_block === null && else_block !== null) {
                 s.push("-boolean_t", "-any_t A", else_block);
                 pl.unshift("play");
-                return [s];
+                return [s, pl];
+            }
+            if (then_block !== null && else_block !== null) {
+                var tc = typeCheck(then_block, wd);
+                var ec = typeCheck(else_block, wd);
+                if (!compareObjects(tc, ec)) {
+                    console.error("squack 'if-else' needs the same type signature for both the 'then' and 'else' clauses.");
+                    return [["'if-else' type check error: then and else clauses types do not match", tc, ec], pl];
+                }
             }
             if (condition === null && then_block !== null && else_block !== null) {
                 s.push("-boolean_t", then_block);
                 pl.unshift("play");
-                return [s];
+                return [s, pl];
             }
             if (condition !== null && then_block !== null && else_block !== null) {
                 s.push(then_block);
                 pl.unshift("play");
-                return [s];
+                return [s, pl];
             }
             return [s, pl];
         },
@@ -3786,7 +3818,7 @@ var coreWords = {
     },
     '=': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'A' }, { type: 'boolean' }]],
-        typeCompose: function (s) {
+        typeCompose: function (s, _, wd) {
             var _a, _b;
             var a = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
             var b = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
@@ -3804,6 +3836,12 @@ var coreWords = {
                 s.push("boolean_t");
             }
             else {
+                var ta = typeCheck([a], wd);
+                var tb = typeCheck([b], wd);
+                if (!compareObjects(ta, tb)) {
+                    console.error("squack '=' needs the same type signature for stack elements.");
+                    return [["'=' type check error: stack elements types do not match", ta, tb]];
+                }
                 // * // console.log("'=' two known types", a, b);
                 s.push(a);
                 s.push("boolean_t");
@@ -3840,7 +3878,7 @@ var coreWords = {
     },
     '==': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: function (s) {
+        typeCompose: function (s, _, wd) {
             var _a, _b;
             var a = (_a = s) === null || _a === void 0 ? void 0 : _a.pop();
             var b = (_b = s) === null || _b === void 0 ? void 0 : _b.pop();
@@ -3856,6 +3894,12 @@ var coreWords = {
                 s.push("boolean_t");
             }
             else {
+                var ta = typeCheck([a], wd);
+                var tb = typeCheck([b], wd);
+                if (!compareObjects(ta, tb)) {
+                    console.error("squack '==' needs the same type signature for stack elements.");
+                    return [["'==' type check error: stack elements types do not match", ta, tb]];
+                }
                 // * // console.log("'==' two known types", a, b);
                 s.push("boolean_t");
             }
@@ -4115,7 +4159,7 @@ var coreWords = {
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
             }
             else {
-                console.log("some stack value(s) not found");
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -4144,7 +4188,7 @@ var coreWords = {
                 pl = __spreadArrays(init, termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
             }
             else {
-                console.log("some stack value(s) not found");
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -4171,7 +4215,7 @@ var coreWords = {
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, [__spreadArrays(nextRec), 'dip'], nextRec, final), 'if-else']).concat(pl);
             }
             else {
-                console.log("some stack value(s) not found");
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -4582,7 +4626,7 @@ var preProcessDefs = function (pl, coreWords) {
             var word = toPLOrNull(next_pl[def_i - 2]);
             var key = toStringOrNull(r.head(toArrOrNull(next_pl[def_i - 1])));
             next_pl.splice(def_i - 2, 3); // splice is particularly mutant
-            next_wd = defineWord(next_wd, key, { "compose": word });
+            next_wd = defineWord(next_wd, key, { "compose": word, typeCompose: "compose" });
         }
         def_i = r.findIndex(function (word) { return word === 'compose'; }, next_pl);
     }
@@ -4621,21 +4665,29 @@ var checkForType = function (s, ts) {
     }
     return "match";
 };
-function typeCheck(pl, wd, level) {
+function typeCheck(orig_pl, wd, level) {
     var _a, _b, _c, _d;
+    if (level === void 0) { level = 0; }
+    var pl = __spreadArrays(orig_pl);
     var s = [];
     var w;
     var concreteTypes = {};
     while ((w = pl.shift()) !== undefined) {
         var wds = r.is(String, w) ? wd[w] : null;
         if (wds) {
+            if (level > 0) {
+                s.push(w);
+                return s;
+            }
             if (typeof wds.typeCompose === 'function') {
-                // * // console.log("compose types0 ", w, s, pl);
-                _a = wds.typeCompose(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
+                // * // console.log("compose types0A ", w, s, pl);
+                _a = wds.typeCompose(s, pl, wd), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
+                // * // console.log("compose types0B ", w, s, pl);
             }
             else if (wds.typeCompose === 'compose' && typeof wds.compose === 'function') {
-                // * // console.log("compose types1 ", w, s, pl);
+                // * // console.log("compose types1A ", w, s, pl);
                 _c = wds.compose(s, pl), s = _c[0], _d = _c[1], pl = _d === void 0 ? pl : _d;
+                // * // console.log("compose types1B ", w, s, pl);
             }
             else {
                 var plist = toPLOrNull(wds.compose);
@@ -4687,7 +4739,7 @@ function typeCheck(pl, wd, level) {
             }
             else if (r.is(Array, w)) {
                 // s.push([].concat(w));
-                // * // console.log("recursive call for array ->", w);
+                // * // console.log("recursive call to level %d, for array ->", (level+1), w);
                 s.push(typeCheck([].concat(w), wd, level + 1)); // copy of type checked 'w'
             }
             else {

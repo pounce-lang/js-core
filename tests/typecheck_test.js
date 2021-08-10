@@ -51,7 +51,7 @@ let tests = [
     ['a 3 drop', ["string_t"]],
     ['a 3 [drop] dip', ["number_t"]],
     ['3 3 =', ["number_t","boolean_t"]],
-    // // // ['3 a =', ["type error in '==' must have matching types: number_t and string_t do not match"]],
+
     ['3 a [3 =] dip', ["number_t","boolean_t","string_t"]],
     ['a [3 3 =] dip', ["number_t","boolean_t","string_t"]],
     ['a [3 3 =] dip drop', ["number_t","boolean_t"]],
@@ -62,11 +62,19 @@ let tests = [
     ['2 3 [+] play', ["number_t"]], 
     ['2 3 [[+] play] play', ["number_t"]], 
     ['2 3 [[[+] play] play] play', ["number_t"]], 
+    ['2 [3 [[+] play] play] play', ["number_t"]], 
+    ['2 [3 [+] play] play', ["number_t"]], 
     ['true [a] [b] if-else', ["string_t"]],
     ['3 true [1 +] [2 +] if-else', ["number_t"]],
+    ['3 true [2 1 +] [3 2 +] if-else', ["number_t","number_t"]],
+    ['3 true [4 1 +] [2 +] if-else', ["'if-else' type check error: then and else clauses types do not match",["number_t"],["-number_t","number_t"]]],
     ['true [a] [b] if-else', ["string_t"]],
-    // ['[true] [a] [a] ifte', ["string_t"]],
-    // ['3 [a b c] [<] split', ["string_t"]],
+    ['[true] [a] [a] ifte', ["string_t"]],
+    // // ['3 [a b c] [<] split', ["string_t"]],
+    ['2 +', ["-number_t", "number_t"]],
+    ['4 3 true [1 +] [[8 +] dip 5 -] if-else', ["number_t","number_t"]],
+    ['3 a ==', ["'==' type check error: stack elements types do not match",["string_t"],["number_t"]]],
+    ['3 a =', ["'=' type check error: stack elements types do not match",["string_t"],["number_t"]]],
 
 ];
 
@@ -97,7 +105,7 @@ tests.forEach((test, i) => {
         //parse then typecheck
         const result_pl = pinna(ps);
         // console.log("calling typeCheck with ", result_pl);
-        const tc_result = typecheck(result_pl, coreWords, 0);
+        const tc_result = typecheck(result_pl, coreWords);
         testCount += 1;
         if (!deepCompare(tc_result, expected_stack)) {
             testsFailed += 1;

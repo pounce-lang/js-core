@@ -4,6 +4,31 @@ import { ProgramList, Word } from '../types';
 import NP from 'number-precision';
 import { unParser as unparse } from "../parser/Pinna";
 import Prando from 'prando';
+import { typeCheck } from "../interpreter";
+
+
+const compareObjects = (a:any, b:any) => {
+    if (a === b) return true;
+   
+    if (typeof a != 'object' || typeof b != 'object' || a == null || b == null) return false;
+   
+    let keysA = Object.keys(a), keysB = Object.keys(b);
+   
+    if (keysA.length != keysB.length) return false;
+   
+    for (let key of keysA) {
+      if (!keysB.includes(key)) return false;
+   
+      if (typeof a[key] === 'function' || typeof b[key] === 'function') {
+        if (a[key].toString() != b[key].toString()) return false;
+      } else {
+        if (!compareObjects(a[key], b[key])) return false;
+      }
+    }
+   
+    return true;
+   }
+
 let rng: { next: () => number };
 
 const toNumTypeOrNull = (u: any): number | null =>
@@ -1022,28 +1047,37 @@ export const coreWords: WordDictionary = {
     },
     'if-else': {
         sig: [[{ type: 'boolean' }, { type: 'A', use: "run!" }, { type: 'A', use: 'run!' }], [{ type: 'A' }]],
-        typeCompose: (s, pl) => {
+        typeCompose: (s, pl, wd) => {
             const else_block = toPLOrNull(s?.pop());
             const then_block = toPLOrNull(s?.pop());
+            // * // console.log("'if-else' clauses ", then_block, else_block);
             const condition = toBoolTypeOrNull(s?.pop());
             if (condition === null && then_block === null && else_block === null) {
                 s.push("-boolean_t", "-any_t A", "-any_t A", "A");
-                return [s];
+                return [s, pl];
             }
             if (condition === null && then_block === null && else_block !== null) {
                 s.push("-boolean_t", "-any_t A", else_block);
                 pl.unshift("play");
-                return [s];
+                return [s, pl];
+            }
+            if (then_block !== null && else_block !== null) {
+                const tc = typeCheck(then_block, wd);
+                const ec = typeCheck(else_block, wd);
+                if (!compareObjects(tc, ec)) {
+                    console.error("squack 'if-else' needs the same type signature for both the 'then' and 'else' clauses.")
+                    return [["'if-else' type check error: then and else clauses types do not match", tc, ec], pl];
+                }
             }
             if (condition === null && then_block !== null && else_block !== null) {
                 s.push("-boolean_t", then_block );
                 pl.unshift("play");
-                return [s];
+                return [s, pl];
             }
             if (condition !== null && then_block !== null && else_block !== null) {
                 s.push( then_block );
                 pl.unshift("play");
-                return [s];
+                return [s, pl];
             }
             return [s, pl];
         },
@@ -1079,7 +1113,7 @@ export const coreWords: WordDictionary = {
     },
     '=': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'A' }, { type: 'boolean' }]],
-        typeCompose: s => {
+        typeCompose: (s, _, wd) => {
             const a = s?.pop();
             const b = s?.pop();
             if (a === undefined && b === undefined) {
@@ -1096,6 +1130,12 @@ export const coreWords: WordDictionary = {
                 s.push("boolean_t");
             }
             else {
+                const ta = typeCheck([a], wd);
+                const tb = typeCheck([b], wd);
+                if (!compareObjects(ta, tb)) {
+                    console.error("squack '=' needs the same type signature for stack elements.")
+                    return [["'=' type check error: stack elements types do not match", ta, tb]];
+                }
                 // * // console.log("'=' two known types", a, b);
                 s.push(a);
                 s.push("boolean_t");
@@ -1131,7 +1171,7 @@ export const coreWords: WordDictionary = {
     },
     '==': {
         sig: [[{ type: 'A' }, { type: 'B' }], [{ type: 'boolean' }]],
-        typeCompose: s => {
+        typeCompose: (s, _, wd) => {
             const a = s?.pop();
             const b = s?.pop();
             if (a === undefined && b === undefined) {
@@ -1146,6 +1186,12 @@ export const coreWords: WordDictionary = {
                 s.push("boolean_t");
             }
             else {
+                const ta = typeCheck([a], wd);
+                const tb = typeCheck([b], wd);
+                if (!compareObjects(ta, tb)) {
+                    console.error("squack '==' needs the same type signature for stack elements.")
+                    return [["'==' type check error: stack elements types do not match", ta, tb]];
+                }
                 // * // console.log("'==' two known types", a, b);
                 s.push("boolean_t");
             }
@@ -1395,7 +1441,7 @@ export const coreWords: WordDictionary = {
                 pl = [...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
             }
             else {
-                console.log("some stack value(s) not found");
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -1423,7 +1469,7 @@ export const coreWords: WordDictionary = {
                 pl = [...init, ...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
             }
             else {
-                console.log("some stack value(s) not found");
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -1449,7 +1495,7 @@ export const coreWords: WordDictionary = {
                 pl = [...termtest, terminal, [...recurse, [...nextRec], 'dip', ...nextRec, ...final], 'if-else'].concat(pl);
             }
             else {
-                console.log("some stack value(s) not found");
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
