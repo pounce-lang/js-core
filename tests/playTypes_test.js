@@ -85,7 +85,7 @@ let allPassing = 1;
 // test playType dictionaries
 const program0 = "t-number t-string swap t-number + ";
 const parsedProgram0 = parse(program0);
-const customWords0 = {
+const typeComposers = {
   'times': {
     compose: (s, pl) => {
       const c = s.pop();
@@ -168,7 +168,7 @@ const customWords0 = {
     // sig: [[], [{ type: 'number' }]],
   }
 };
-const [preProcessedProgram0, corePlusUserDefinedWords0] = preProcessDefs(parsedProgram0, customWords0);
+const [preProcessedProgram0, corePlusUserDefinedWords0] = preProcessDefs(parsedProgram0, typeComposers);
 const runner0 = interpreter(preProcessedProgram0, { wd: corePlusUserDefinedWords0 });
 const result0 = runner0.next();
 if (!(result0.value.active === false && result0.value.stack[0] === 't-string' && result0.value.stack[1] === 't-number')) {
@@ -181,23 +181,23 @@ allPassing &= (result0.value.active === false && result0.value.stack[0] === 't-s
 const program1 = `t-number increment increment 
 [t-number +] [increment] compose `;
 const parsedProgram1 = parse(program1);
-const [preProcessedProgram1, corePlusUserDefinedWords1] = preProcessDefs(parsedProgram1, customWords0);
+const [preProcessedProgram1, corePlusUserDefinedWords1] = preProcessDefs(parsedProgram1, typeComposers);
 const runner1 = purr(preProcessedProgram1, corePlusUserDefinedWords1);
 const result1 = runner1.next();
 allPassing &= (result1.value.active === false && result1.value.stack[0] === 't-number');
 
-allPassing &= testIt("t-number t-number +", ['t-number'], customWords0);
-allPassing &= testIt("t-number +", ['-t-number'], customWords0);
-allPassing &= testIt("+", ['-t-number','-t-number'], customWords0);
-allPassing &= testIt("t-number t-string swap t-number +", ['t-string', 't-number'], customWords0);
-allPassing &= testIt("t-number t-number [+] play", ['t-number'], customWords0);
-allPassing &= testIt("t-string t-number t-number [+ swap] play", ['t-number', 't-string'], customWords0);
-allPassing &= testIt('t-number t-number [[[+] play] play] play', ["t-number"], customWords0);
-allPassing &= testIt('t-number [[t-number [+] play] play] play', ["t-number"], customWords0);
-allPassing &= testIt('[t-number [[+] play] play] play', ["-t-number"], customWords0);
-allPassing &= testIt('t-number t-number -t-number', ["t-number"], customWords0);
-allPassing &= testIt('t-number [dup +] t-number times', ["t-number"], customWords0);
-allPassing &= testIt('t-number [dup dup +] t-number times', ["t-number", "t-number"], customWords0);
+allPassing &= testIt("t-number t-number +", ['t-number'], typeComposers);
+allPassing &= testIt("t-number +", ['-t-number'], typeComposers);
+allPassing &= testIt("+", ['-t-number','-t-number'], typeComposers);
+allPassing &= testIt("t-number t-string swap t-number +", ['t-string', 't-number'], typeComposers);
+allPassing &= testIt("t-number t-number [+] play", ['t-number'], typeComposers);
+allPassing &= testIt("t-string t-number t-number [+ swap] play", ['t-number', 't-string'], typeComposers);
+allPassing &= testIt('t-number t-number [[[+] play] play] play', ["t-number"], typeComposers);
+allPassing &= testIt('t-number [[t-number [+] play] play] play', ["t-number"], typeComposers);
+allPassing &= testIt('[t-number [[+] play] play] play', ["-t-number"], typeComposers);
+allPassing &= testIt('t-number t-number -t-number', ["t-number"], typeComposers);
+allPassing &= testIt('t-number [dup +] t-number times', ["t-number"], typeComposers);
+allPassing &= testIt('t-number [dup dup +] t-number times', ["t-number", "t-number"], typeComposers);
 
 
 console.log("playType Tests Pass:", allPassing === 1);
