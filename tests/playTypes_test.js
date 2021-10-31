@@ -82,6 +82,32 @@ const testIt = (p, expected_result, dict) => {
 
 let allPassing = 1;
 
+// notation for types with guards, constraints
+// type integer 
+//    any value `t-integer`
+//  by guard
+//    non-zero positive `t-integer|0 >|`
+//    non-negative      `t-integer|0 >=|`
+//    even              `t-integer|2 % 0 =|`
+//  by claim
+//    ever increasing       `t-integer(++)`
+//    ever decreasing       `t-integer(--)`
+//    ever constant         `t-integer(==)`
+//  combinations
+//    decreasing, but ever positive   `t-integer(--)|0 >|`
+//    increasing, but ever negative   `t-integer(++)|0 <|`
+//
+// types of lists
+//    any list `t-list`
+//  by guard
+//    non empty    `t-list|len 0 >|`
+//  by claim
+//    ever increasing length   `t-list(++)`
+//  constrain contents
+//    only integers            `t-list<t-integer>`
+//    Union integers, strings  `t-list<t-integer t-string>`
+
+
 // test playType dictionaries
 const program0 = "t-number t-string swap t-number + ";
 const parsedProgram0 = parse(program0);
