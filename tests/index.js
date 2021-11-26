@@ -143,6 +143,7 @@ allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("2 5 +", [7]);
+allPassing &= testIt("5 +", null);
 allPassing &= testIt(".1 .2 +", [0.3]);
 allPassing &= testIt("2 5 -", [-3]);
 allPassing &= testIt("1.0 0.9 -", [0.1]);

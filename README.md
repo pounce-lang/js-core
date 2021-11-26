@@ -32,3 +32,8 @@ pounceState = interp.next();
 }
 console.log(pounceState.value.stack);
 ```
+## build
+```
+npm i
+npm run build
+```
