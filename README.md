@@ -7,14 +7,14 @@ A core dictionary of Pounce words (functions on a value stack) is included. This
 Pounce follows in the footsteps of Joy, Factor, Cat and Kitten, in that it is, [Concatenative](https://concatenative.org/) and a ['stack-based' language](https://wiki.c2.com/?StackBasedLanguage). To summarize, Pounce has:
 * code written in post-fix notation (yes it will feel backwards at first, but post-fix has advantages)
 * very little syntax -- no parentheses, just 'words' or 'lists of words' separated by spaces (at first you might experience syntax withdrawal symptoms)
-* no variables -- a stack is used to store values, (i.e. it's a mostly point-free, stack-based language) (see the word `pounce` for non-varaible naming of stack elements)
+* no variables -- a stack is used to store values, (i.e. it's a mostly point-free, stack-based language) (see the word `pounce` for non-variable naming of stack elements)
 * the nice property that "all words are functions!" including values (e.g the word `5`) where the identity function is used. 
 * the same signature for all words -- they receive a stack as an argument and return a new stack
 * no assignment operator and no side-effects (the program is the input and the final stack is the output)
-* programs that are built up by composing words (rather than the application of functions to variable arguments), concatenative programming is essentailly functional composition into a single function (or program)
+* programs that are built up by composing words (rather than the application of functions to variable arguments), concatenative programming is essentially functional composition into a single function (or program)
 
 ## Quick Start
-To start Pounce programming in the browser, you can [try this demonstration](https://nmorse.github.io/pounce/js/try_pounce.html). You may also clone this [starter project template](https://github.com/pounce-lang/simple-example-app) and extend it how ever you see fix.
+To start Pounce programming in the browser, you can [try this sampler](https://pounce-lang-show-case.netlify.app/). Or clone this [starter project template](https://github.com/pounce-lang/simple-example-app) and extend it how ever you see fit.
 
 ## Try it in RunKit
 [RunKit https://runkit.com/embed/i6tu1bf90mz6](https://runkit.com/embed/i6tu1bf90mz6)
@@ -32,8 +32,13 @@ pounceState = interp.next();
 }
 console.log(pounceState.value.stack);
 ```
-## build
+## to peek in on the code: clone, install, build and test
 ```
 npm i
 npm run build
+```
+
+and run the tests 
+```
+npm run test
 ```
