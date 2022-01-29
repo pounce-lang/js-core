@@ -1616,7 +1616,7 @@ export const coreWords: WordDictionary = {
             const i = toNumOrNull(s?.pop());
             const ele = toWordOrNull(s?.pop());
             let arr: Word[] = toArrOrNull(s?.pop());
-            if (i !== null && ele && arr && arr.length - 1 >= i) {
+            if (i !== null && ele !== null && arr && arr.length - 1 >= i) {
                 arr[i] = ele;
                 s.push(arr);
             }

@@ -294,7 +294,7 @@ allPassing &= testIt('Type_number [[Type_number [+] play] play] play', ["Type_nu
 allPassing &= testIt('[Type_number [[+] play] play] play', ["-Type_number"], typeComposers);
 allPassing &= testIt('Type_number Type_number -Type_number', ["Type_number"], typeComposers);
 allPassing &= testIt('Type_number [dup +] Type_number times', ["Type_number"], typeComposers);
-allPassing &= testIt('Type_number [dup dup +] Type_number times', ["Type_number", "Type_number"], typeComposers);
+allPassing &= testIt('Type_number [dup dup +] Type_number times', ["Type_number+"], typeComposers);
 
 
 console.log("playType Tests Pass:", allPassing === 1);

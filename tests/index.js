@@ -18,6 +18,7 @@ const runDebug = (p, debugLevel = 10) => {
 };
 
 const testIt = (p, expected_result) => {
+  testCount++;
   let pp;
   try {
     pp = parse(p);
@@ -82,6 +83,7 @@ const testIt = (p, expected_result) => {
   return false;
 };
 
+let testCount = 0;
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
 allPassing &= testIt("words", [["words","word","dup","dup2","swap","drop","round","+","-","/","%","*","&","|","^","~","&&","||","!","E","LN10","LN2","LOG10E","LOG2E","PI","SQRT1_2","SQRT2","abs","acos","acosh","asin","asinh","atan","atan2","atanh","cbrt","ceil","cos","cosh","exp","expm1","floor","hypot","log","log10","log1p","log2","max","min","pow","seedrandom","random","sign","sin","sinh","sqrt","tan","tanh","trunc","play","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","times","map","map2","filter","reduce","split","size","outAt","inAt","depth","stack-copy"]]);
@@ -200,6 +202,7 @@ allPassing &= testIt("[1 2] 5 outAt", null);
 allPassing &= testIt("[1 2 3] 2 outAt", [[1, 2, 3], 3]);
 
 allPassing &= testIt("[1 2] 8 0 inAt", [[8, 2]]);
+allPassing &= testIt("[1 2] 0 1 inAt", [[1, 0]]);
 allPassing &= testIt("[1 2 c] d 2 inAt", [[1, 2, 'd']]);
 allPassing &= testIt("[1 2] 5 inAt", null);
 allPassing &= testIt("[1 88 3] 2 1 inAt", [[1, 2, 3]]);
@@ -290,7 +293,7 @@ if (!(result0.value.active === false && result0.value.stack[0] === 5)) {
   console.log("hmmm", result0.value.stack);
 }
 allPassing &= (result0.value.active === false && result0.value.stack[0] === 5);
-
+testCount++;
 
 // set up a production configuration and test purr
 const program1 = "0 increment increment decrement [1 +] [increment] compose [1 -] [decrement] compose";
@@ -299,6 +302,7 @@ const [preProcessedProgram1, corePlusUserDefinedWords1] = preProcessDefs(parsedP
 const runner1 = purr(preProcessedProgram1, corePlusUserDefinedWords1);
 const result1 = runner1.next();
 allPassing &= (result1.value.active === false && result1.value.stack[0] === 1);
+testCount++;
 
 const program2 = "0 [ 1 +] 10000 times";
 const parsedProgram2 = parse(program2);
@@ -306,14 +310,22 @@ const [preProcessedProgram2, corePlusUserDefinedWords2] = preProcessDefs(parsedP
 const runner2 = purr(preProcessedProgram2, corePlusUserDefinedWords2, 100);
 const result2 = runner2.next();
 allPassing &= (result2.value.active === false && result2.value.stack[0] === undefined && result2.value.cyclesConsumed === 100);
+testCount++;
+
 // ... a pounce program that did not finish should be ready to be continued (without parsing)
 const parsedProgram3 = result2.value.prog;
 const [preProcessedProgram3, corePlusUserDefinedWords3] = preProcessDefs(parsedProgram3, coreWords);
 const runner3 = purr(preProcessedProgram3, corePlusUserDefinedWords3);
 const result3 = runner3.next();
 allPassing &= (result3.value.active === false && result3.value.stack[0] === 10000);
+testCount++;
 
-console.log("Pounce Tests Pass:", allPassing === 1);
+if(allPassing === 1) { 
+  console.log(`All ${testCount} Pounce Tests Passed`);
+} else {
+  console.log("Failed to pass all tests!")
+}
+
 
 // runDebug(`
 // [3 8 5 7 10 2 9 1] [2 % 0 !=] filter

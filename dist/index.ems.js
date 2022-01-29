@@ -4251,7 +4251,7 @@ var coreWords = {
             var i = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var ele = toWordOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            if (i !== null && ele && arr && arr.length - 1 >= i) {
+            if (i !== null && ele !== null && arr && arr.length - 1 >= i) {
                 arr[i] = ele;
                 s.push(arr);
             }
