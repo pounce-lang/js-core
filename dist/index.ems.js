@@ -4775,10 +4775,7 @@ function interpreter(pl_in, opt) {
             case 22:
                 _j.sent();
                 _j.label = 23;
-            case 23: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
-            case 24:
-                _j.sent();
-                return [2 /*return*/];
+            case 23: return [2 /*return*/, { stack: s, prog: pl, active: false }];
         }
     });
 }
@@ -4787,47 +4784,48 @@ function interpreter(pl_in, opt) {
 // opt:{ logLevel: 0, yieldOnId: false, preProcessed: true, wd: coreWords_merged_with_preProcessedDefs }
 //
 function purr(pl, wd, cycleLimit) {
-    var s, w, cycles, wds, plist;
+    var s, cycles, w, wds, plist;
     var _a, _b;
-    if (cycleLimit === void 0) { cycleLimit = 1000000; }
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var _c;
+    if (cycleLimit === void 0) { cycleLimit = 100000; }
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
                 s = [];
                 cycles = 0;
-                while ((w = pl.shift()) !== undefined && cycles < cycleLimit) {
-                    cycles += 1;
-                    wds = is(String, w) ? wd[w] : null;
-                    if (wds) {
-                        if (typeof wds.compose === 'function') {
-                            _a = wds.compose(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
-                        }
-                        else {
-                            plist = toPLOrNull(wds.compose);
-                            if (plist) {
-                                pl.unshift.apply(pl, plist);
-                            }
-                        }
+                _d.label = 1;
+            case 1:
+                if (!(pl.length > 0)) return [3 /*break*/, 4];
+                cycles += 1;
+                w = pl.shift();
+                wds = is(String, w) ? wd[w] : null;
+                if (wds) {
+                    if (typeof wds.compose === 'function') {
+                        _a = wds.compose(s, pl), s = _a[0], _b = _a[1], pl = _b === void 0 ? pl : _b;
                     }
-                    else if (w !== undefined && s !== null) {
-                        if (is(Array, w)) {
-                            s.push([].concat(w));
-                        }
-                        else {
-                            s.push(w);
+                    else {
+                        plist = toPLOrNull(wds.compose);
+                        if (plist) {
+                            pl.unshift.apply(pl, plist);
                         }
                     }
                 }
-                if (!(pl.length > 0)) return [3 /*break*/, 2];
-                return [4 /*yield*/, { stack: [], prog: __spreadArrays(s, [w], pl), active: false, cyclesConsumed: cycles }];
-            case 1:
-                _c.sent();
-                return [3 /*break*/, 4];
-            case 2: return [4 /*yield*/, { stack: s, prog: pl, active: false }];
-            case 3:
-                _c.sent();
-                _c.label = 4;
-            case 4: return [2 /*return*/];
+                else if (w !== undefined && s !== null) {
+                    if (is(Array, w)) {
+                        s.push([].concat(w));
+                    }
+                    else {
+                        s.push(w);
+                    }
+                }
+                if (!(cycles >= cycleLimit)) return [3 /*break*/, 3];
+                return [4 /*yield*/, { stack: [], prog: __spreadArrays(s, [w], pl), active: true }];
+            case 2:
+                cycleLimit = (_c = (_d.sent())) !== null && _c !== void 0 ? _c : 1000;
+                cycles = 0;
+                _d.label = 3;
+            case 3: return [3 /*break*/, 1];
+            case 4: return [2 /*return*/, { stack: s, prog: pl, active: false }];
         }
     });
 }

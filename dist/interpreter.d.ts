@@ -11,10 +11,8 @@ export declare function purr(pl: ProgramList, wd: WordDictionary, cycleLimit?: n
     stack: ValueStack;
     prog: Word[];
     active: boolean;
-    cyclesConsumed: number;
-} | {
+}, {
     stack: ValueStack;
     prog: ProgramList;
     active: boolean;
-    cyclesConsumed?: undefined;
-}, void, unknown>;
+}, number>;

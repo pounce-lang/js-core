@@ -203,7 +203,7 @@ export function* interpreter(
   if (internalCallStack.length >= 1000) {
     yield { stack: s, prog: pl, active: false, internalCallStack: [...internalCallStack], error: "callStack size exceeded: this may be an infinite loop" };
   }
-  yield { stack: s, prog: pl, active: false };
+  return { stack: s, prog: pl, active: false };
 }
 
 // (more closer to a) production version interpreter
@@ -213,13 +213,13 @@ export function* interpreter(
 export function* purr(
   pl: ProgramList,
   wd: WordDictionary,
-  cycleLimit: number = 1000000
+  cycleLimit: number = 100000
 ) {
   let s: ValueStack = [];
-  let w;
   let cycles = 0;
-  while ((w = pl.shift()) !== undefined && cycles < cycleLimit) {
+  while (pl.length > 0) {
     cycles += 1;
+    let w = pl.shift();
     let wds: WordValue = r.is(String, w) ? wd[w as string] : null;
     if (wds) {
       if (typeof wds.compose === 'function') {
@@ -240,11 +240,10 @@ export function* purr(
         s.push(w);
       }
     }
+    if (cycles >= cycleLimit) {
+      cycleLimit = (yield { stack: [] as ValueStack, prog: [...s, w, ...pl], active: true }) ?? 1000;
+      cycles = 0;
+    }
   }
-  if (pl.length > 0) {
-    yield { stack: [] as ValueStack, prog: [...s, w, ...pl], active: false, cyclesConsumed: cycles };
-  }
-  else {
-    yield { stack: s, prog: pl, active: false };
-  }
+  return { stack: s, prog: pl, active: false };
 }

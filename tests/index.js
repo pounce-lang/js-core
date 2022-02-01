@@ -45,8 +45,8 @@ const testIt = (p, expected_result) => {
   }
   const itest = interpreter(p);
   let iresult = itest.next();
-  while (iresult.value && iresult.value.active) {
-    iresult = itest.next();
+  while (iresult.value && iresult.value.active && !iresult.done) {
+    iresult = itest.next(100);
   }
   const str_exp = JSON.stringify(expected_result);
   const str_res = JSON.stringify(iresult.value ? iresult.value.stack : "error");
@@ -59,7 +59,7 @@ const testIt = (p, expected_result) => {
       }
       let presult = ptest.next();
       while (presult.value && presult.value.active) {
-        presult = ptest.next();
+        presult = ptest.next(100);
       }
       const str_exp2 = JSON.stringify(expected_result);
       const str_res2 = JSON.stringify(presult.value ? presult.value.stack : "error");
@@ -308,16 +308,11 @@ const program2 = "0 [ 1 +] 10000 times";
 const parsedProgram2 = parse(program2);
 const [preProcessedProgram2, corePlusUserDefinedWords2] = preProcessDefs(parsedProgram2, coreWords);
 const runner2 = purr(preProcessedProgram2, corePlusUserDefinedWords2, 100);
-const result2 = runner2.next();
-allPassing &= (result2.value.active === false && result2.value.stack[0] === undefined && result2.value.cyclesConsumed === 100);
-testCount++;
-
-// ... a pounce program that did not finish should be ready to be continued (without parsing)
-const parsedProgram3 = result2.value.prog;
-const [preProcessedProgram3, corePlusUserDefinedWords3] = preProcessDefs(parsedProgram3, coreWords);
-const runner3 = purr(preProcessedProgram3, corePlusUserDefinedWords3);
-const result3 = runner3.next();
-allPassing &= (result3.value.active === false && result3.value.stack[0] === 10000);
+let result2 = runner2.next();
+while (result2.value && result2.value.active && !result2.done) {
+  result2 = runner2.next(1000);
+}
+allPassing &= (result2.value.active === false && result2.value.stack[0] === 10000 );
 testCount++;
 
 if(allPassing === 1) { 
