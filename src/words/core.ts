@@ -948,6 +948,26 @@ export const coreWords: WordDictionary = {
             return [s, pl];
         }
     },
+    'crouch': {
+        sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
+        typeCompose: "compose",
+		compose: (s, pl) => {
+            const words = toPLOrNull(s?.pop());
+            const argList = toArrOfStrOrNull(s?.pop());
+            if (words !== null && argList) {
+                const values: Word[] = r.map(() => s?.pop(), argList);
+                const localWD: { [index: string]: Word } =
+                    r.zipObj(r.reverse(argList), values);
+                const newWords: ProgramList =
+                    toPLOrNull(subInWD(localWD, words));
+
+                if (newWords) {
+                    s.push(newWords);
+                }
+            }
+            return [s, pl];
+        }
+    },
     'pounce': {
         sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
         typeCompose: "compose",

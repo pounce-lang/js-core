@@ -3590,6 +3590,23 @@ var coreWords = {
             return [s, pl];
         }
     },
+    'crouch': {
+        sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
+        typeCompose: "compose",
+        compose: function (s, pl) {
+            var words = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            var argList = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            if (words !== null && argList) {
+                var values = map(function () { return s === null || s === void 0 ? void 0 : s.pop(); }, argList);
+                var localWD = zipObj(reverse(argList), values);
+                var newWords = toPLOrNull(subInWD(localWD, words));
+                if (newWords) {
+                    s.push(newWords);
+                }
+            }
+            return [s, pl];
+        }
+    },
     'pounce': {
         sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
         typeCompose: "compose",

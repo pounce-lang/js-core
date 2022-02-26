@@ -86,7 +86,7 @@ const testIt = (p, expected_result) => {
 let testCount = 0;
 let allPassing = 1;
 allPassing &= testIt("Hello Pounce", ["Hello", "Pounce"]);
-allPassing &= testIt("words", [["words","word","dup","dup2","swap","drop","round","+","-","/","%","*","&","|","^","~","&&","||","!","E","LN10","LN2","LOG10E","LOG2E","PI","SQRT1_2","SQRT2","abs","acos","acosh","asin","asinh","atan","atan2","atanh","cbrt","ceil","cos","cosh","exp","expm1","floor","hypot","log","log10","log1p","log2","max","min","pow","seedrandom","random","sign","sin","sinh","sqrt","tan","tanh","trunc","play","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","times","map","map2","filter","reduce","split","size","outAt","inAt","depth","stack-copy"]]);
+allPassing &= testIt("words", [["words","word","dup","dup2","swap","drop","round","+","-","/","%","*","&","|","^","~","&&","||","!","E","LN10","LN2","LOG10E","LOG2E","PI","SQRT1_2","SQRT2","abs","acos","acosh","asin","asinh","atan","atan2","atanh","cbrt","ceil","cos","cosh","exp","expm1","floor","hypot","log","log10","log1p","log2","max","min","pow","seedrandom","random","sign","sin","sinh","sqrt","tan","tanh","trunc","play","crouch","pounce","dip","dip2","rotate","rollup","rolldown","if-else","ifte","=","==","!=",">","<",">=","<=","concat","cons","uncons","push","pop","constrec","linrec","linrec5","binrec","times","map","map2","filter","reduce","split","size","outAt","inAt","depth","stack-copy"]]);
 allPassing &= testIt("[dup2] word", [{"sig":[[{"type":"A","use":"observe"},{"type":"B","use":"observe"}],[{"type":"A"},{"type":"B"},{"type":"A"},{"type":"B"}]],"typeCompose":"compose","compose":[["dup"],"dip","dup",["swap"],"dip"]}]);
 allPassing &= testIt("[word] word", [{"sig":[[{"type":"list<string>)"}],[{"type":"record"}]],"typeCompose":"compose"}]);
 allPassing &= testIt("497 seedrandom random", [0.5311601270295587]);
@@ -249,6 +249,11 @@ allPassing &= testIt(`
 [f d b c a h b j e g] 
 [size 1 <=] [] [uncons [>] split] [concat] binrec
 `, [["a", "b", "b", "c", "d", "e", "f", "g", "h", "j"]]);
+
+allPassing &= testIt("0 0 [a b] [a b +] crouch", [[0, 0, '+']]);
+allPassing &= testIt("22 -3 [a b] [a b a + *] crouch", [[22, -3, 22, '+', '*']]);
+allPassing &= testIt(`0.5 1 [m b] [[x] [m x * b +] pounce] crouch`, [[['x'], [0.5, 'x', '*', 1, '+'], 'pounce']]);
+allPassing &= testIt(`4 0.5 1 [m b] [[x] [m x * b +] pounce] crouch play`, [3]);
 
 allPassing &= testIt("0 0 [a b] [a b +] pounce", [0]);
 allPassing &= testIt("0 [a] [a] pounce", [0]);
