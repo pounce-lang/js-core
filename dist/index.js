@@ -3418,12 +3418,13 @@ var coreWords = {
     },
     // Math.max()
     'max': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         typeCompose: "compose",
         compose: function (s) {
             var a = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            if (a !== null) {
-                s.push(Math.max(a));
+            var b = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            if (a !== null && b !== null) {
+                s.push(Math.max(a, b));
                 return [s];
             }
             return [null];
@@ -3431,12 +3432,13 @@ var coreWords = {
     },
     // Math.min()
     'min': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         typeCompose: "compose",
         compose: function (s) {
             var a = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            if (a !== null) {
-                s.push(Math.min(a));
+            var b = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            if (a !== null && b !== null) {
+                s.push(Math.min(a, b));
                 return [s];
             }
             return [null];

@@ -153,6 +153,9 @@ allPassing &= testIt("2 5 *", [10]);
 allPassing &= testIt("2 5 /", [0.4]);
 allPassing &= testIt("2 5 %", [2]);
 allPassing &= testIt("-2 abs", [2]);
+allPassing &= testIt("-2 5 max", [5]);
+allPassing &= testIt("-2 5 min", [-2]);
+
 allPassing &= testIt("0.105 2 round", [0.11]);
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 

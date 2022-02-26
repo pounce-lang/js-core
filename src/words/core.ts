@@ -770,12 +770,13 @@ export const coreWords: WordDictionary = {
     },
     // Math.max()
     'max': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
-            if (a !== null) {
-                s.push(Math.max(a));
+            const b = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(Math.max(a, b));
                 return [s];
             }
             return [null];
@@ -783,12 +784,13 @@ export const coreWords: WordDictionary = {
     },
     // Math.min()
     'min': {
-        sig: [[{ type: 'number' }], [{ type: 'number' }]],
+        sig: [[{ type: 'number' }, { type: 'number' }], [{ type: 'number' }]],
         typeCompose: "compose",
 		compose: s => {
             const a = toNumOrNull(s?.pop());
-            if (a !== null) {
-                s.push(Math.min(a));
+            const b = toNumOrNull(s?.pop());
+            if (a !== null && b !== null) {
+                s.push(Math.min(a, b));
                 return [s];
             }
             return [null];
