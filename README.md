@@ -1,7 +1,9 @@
-# Pounce-lang/core
+# Pounce-lang/js-core
 Pounce is a small concatenative programming language.
 The core of the language includes a parser and an interpreter (written in TypeScript).
 A core dictionary of Pounce words (functions on a value stack) is included. This dictionary can be augmented or replaced with a custom, perhaps more efficient or expressive, dictionary.
+
+also see: c-core and py-core, plus some demos under pounce-lang.
 
 ## about Pounce
 Pounce follows in the footsteps of Joy, Factor, Cat and Kitten, in that it is, [Concatenative](https://concatenative.org/) and a ['stack-based' language](https://wiki.c2.com/?StackBasedLanguage). To summarize, Pounce has:
