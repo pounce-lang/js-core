@@ -4,4 +4,6 @@ export declare const toNumOrNull: (u: any) => number | null;
 export declare const toArrOrNull: (u: any) => [] | null;
 export declare const toStringOrNull: (u: any) => string | null;
 export declare const toPLOrNull: (u: any) => ProgramList | null;
+export declare const toBoolOrNull: (u: any) => boolean | null;
 export declare const coreWords: WordDictionary;
+export declare const clone: <T>(source: T) => T;
