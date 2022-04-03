@@ -971,6 +971,7 @@ export const coreWords: WordDictionary = {
             return [s, pl];
         }
     },
+    // binds names to stack values within one phrase of words
     'crouch': {
         dt:'[[[S+]F][F]]',
         sig: [[{ type: 'list<string>', use: 'pop-each!' }, { type: 'P', use: 'run!' }], [{ type: 'runOf P' }]],
