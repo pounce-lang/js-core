@@ -12,7 +12,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "publish": "rollup -c; npm publish --access public",
-    "test": "node ./tests/parser_test.js; node ./tests/index.js; node ./tests/typecheck_test.js"
+    "test": "node ./tests/parser_test.js; node ./tests/index.js; node ./tests/dt_test.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse",
