@@ -4934,13 +4934,14 @@ var dtWords = {
             var fo = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var fi = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var error = false;
-            // console.log("comp 1 fi fo", fi, fo);
-            if (fo && fi) {
+            // console.log("comp 00 s fi fo", s, fi, fo);
+            if (fo && fi && s.length > 0 && s[s.length - 1] !== "comp") {
                 if (s.length >= fi.length) {
-                    while (fi.length > 0) {
+                    while (fi.length > 0 && s.length > 0 && s[s.length - 1] !== "bind") {
                         var last = toStringOrNull(fi.pop());
                         var top_1 = toStringOrNull(s.pop());
                         if (last === null || top_1 === null || last !== top_1) {
+                            console.log("error: comp 1 mismatch s:", s, " top:", top_1, " fi:", last);
                             s.push("error: comp 1 mismatch s:", top_1, "with fi:", last);
                             error = true;
                         }
@@ -4979,12 +4980,13 @@ var dtWords = {
                 return [s];
             }
             if (fi === null && fo !== null) {
-                // console.log("comp 106", s, fo);
+                console.log("comp 106", s, fo);
                 s.push.apply(s, fo);
                 return [s];
             }
-            console.error("Type error 27", fi, fo);
-            return [null];
+            // console.error("push back comp" , fi, fo);
+            s.push(fi, fo, "comp");
+            return [s];
         }
     },
     'run': {

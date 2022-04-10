@@ -13,15 +13,16 @@ const dtWords: WordDictionary = {
           const fo = toArrOfStrOrNull(s?.pop());
           const fi = toArrOfStrOrNull(s?.pop());
           let error = false;
-          // console.log("comp 1 fi fo", fi, fo);
-          if (fo && fi) {
+          // console.log("comp 00 s fi fo", s, fi, fo);
+          if (fo && fi && s.length > 0 && s[s.length - 1] !== "comp") {
               if(s.length >= fi.length) {
-                  while(fi.length > 0) {
+                  while(fi.length > 0 && s.length > 0 && s[s.length - 1] !== "bind") {
                       const last = toStringOrNull(fi.pop());
                       const top = toStringOrNull(s.pop());
                       if (last === null || top === null || last !== top) {
-                          s.push("error: comp 1 mismatch s:", top, "with fi:", last)
-                          error = true;
+                        console.log("error: comp 1 mismatch s:", s, " top:", top, " fi:", last);
+                        s.push("error: comp 1 mismatch s:", top, "with fi:", last);
+                        error = true;
                       }
                   }
                   if(!error) {
@@ -58,12 +59,14 @@ const dtWords: WordDictionary = {
               return [s];
           }
           if(fi === null && fo !== null) {
-              // console.log("comp 106", s, fo);
+              console.log("comp 106", s, fo);
               s.push(...fo);
               return [s];
           }
-          console.error("Type error 27" , fi, fo);
-          return [null];
+
+          // console.error("push back comp" , fi, fo);
+          s.push(fi, fo, "comp");
+          return [s];
       }
   },
   'run': {
