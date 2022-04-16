@@ -9,86 +9,18 @@ const dtWords: WordDictionary = {
   'comp': {
       sig: [[], []],
       typeCompose: "compose",
-      compose: s => {
-          const fo = toArrOfStrOrNull(s?.pop());
-          const fi = toArrOfStrOrNull(s?.pop());
-          let error = false;
-          // console.log("comp 00 s fi fo", s, fi, fo);
-          if (fo && fi && s.length > 0 && s[s.length - 1] !== "comp") {
-              if(s.length >= fi.length) {
-                  while(fi.length > 0 && s.length > 0 && s[s.length - 1] !== "bind") {
-                      const last = toStringOrNull(fi.pop());
-                      const top = toStringOrNull(s.pop());
-                      if (last === null || top === null || last !== top) {
-                        console.log("error: comp 1 mismatch s:", s, " top:", top, " fi:", last);
-                        s.push("error: comp 1 mismatch s:", top, "with fi:", last);
-                        error = true;
-                      }
-                  }
-                  if(!error) {
-                      // console.log("comp 102");
-                      s.push(...fo);
-                  }
-                  else {
-                      console.log("comp 103");
-                      return null;
-                  }
-              }
-              else {
-                  while(s.length > 0 && fi.length > 0) {
-                      const last = toStringOrNull(fi.pop());
-                      const top = toStringOrNull(s.pop());
-                      if (last === null || top === null || last !== top) {
-                          s.push("error: comp 2 mismatch s:", top, "with fi:", last)
-                          error = true;
-                      }
-                  }
-                  if(!error && fi.length > 0) {
-                      // console.log("comp 104");
-                      s.push(fi, fo, "comp");
-                  }
-                  else if (!error && fi.length === 0) {
-                      console.log("comp 105");
-                      s.push(fo);
-                  }
-                  else {
-                      console.error("Type error 26");
-                      return null;
-                  }
-              }
-              return [s];
-          }
-          if(fi === null && fo !== null) {
-              console.log("comp 106", s, fo);
-              s.push(...fo);
-              return [s];
-          }
-
-          // console.error("push back comp" , fi, fo);
-          s.push(fi, fo, "comp");
-          return [s];
-      }
+      compose: parse("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error] if-else")
   },
   'run': {
       sig: [[], []],
       typeCompose: "compose",
-      compose: (s, pl) => {
-          const block = toPLOrNull(s?.pop());
-          if (block) {
-              // console.log("run 202", block, pl);
-              pl = block.concat(pl);
-          }
-          else {
-              // console.log("run 203", block, pl);
-              pl.unshift(block);
-          }
-          return [s, pl];
-      }
+      compose: ["play"]
+      // compose: parse('[size 0 <=] [drop] [uncons] [] linrec')
   },
   'bind': {
       sig: [[], []],
       typeCompose: "compose",
-      compose: s => {
+      compose: (s, pl) => {
           let fo = toArrOfStrOrNull(s?.pop());
           const fi = toArrOfStrOrNull(s?.pop());
           let error = false;
@@ -96,20 +28,20 @@ const dtWords: WordDictionary = {
               while(s.length > 0 && fi.length > 0) {
                   const se = s.pop();
                   const e = fi.pop();
-                  if (e === "A" || e === "C" || e === "D" || e === "E" || e === "F") {
+                  if (e === "A" || e === "C" || e === "D" || e === "E" || e === "F" || e === "G" || e === "H") {
                       fo = r.map(foe => foe === e? se: foe, fo) as any[];
                   }
               }
               if (fi.length === 0) {
-                  // console.log("bind push 1 s fo", s, fo);
-                  s.push(...fo);
+                  // console.log("bind requeue fo", s, fo);
+                  pl.unshift(...fo);
               }
               else {
-                  // console.log("bind another day push 2 ", fi, fo, "comp");
+                  console.log("bind another day push 2 ", fi, fo, "comp");
                   s.push(fi, fo, "bind");
               }
 
-              return [s];
+              return [s, pl];
           }
           console.error("Type error 28");
           return [null];
@@ -119,41 +51,40 @@ const dtWords: WordDictionary = {
 
 
 const mbr2 = (s: ValueStack, sig: ProgramList): ValueStack => {
-  let initial = r.concat(s, r.unnest(sig));
+  let initial = r.concat(s, sig);
   let typeExp1 = clone(initial);
-  let purrur = purr(initial as ProgramList, dtWords);
+  const allWords = {...dtWords, ...coreWords};
+  let purrur = purr(initial as ProgramList, allWords);
   let typeExp2 = purrur.next().value.stack;
   let count = 0; // just incase there is a bad recursive type def
-  // console.log("mbr 0", typeExp1, typeExp2);
+  // console.log("mbr ", count, typeExp1, typeExp2);
   while (count < 500 && ! compareObjects(typeExp1, typeExp2)) {
     count++;
-    // console.log("mbr *", typeExp1, typeExp2);
+    // console.log("mbr ", count, typeExp1, typeExp2);
     initial = clone(typeExp2);
     typeExp1 = clone(typeExp2);
-    purrur = purr(initial as ProgramList, dtWords);
+    purrur = purr(initial as ProgramList, allWords);
     typeExp2 = purrur.next().value.stack;
   }
   return typeExp2;
 };
 
-export function dtCheck(
+export function typeConversion(
   orig_pl: ProgramList,
 ) {
   let pl = clone(orig_pl);
   let s: ValueStack = [];
   let w: Word;
-  let concreteTypes: { [index: string]: Word } = {};
-  let errorMsg = "";
   while ((w = pl.shift()) !== undefined) {
     let wds: WordValue = r.is(String, w) ? coreWords[w as string] : null;
     if (wds) {
-      // console.log("dtCheck w", w, "s", clone(s), wds?.dt);
+      // console.log("TC w", w, "s", clone(s), wds?.dt);
       s.push(...parse(wds?.dt)[0]);
     }
     else if (w !== undefined && s !== null) {
       if (toNumOrNull(w) !== null) { s.push("N"); }
       else if (toStringOrNull(w) !== null) {
-        if (w === "comp" || w === "bind" || w === "run") {
+        if (w === "comp" || w === "bind" || w === "run" || w === "drop") {
           s.push(w);
         }
         else {
@@ -164,17 +95,19 @@ export function dtCheck(
         s.push("B");
       }
       else if (toArrOrNull(w) !== null) {
-        s.push(dtCheck(w as ProgramList));
+        s.push(typeConversion(w as ProgramList));
       }
       else {
         console.log("TBD handle word", w, "on stack", s);
       }
     }
   }
-  if (pl.length > 0) {
-    return mbr2(s, pl);
-  }
-  else {
-    return mbr2(s, []);
-  }
+  return s;
 }
+
+export function dtCheck(
+  typed_pl: ProgramList,
+) {
+    return mbr2([], typed_pl);
+}
+

@@ -1,134 +1,132 @@
 const pinna = require('../dist/index').parse;
+const unparse = require('../dist/index').unParse;
 const dtcheck = require('../dist/index').dtcheck;
+const typeConv = require('../dist/index').typeConv;
 const coreWords = require('../dist/index').coreWordDictionary;
 
 
 let tests = [
-    ['2', ["N"]],
-    ['true', ["B"]],
-    ['false', ["B"]],
-    ['"abc"', ["S"]],
-    ['2 3 +', ["N"]],
-    ['2 3 + -4 +', ["N"]],
-    // // // ['2 abc +', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    // // // ['twelve 12 +', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['hello world', ["S", "S"]],
-    ['"hello world"', ["S"]],
-    ['2 3 -', ["N"]],
-    // // // ['2 abc -', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    // // // ['twelve 12 -', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['2 3 *', ["N"]],
-    ['2 3 * 6 -', ["N"]],
-    // // // ['2 abc *', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    // // // ['twelve 12 *', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    ['2 3 /', ["N"]],
-    // // // ['2 abc /', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    // // // ['twelve 12 /', [{"error":"An unexpected stack type of 'string' was encountered!","expectedType":"number","encounteredType":"string"}]],
-    // // // ['2 0 /', [{"error":"Guard found that the static value 0 failed to pass its requirement [0 !=]"}]],
-    ['[]', [[]]],
-    ['[][]', [[], []]],
-    ['[2 4 7]', [["N", "N", "N"]]],
-    ['[[]]', [[[]]]],
-    ['[[[]]]', [[[[]]]]],
-    ['[a[b b2]]', [["S", ["S", "S"]]]],
-    ['[a[b b2]] 7', [["S", ["S", "S"]], "N"]],
-    ['[a[b b2[c c2]d]e]', [["S", ["S", "S", ["S", "S"], "S"], "S"]]],
-    ['[a[b b2]c c2[d]e]', [["S", ["S", "S"], "S", "S", ["S"], "S"]]],
-    ['a 2 swap', ["N", "S"]],
-    ['a 2 dup', ["S", "N", "N"]],
-    ['a 2 swap dup', ["N", "S", "S"]],
-    ['[a] 2 swap dup', ["N", ["S"], ["S"]]],
-    ['3 2 a [+] dip', ["N", "S"]],
-    ['3 a [2 +] dip', ["N", "S"]],
-    ['d 2 a [swap] dip', ["N", "S", "S"]],
+    ['2', 'N', 'N'],
+    ['true', 'B', 'B'],
+    ['false', 'B', 'B'],
+    ['"abc"', 'S', 'S'],
+    ['2 3 +', 'N N [N N] [N] comp', 'N'],
+    ['2 3 + -4 +', 'N N [N N] [N] comp N [N N] [N] comp', 'N'],
+    ['2 abc +', 'N S [N N] [N] comp', 'Error'],
+    ['twelve 12 +', 'S N [N N] [N] comp', 'Error'],
+    ['hello world', 'S S', 'S S'],
+    ['"hello world"', "S", "S"],
+    ['2 3 -', 'N N [N N] [N] comp', 'N'],
+    ['2 abc -', 'N S [N N] [N] comp', 'Error'],
+    ['twelve 12 -', 'S N [N N] [N] comp', 'Error'],
+    ['2 3 *', 'N N [N N] [N] comp', 'N'],
+    ['2 3 * 6 -', 'N N [N N] [N] comp N [N N] [N] comp', 'N'],
+    ['2 3 /', 'N N [N N] [N] comp', 'N'],
+    // // ['2 0 /', [{"error":"Guard found that the static value 0 failed to pass its requirement [0 !=]"}]],
+    ['[]', '[]', '[]'],
+    ['[][]', '[] []', '[] []'],
+    ['[2 4 7]', '[N N N]', '[N N N]'],
+    ['[[]]', '[[]]', '[[]]'],
+    ['[[[]]]', '[[[]]]', '[[[]]]'],
+    ['[a[b b2]]', '[S [S S]]', '[S [S S]]'],
+    ['[a[b b2]] 7', '[S [S S]] N', '[S [S S]] N'],
+    ['[a[b b2[c c2]d]e]', '[S [S S [S S] S] S]', '[S [S S [S S] S] S]'],
+    ['[a[b b2]c c2[d]e]', '[S [S S] S S [S] S]', '[S [S S] S S [S] S]'],
+    ['a 2 swap', 'S N [C D] [D C] bind', 'N S'],
+    ['a 2 dup', 'S N [A] [A A] bind', 'S N N'],
+    ['a 2 swap dup', 'S N [C D] [D C] bind [A] [A A] bind', 'N S S'],
+    ['[a] 2 swap dup', '[S] N [C D] [D C] bind [A] [A A] bind', 'N [S] [S]'],
+    ['3 2 a [+] dip', 'N N S [[N N] [N] comp] [A F] [F run A] bind', 'N S'],
+    ['3 a [2 +] dip', 'N S [N [N N] [N] comp] [A F] [F run A] bind', 'N S'],
+    ['d 2 a [swap] dip', 'S N S [[C D] [D C] bind] [A F] [F run A] bind', 'N S S'],
+    ['true a 5 rotate', 'B S N [C D E] [E D C] bind', 'N S B'],
+    ['aa cc 3 rotate', 'S S N [C D E] [E D C] bind', 'N S S'],
+    ['3 true "3" rollup', 'N B S [C D E] [E C D] bind', 'S N B'],
+    ['false 3.14 "c3p0" rolldown', 'B N S [C D E] [D E C] bind', 'N S B'],
+    ['2 a [dup] dip', 'N S [[A] [A A] bind] [A F] [F run A] bind', 'N N S'],
+    ['[a] 3 dup2', '[S] N [C D] [C D C D] bind', '[S] N [S] N'],
+    // ['a 3 dup2', ["S", "N", "S", "N"]],
+    // ['a 3 drop', ["S"]],
+    // ['a 3 [drop] dip', ["N"]],
+    // ['3 3 =', ["N", "B"]],
+    // ['3 a [3 =] dip', ["N", "B", "S"]],
+    // ['a [3 3 =] dip', ["N", "B", "S"]],
+    // ['a [3 3 =] dip drop', ["N", "B"]],
+    // ['5 5 ==', ["B"]],
+    ['5 a ==', 'N S [N N] [B] comp', 'Error'],
+    // ['5 a [6 ==] dip', ["B", "S"]],
+    // ['a [5 5 ==] dip', ["B", "S"]],
+    // ['2 3 [+] play', ["N"]],
+    ['2 3 5 + +', 'N N N [N N] [N] comp [N N] [N] comp', 'N'],
+    ['2 3 5 [+ +] play', 'N N N [[N N] [N] comp [N N] [N] comp] [F] [F run] bind', 'N'],
+    
+    ['1 2 3 [5 + [2 + 6 *] dip] dip', 'N N N [N [N N] [N] comp [N [N N] [N] comp N [N N] [N] comp] [A F] [F run A] bind] [A F] [F run A] bind', 'N N N'],
+    ['2 3 [[+] play] play', 'N N [[[N N] [N] comp] [F] [F run] bind] [F] [F run] bind', 'N'],
+    // ['2 3 [[[+] play] play] play', ["N"]],
+    // ['2 [3 [[+] play] play] play', ["N"]],
+    // ['2 [3 [+] play] play', ["N"]],
+    ['true [a] [b] if-else', 'B [S] [S] [B F F] [F run] bind', 'S'],
+    ['3 true [1 +] [2 +] if-else', 'N B [N [N N] [N] comp] [N [N N] [N] comp] [B F F] [F run] bind', 'N'],
+    // ['3 true [2 1 +] [3 2 +] if-else', ["N", "N"]],
+    // // ['3 true [4 1 +] [2 +] if-else', ["'if-else' type check error: then and else clauses types do not match",["N"],["-N","N"]]],
+    // ['false [a] [a] if-else', ["S"]],
+    ['[true] [a] [a] ifte', '[B] [S] [S] [F G G] [F run G G] bind [B F F] [F run] bind', 'S'],
+    ['true [true &&] play', 'B [B [B B] [B] comp] [F] [F run] bind', 'B'],
+    ['true [true &&] [a] [a] ifte', 'B [B [B B] [B] comp] [S] [S] [F G G] [F run G G] bind [B F F] [F run] bind', 'S'],
+    ['2 +', 'N [N N] [N] comp', 'Error'], // ??
+    ['4 3 true [1 +] [1 -] if-else', 'N N B [N [N N] [N] comp] [N [N N] [N] comp] [B F F] [F run] bind', 'N N'],
+    ['4 3 [8 +] dip 5 -', 'N N [N [N N] [N] comp] [A F] [F run A] bind N [N N] [N] comp', 'N N'],
+    ['4 a [8 +] dip', 'N S [N [N N] [N] comp] [A F] [F run A] bind', 'N S'],
+    ['true a 3 [drop] dip2', 'B S N [[A] [] bind] [A C F] [F run A C] bind', 'S N'],
+    ['4 3 [[8 +] dip] play', 'N N [[N [N N] [N] comp] [A F] [F run A] bind] [F] [F run] bind', 'N N'],
+    ['4 3 [5 - [8 +] dip] play', 'N N [N [N N] [N] comp [N [N N] [N] comp] [A F] [F run A] bind] [F] [F run] bind', 'N N'],
+    ['4 3 [[8 +] dip 5 -] play', 'N N [[N [N N] [N] comp] [A F] [F run A] bind N [N N] [N] comp] [F] [F run] bind', 'N N'],
 
-    ['3 2 5 rotate', ["N", "N", "N"]],
-    ['aa cc 3 rotate', ["N", "S", "S"]],
-    ['3 2 "3" rollup', ["S", "N", "N"]],
-    ['a 3.14 "c3p0" rolldown', ["N", "S", "S"]],
-    ['2 a [dup] dip', ["N", "N", "S"]],
-    ['[a] 3 dup2', [["S"], "N", ["S"], "N"]],
-    ['a 3 dup2', ["S", "N", "S", "N"]],
-    ['a 3 drop', ["S"]],
-    ['a 3 [drop] dip', ["N"]],
-    ['3 3 =', ["N", "B"]],
-
-    ['3 a [3 =] dip', ["N", "B", "S"]],
-    ['a [3 3 =] dip', ["N", "B", "S"]],
-    ['a [3 3 =] dip drop', ["N", "B"]],
-    ['5 5 ==', ["B"]],
-    // // // ['5 a ==', ["type error in '==' must have matching types: N and S do not match"]],
-    ['5 a [6 ==] dip', ["B", "S"]],
-    ['a [5 5 ==] dip', ["B", "S"]],
-    ['2 3 [+] play', ["N"]],
-    ['2 3 5 [+ +] play', ["N"]],
-    ['2 3 [[+] play] play', ["N"]],
-    ['2 3 [[[+] play] play] play', ["N"]],
-    ['2 [3 [[+] play] play] play', ["N"]],
-    ['2 [3 [+] play] play', ["N"]],
-    ['true [a] [b] if-else', ["S"]],
-    ['3 true [1 +] [2 +] if-else', ["N"]],
-    ['3 true [2 1 +] [3 2 +] if-else', ["N", "N"]],
-    // ['3 true [4 1 +] [2 +] if-else', ["'if-else' type check error: then and else clauses types do not match",["N"],["-N","N"]]],
-    ['false [a] [a] if-else', ["S"]],
-    ['[true] [a] [a] ifte', ["S"]],
-    // // ['2 +', ["-N", "N"]], // ??
-    ['4 3 true [1 +] [1 -] if-else', ["N", "N"]],
-    ['4 3 [8 +] dip 5 -', ["N","N"]],
-    ['4 a [8 +] dip', ["N","S"]],
-    ['true a 3 [drop] dip2', ["S", "N"]],
-    // ['4 3 [[8 +] dip 5 -] play', ["N","N"]],
-    // ['4 3 true [1 +] [[8 +] dip 5 -] if-else', ["N","N"]],
+    ['4 3 true [1 +] [[8 +] dip 5 -] if-else', 'N N B [N [N N] [N] comp] [[N [N N] [N] comp] [A F] [F run A] bind N [N N] [N] comp] [B F F] [F run] bind', 'N N'],
     // // ['3 a ==', ["'==' type check error: stack elements types do not match",["S"],["N"]]],
     // // ['3 a =', ["'=' type check error: stack elements types do not match",["S"],["N"]]],
     // // ['0 1 [dup2 +] 5 times', [["*N"]]],
     // // // ['6 [3 8 5 7 10 2 9 1] [>] split', [["*N"],["*N"]]],
-
 ];
 
-function cmpLists(a, b) {
-    let same = true;
-    if (a.length === b.length) {
-        a.forEach((a_ele, i) => {
-            if (a[i] !== b[i]) {
-                same = false;
-            }
-        });
-    }
-    else {
-        same = false;
-    }
-    return same;
-}
 
 console.log('Starting type check tests:');
 let testCount = 0;
 let testsFailed = 0;
 tests.forEach((test, i) => {
     const ps = test[0];
-    const expected_stack = test[1];
+    const expect_interim = test[1];
+    const expected_stack = test[2];
 
     // console.log(`starting parse test for: '${ps}'`);
     try {
         //parse then typecheck
-        const result_pl = pinna(ps);
-        // console.log("calling typeCheck with ", result_pl);
-        const tc_result = dtcheck(result_pl, coreWords);
+        const parsed_pl = pinna(ps);
+        // console.log("calling typeConversion with ", parsed_pl);
+        const tc_interim = typeConv(parsed_pl, coreWords);
+        // console.log(unparse(tc_interim)); 
         testCount += 1;
-        if (!deepCompare(tc_result, expected_stack)) {
+        if (!deepCompare(unparse(tc_interim), expect_interim)) {
             testsFailed += 1;
-            console.log(JSON.stringify(tc_result), ' expected:', expected_stack);
-            console.log('---- Failed typecheck test for: ', ps);
-            tests[i][2] = false;
-            tests[i][3] = tc_result;
+            console.log(unparse(tc_interim), ' expected interim:', expect_interim);
+            console.log('---- Failed interim typecheck test for: ', ps);
         }
         else {
-            tests[i][2] = true;
+            //console.log("passed interim ", expect_interim);
+            tests[i][3] = true;
+            //console.log("tc_interim", tc_interim);
+            const tc_stack = dtcheck(tc_interim);
+            //console.log("tc_stack", tc_stack);
+            if (!deepCompare(unparse(tc_stack), expected_stack)) {
+                testsFailed += 1;
+                console.log(unparse(tc_stack), ' expected stack:', expected_stack);
+                console.log('---- Failed stack typecheck test for: ', ps);
+            }
         }
     }
     catch (e) {
         if (tests[i][1][0] !== "type error") {
-            tests[i][2] = false;
+            tests[i][3] = false;
             testsFailed += 1;
             console.log(`Type error in: '${tests[i][0]}' Exception: ${e}`);
         }
