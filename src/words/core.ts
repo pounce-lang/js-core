@@ -776,7 +776,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'pounce': {
-        dt: '[[[S+]F][[Fi][Fo]mbr]]',
+        dt: '[[[S+]F][F run]]',
         compose: (s, pl) => {
             const words = toPLOrNull(s?.pop());
             const argList = toArrOfStrOrNull(s?.pop());
@@ -1036,6 +1036,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'concat': {
+        dt: '[[[A*] [C*]][[A* C*]] bind]',
         compose: s => {
             const b = toArrOrNull(s?.pop());
             const a = toArrOrNull(s?.pop());
@@ -1046,6 +1047,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'cons': {
+        dt: '[[A [C*]][[A C*]] bind]',
         compose: s => {
             const b = toArrOrNull(s?.pop());
             const a = s?.pop();
@@ -1056,6 +1058,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'uncons': {
+        dt: '[[[A+]][Af [Ar]] bind]',
         compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
@@ -1065,6 +1068,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'push': {
+        dt: '[[[A*] C][[A C]] bind]',
         compose: s => {
             const item = s?.pop();
             const arr = toArrOrNull(s?.pop());
@@ -1075,6 +1079,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'pop': {
+        dt: '[[[A+]][[Ab] Al] bind]',
         compose: s => {
             const arr = toArrOrNull(s?.pop());
             if (arr) {
@@ -1084,7 +1089,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'constrec': {
-        dt: '[] []',
+        dt: '[[F][G][H][I][J]] [J run H run F run...]',
         //     { type: 'initial extends (list<words>)' },
         //     { type: 'increment extends (list<words>)' },
         //     { type: 'condition extends (list<words>)' },
@@ -1103,13 +1108,14 @@ export const coreWords: WordDictionary = {
                 pl = [...initial, ...increment, ...condition, [...recurse, ...nextRec], final, 'if-else'].concat(pl);
             }
             else {
+                console.error("some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             return [s, pl];
         }
     },
     'linrec': {
-        
+        dt: '[[F][G][H][I]] [I run H [G run I H G F linrec F run] if-else]',
         //     { type: 'termTest extends (list<words>)' },
         //     { type: 'terminal extends (list<words>)' },
         //     { type: 'recurse extends (list<words>)' },
@@ -1117,10 +1123,10 @@ export const coreWords: WordDictionary = {
         // ], []],
         compose: (s, pl) => {
             // termtest && terminal && recurse && final linrec 
-            const final = toPLOrNull(s?.pop());
-            const recurse = toPLOrNull(s?.pop());
-            const terminal = toPLOrNull(s?.pop());
-            const termtest = toPLOrNull(s?.pop());
+            const final = toPLOrNull(s?.pop());    // F
+            const recurse = toPLOrNull(s?.pop());  // G
+            const terminal = toPLOrNull(s?.pop()); // H
+            const termtest = toPLOrNull(s?.pop()); // I
             if (termtest && terminal && recurse && final) {
                 const nextRec = [termtest, terminal, recurse, final, 'linrec', ...final];
                 pl = [...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
@@ -1134,7 +1140,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'linrec5': {
-        
+        dt: '[[F][G][H][I][J]] [J run H run F run...]',
         //     { type: 'init extends (list<words>)' },
         //     { type: 'termTest extends (list<words>)' },
         //     { type: 'terminal extends (list<words>)' },

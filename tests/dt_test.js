@@ -83,9 +83,9 @@ let tests = [
     ['4 3 [[8 +] dip 5 -] play', 'N N [[N [N N] [N] comp] [A F] [F run A] bind N [N N] [N] comp] [F] [F run] bind', 'N N'],
 
     ['4 3 true [1 +] [[8 +] dip 5 -] if-else', 'N N B [N [N N] [N] comp] [[N [N N] [N] comp] [A F] [F run A] bind N [N N] [N] comp] [B F F] [F run] bind', 'N N'],
-    // // ['3 a ==', ["'==' type check error: stack elements types do not match",["S"],["N"]]],
-    // // ['3 a =', ["'=' type check error: stack elements types do not match",["S"],["N"]]],
-    // // ['0 1 [dup2 +] 5 times', [["*N"]]],
+    ['3 a ==', 'N S [N N] [B] comp', 'Error'],
+    ['3 a =', 'N S [N N] [N B] comp', 'Error'],
+    ['0 1 [dup2 +] 5 times', 'N N [[C D] [C D C D] bind [N N] [N] comp] N F N', 'N N [[C D] [C D C D] bind [N N] [N] comp] N F N'],
     // // // ['6 [3 8 5 7 10 2 9 1] [>] split', [["*N"],["*N"]]],
 ];
 

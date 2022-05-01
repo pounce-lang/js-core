@@ -3415,7 +3415,7 @@ var coreWords = {
         }
     },
     'pounce': {
-        dt: '[[[S+]F][[Fi][Fo]mbr]]',
+        dt: '[[[S+]F][F run]]',
         compose: function (s, pl) {
             var words = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var argList = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -3669,6 +3669,7 @@ var coreWords = {
         }
     },
     'concat': {
+        dt: '[[[A*] [C*]][[A* C*]] bind]',
         compose: function (s) {
             var b = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var a = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -3679,6 +3680,7 @@ var coreWords = {
         }
     },
     'cons': {
+        dt: '[[A [C*]][[A C*]] bind]',
         compose: function (s) {
             var b = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var a = s === null || s === void 0 ? void 0 : s.pop();
@@ -3689,6 +3691,7 @@ var coreWords = {
         }
     },
     'uncons': {
+        dt: '[[[A+]][Af [Ar]] bind]',
         compose: function (s) {
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             if (arr) {
@@ -3698,6 +3701,7 @@ var coreWords = {
         }
     },
     'push': {
+        dt: '[[[A*] C][[A C]] bind]',
         compose: function (s) {
             var item = s === null || s === void 0 ? void 0 : s.pop();
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -3708,6 +3712,7 @@ var coreWords = {
         }
     },
     'pop': {
+        dt: '[[[A+]][[Ab] Al] bind]',
         compose: function (s) {
             var arr = toArrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             if (arr) {
@@ -3717,7 +3722,7 @@ var coreWords = {
         }
     },
     'constrec': {
-        dt: '[] []',
+        dt: '[[F][G][H][I][J]] [J run H run F run...]',
         //     { type: 'initial extends (list<words>)' },
         //     { type: 'increment extends (list<words>)' },
         //     { type: 'condition extends (list<words>)' },
@@ -3735,10 +3740,15 @@ var coreWords = {
                 var nextRec = [[], increment, condition, recurse, final, 'constrec'];
                 pl = __spreadArrays(initial, increment, condition, [__spreadArrays(recurse, nextRec), final, 'if-else']).concat(pl);
             }
+            else {
+                console.error("some stack value(s) not found");
+                // throw new Error("stack value(s) not found");
+            }
             return [s, pl];
         }
     },
     'linrec': {
+        dt: '[[F][G][H][I]] [I run H [G run I H G F linrec F run] if-else]',
         //     { type: 'termTest extends (list<words>)' },
         //     { type: 'terminal extends (list<words>)' },
         //     { type: 'recurse extends (list<words>)' },
@@ -3746,10 +3756,10 @@ var coreWords = {
         // ], []],
         compose: function (s, pl) {
             // termtest && terminal && recurse && final linrec 
-            var final = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            var recurse = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            var terminal = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            var termtest = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            var final = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop()); // F
+            var recurse = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop()); // G
+            var terminal = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop()); // H
+            var termtest = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop()); // I
             if (termtest && terminal && recurse && final) {
                 var nextRec = __spreadArrays([termtest, terminal, recurse, final, 'linrec'], final);
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
@@ -3763,6 +3773,7 @@ var coreWords = {
         }
     },
     'linrec5': {
+        dt: '[[F][G][H][I][J]] [J run H run F run...]',
         //     { type: 'init extends (list<words>)' },
         //     { type: 'termTest extends (list<words>)' },
         //     { type: 'terminal extends (list<words>)' },
