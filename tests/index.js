@@ -153,8 +153,14 @@ allPassing &= testIt("2 5 %", [2]);
 allPassing &= testIt("-2 abs", [2]);
 allPassing &= testIt("-2 5 max", [5]);
 allPassing &= testIt("-2 5 min", [-2]);
-
-allPassing &= testIt("0.105 2 round", [0.11]);
+allPassing &= testIt("4.71 0.628 + sin dup *", [0.6570812154008993]);
+allPassing &= testIt("0.1 0.2 +", [0.3]);    // = 0.3, not 0.30000000000000004
+allPassing &= testIt("2.3 2.4 +", [4.7]);    // = 4.7, not 4.699999999999999
+allPassing &= testIt("1.0 0.9 -", [0.1]);    // = 0.1, not 0.09999999999999998
+allPassing &= testIt("3 0.3 *", [0.9]);      // = 0.9, not 0.8999999999999999
+allPassing &= testIt("0.362 100 *", [36.2]); // = 36.2, not 36.199999999999996
+allPassing &= testIt("1.21 1.1 /", [1.1]);   // = 1.1, not 1.0999999999999999
+allPassing &= testIt("0.105 2 round", [0.11]); // = 0.11, not 0.1
 allPassing &= testIt("0 1 [dup2 +] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
 // discrete ops

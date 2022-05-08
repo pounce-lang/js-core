@@ -5,6 +5,8 @@ import NP from 'number-precision';
 import { unParser as unparse } from "../parser/Pinna";
 import Prando from 'prando';
 
+NP.enableBoundaryChecking(false);
+
 
 export const compareObjects = (a: any, b: any) => {
     if (a === b) return true;

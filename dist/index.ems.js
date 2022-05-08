@@ -2645,6 +2645,7 @@ function __spreadArrays() {
     return r;
 }
 
+NP.enableBoundaryChecking(false);
 var compareObjects = function (a, b) {
     if (a === b)
         return true;
