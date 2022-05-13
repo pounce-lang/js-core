@@ -268,6 +268,13 @@ allPassing &= testIt("0 [a] [a] pounce", [0]);
 allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] pounce", [27]);
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] pounce", [11]);
 
+allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] crouch", [[2, 4, "*", 3, "+"]]);
+
+allPassing &= testIt("3 type-of", ['Nat']);
+allPassing &= testIt("-3 type-of", ['Neg']);
+allPassing &= testIt("apple type-of", ['Str']);
+allPassing &= testIt("[apple 3] type-of", ['List']);
+
 allPassing &= testIt(`
 210 2 [] 
 [[p n fs] [p n fs p 1 <=] pounce]
@@ -324,10 +331,10 @@ let result2 = runner2.next();
 while (result2.value && result2.value.active && !result2.done) {
   result2 = runner2.next(1000);
 }
-allPassing &= (result2.value.active === false && result2.value.stack[0] === 10000 );
+allPassing &= (result2.value.active === false && result2.value.stack[0] === 10000);
 testCount++;
 
-if(allPassing === 1) { 
+if (allPassing === 1) {
   console.log(`All ${testCount} Pounce Tests Passed`);
 } else {
   console.log("Failed to pass all tests!")

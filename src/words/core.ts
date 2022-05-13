@@ -1169,7 +1169,7 @@ export const coreWords: WordDictionary = {
         }
     },
     'binrec': {
-        
+
         //     { type: 'termTest extends (list<words>)' },
         //     { type: 'terminal extends (list<words>)' },
         //     { type: 'recurse extends (list<words>)' },
@@ -1223,10 +1223,10 @@ export const coreWords: WordDictionary = {
             ], "pounce"]
     },
     'filter': {
-        
-            // [{ type: 'valueList extends (list<words>)' },
-            // { type: 'phrase extends (list<words>)' }],
-            // [{ type: 'resultValueList extends (list<words>)' }]],
+
+        // [{ type: 'valueList extends (list<words>)' },
+        // { type: 'phrase extends (list<words>)' }],
+        // [{ type: 'resultValueList extends (list<words>)' }]],
         compose: [["list", "phrase"], [
             [[], "list"],
             ['size', 0, '<='],
@@ -1236,11 +1236,11 @@ export const coreWords: WordDictionary = {
         ], "pounce"]
     },
     'reduce': {
-        
-            // [{ type: 'valueList extends (list<words>)' },
-            // { type: 'accumulater (word)' },
-            // { type: 'phrase extends (list<words>)' }],
-            // [{ type: 'resultValueList extends (list<words>)' }]],
+
+        // [{ type: 'valueList extends (list<words>)' },
+        // { type: 'accumulater (word)' },
+        // { type: 'phrase extends (list<words>)' }],
+        // [{ type: 'resultValueList extends (list<words>)' }]],
         compose: [["list", "acc", "phrase"], [
             ["acc", "list"],
             ['size', 0, '<='],
@@ -1317,7 +1317,7 @@ export const coreWords: WordDictionary = {
     },
     'popInternalCallStack': {
         compose: []
-    }
+    },
     // // 'import': {
     // //     definition: function (s: Json[], pl: PL, wordstack: Dictionary[]) {
     // //         const importable = toString(s?.pop());
@@ -1340,13 +1340,6 @@ export const coreWords: WordDictionary = {
     // //             // given a dictionary
     // //             wordstack.push(importable);
     // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'abs': {
-    // //     definition: function (s: Json[]) {
-    // //         const n = s?.pop();
-    // //         s.push(Math.abs(n));
     // //         return [s, pl];
     // //     }
     // // },
@@ -1425,92 +1418,31 @@ export const coreWords: WordDictionary = {
     // //         return [s, pl];
     // //     }
     // // },
-    // // 'depth': {
-    // //     expects: [], effects: [1], tests: [], desc: 'stack depth',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         s.push(s.length);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'and': {
-    // //     expects: [{ desc: 'a', ofType: 'boolean' }, { desc: 'b', ofType: 'boolean' }], effects: [-1], tests: [], desc: 'logical and',
-    // //     definition: function (s: Json[]) {
-    // //         const b = toBoolean(s?.pop());
-    // //         const a = toBoolean(s?.pop());
-    // //         s.push(a && b);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'or': {
-    // //     expects: [{ desc: 'a', ofType: 'boolean' }, { desc: 'b', ofType: 'boolean' }], effects: [-1], tests: [], desc: 'logical or',
-    // //     definition: function (s: Json[]) {
-    // //         const b = toBoolean(s?.pop());
-    // //         const a = toBoolean(s?.pop());
-    // //         s.push(a || b);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'not': {
-    // //     expects: [{ desc: 'a', ofType: 'boolean' }], effects: [0], tests: [], desc: 'logical not',
-    // //     definition: function (s: Json[]) {
-    // //         const a = toBoolean(s?.pop());
-    // //         s.push(!a);
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'bubble-up': {
-    // //     'requires': 'list_module',
-    // //     'named-args': ['c'],
-    // //     'local-words': {
-    // //     },
-    // //     'definition': [[], ['cons'], 'c', 'repeat', 'swap', [['uncons'], 'c', 'repeat', 'drop'], 'dip']
-    // // },
-    // // 'case': {
-    // //     expects: [{ desc: 'key', ofType: 'word' }, { desc: 'a', ofType: 'record' }], effects: [-2], tests: [], desc: 'play a matching case',
-    // //     definition: function (s: Json[], pl: PL) {
-    // //         const case_record = s?.pop();
-    // //         let key = s?.pop();
-    // //         if (key === " ") {
-    // //             key = "' '";
-    // //         }
-    // //         if (case_record[key]) {
-    // //             if (isArray(case_record[key])) {
-    // //                 pl = [case_record[key]].concat(pl);
-    // //             }
-    // //             else {
-    // //                 pl.unshift(case_record[key]);
-    // //             }
-    // //         }
-    // //         else {
-    // //             s.push(false);
-    // //         }
-    // //         return [s, pl];
-    // //     }
-    // // },
-    // // 'floor': ['dup', 1, '%', '-'],
-    // // 'filter': {
-    // //     'requires': 'list_module',
-    // //     'local-words': {
-    // //         'setup-filter': [[]],
-    // //         'process-filter': [
-    // //             ["size"], "dip2", "rolldown", 0, ">",
-    // //             ["rotate", "pop", "rolldown", ["dup"], "dip", "dup", ["play"], "dip", "swap",
-    // //                 [["swap"], "dip2", ["prepend"], "dip"],
-    // //                 [["swap"], "dip2", ["drop"], "dip"], "if-else", "swap", "process-filter"],
-    // //             [["drop", "drop"], "dip"], "if-else"]
-    // //     },
-    // //     'definition': ['setup-filter', 'process-filter']
-    // // },
-    // // 'reduce': {
-    // //     'requires': 'list_module',
-    // //     'local-words': {
-    // //         'more?': ['rolldown', 'size', 0, '>', ['rollup'], 'dip'],
-    // //         'process-reduce': ['more?', ['reduce-step', 'process-reduce'], 'if'],
-    // //         'reduce-step': [['pop'], 'dip2', 'dup', [['swap'], 'dip', 'play'], 'dip'],
-    // //         'teardown-reduce': ['drop', ['drop'], 'dip'],
-    // //     },
-    // //     'definition': ['process-reduce', 'teardown-reduce']
-    // // }
+    'type-of': {
+        compose: s => {
+            const item = s?.pop();
+            const aNumber = toNumOrNull(item);
+            if (aNumber && aNumber >= 0) {
+                s.push("Nat");
+                return [s];
+            }
+            if (aNumber && aNumber < 0) {
+                s.push("Neg");
+                return [s];
+            }
+            const aString = toStringOrNull(item);
+            if (aString) {
+                s.push("Str");
+                return [s];
+            }
+            const aList = toArrOrNull(item);
+            if (aList) {
+                s.push("List");
+                return [s];
+            }
+            return null;
+        }
+    }
 
 };
 
