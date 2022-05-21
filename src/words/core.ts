@@ -1419,7 +1419,7 @@ export const coreWords: WordDictionary = {
     // //     }
     // // },
     'type-of': {
-        compose: s => {
+        compose: (s, pl) => {
             const item = s?.pop();
             const aNumber = toNumOrNull(item);
             if (aNumber && aNumber >= 0) {
@@ -1437,10 +1437,36 @@ export const coreWords: WordDictionary = {
             }
             const aList = toArrOrNull(item);
             if (aList) {
-                s.push("List");
-                return [s];
+                pl.unshift("map");
+                pl.unshift(["type-of"]);
+                pl.unshift(aList);
+                return [s, pl];
             }
             return null;
+        }
+    },
+    'is-a-type': {
+        compose: (s, pl) => {
+            const item = s?.pop();
+            const aString = toStringOrNull(item);
+            if (aString && 
+                (  aString === 'Str' 
+                || aString === 'Nat' 
+                || aString === 'Neg' 
+                || aString === 'Zero' 
+                )) {
+                s.push(true);
+                return [s];
+            }
+            const aList = toArrOrNull(item);
+            if (aList) {
+                pl.unshift("map");
+                pl.unshift(["is-a-type"]);
+                pl.unshift(aList);
+                return [s, pl];
+            }
+            s.push(false);
+            return [s];
         }
     }
 

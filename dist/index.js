@@ -4045,7 +4045,7 @@ var coreWords = {
     // //     }
     // // },
     'type-of': {
-        compose: function (s) {
+        compose: function (s, pl) {
             var item = s === null || s === void 0 ? void 0 : s.pop();
             var aNumber = toNumOrNull(item);
             if (aNumber && aNumber >= 0) {
@@ -4063,10 +4063,35 @@ var coreWords = {
             }
             var aList = toArrOrNull(item);
             if (aList) {
-                s.push("List");
-                return [s];
+                pl.unshift("map");
+                pl.unshift(["type-of"]);
+                pl.unshift(aList);
+                return [s, pl];
             }
             return null;
+        }
+    },
+    'is-a-type': {
+        compose: function (s, pl) {
+            var item = s === null || s === void 0 ? void 0 : s.pop();
+            var aString = toStringOrNull(item);
+            if (aString &&
+                (aString === 'Str'
+                    || aString === 'Nat'
+                    || aString === 'Neg'
+                    || aString === 'Zero')) {
+                s.push(true);
+                return [s];
+            }
+            var aList = toArrOrNull(item);
+            if (aList) {
+                pl.unshift("map");
+                pl.unshift(["is-a-type"]);
+                pl.unshift(aList);
+                return [s, pl];
+            }
+            s.push(false);
+            return [s];
         }
     }
 };
