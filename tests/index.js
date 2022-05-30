@@ -280,6 +280,7 @@ allPassing &= testIt("Nat type-of", ['Type']);
 allPassing &= testIt("Neg type-of", ['Type']);
 allPassing &= testIt("Zero type-of", ['Type']);
 allPassing &= testIt("Type type-of", ['MetaType']);
+allPassing &= testIt("0 type-of", ['Nat']);
 
 allPassing &= testIt("3 is-a-type", [false]);
 allPassing &= testIt("Nat is-a-type", [true]);

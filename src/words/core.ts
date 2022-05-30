@@ -1422,7 +1422,7 @@ export const coreWords: WordDictionary = {
         compose: (s, pl) => {
             const item = s?.pop();
             const aNumber = toNumOrNull(item);
-            if (aNumber && aNumber >= 0) {
+            if ((aNumber || aNumber === 0) && aNumber >= 0) {
                 s.push("Nat");
                 return [s];
             }

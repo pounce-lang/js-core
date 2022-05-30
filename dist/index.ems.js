@@ -4042,7 +4042,7 @@ var coreWords = {
         compose: function (s, pl) {
             var item = s === null || s === void 0 ? void 0 : s.pop();
             var aNumber = toNumOrNull(item);
-            if (aNumber && aNumber >= 0) {
+            if ((aNumber || aNumber === 0) && aNumber >= 0) {
                 s.push("Nat");
                 return [s];
             }
