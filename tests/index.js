@@ -275,6 +275,11 @@ allPassing &= testIt("-3 type-of", ['Neg']);
 allPassing &= testIt("apple type-of", ['Str']);
 allPassing &= testIt("[apple 3] type-of", [['Str', 'Nat']]);
 allPassing &= testIt("[apple [3] 6] type-of", [['Str', ['Nat'], 'Nat']]);
+allPassing &= testIt("Str type-of", ['Type']);
+allPassing &= testIt("Nat type-of", ['Type']);
+allPassing &= testIt("Neg type-of", ['Type']);
+allPassing &= testIt("Zero type-of", ['Type']);
+allPassing &= testIt("Type type-of", ['MetaType']);
 
 allPassing &= testIt("3 is-a-type", [false]);
 allPassing &= testIt("Nat is-a-type", [true]);

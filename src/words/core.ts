@@ -1432,7 +1432,15 @@ export const coreWords: WordDictionary = {
             }
             const aString = toStringOrNull(item);
             if (aString) {
-                s.push("Str");
+                if (aString === "Nat" || aString === "Zero" || aString === "Str" || aString === "Neg") {
+                    s.push("Type");
+                }
+                else if (aString === "Type") {
+                    s.push("MetaType");
+                }
+                else {
+                    s.push("Str");
+                }
                 return [s];
             }
             const aList = toArrOrNull(item);
@@ -1449,11 +1457,11 @@ export const coreWords: WordDictionary = {
         compose: (s, pl) => {
             const item = s?.pop();
             const aString = toStringOrNull(item);
-            if (aString && 
-                (  aString === 'Str' 
-                || aString === 'Nat' 
-                || aString === 'Neg' 
-                || aString === 'Zero' 
+            if (aString &&
+                (aString === 'Str'
+                    || aString === 'Nat'
+                    || aString === 'Neg'
+                    || aString === 'Zero'
                 )) {
                 s.push(true);
                 return [s];
