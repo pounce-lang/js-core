@@ -3877,15 +3877,21 @@ var coreWords = {
                 [], 'linrec5'
             ], "pounce"]
     },
+    // // 'split': {
+    // //     compose: [["cutVal", "theList", "operator"], [
+    // //         [], [], "cutVal", "theList",
+    // //         'size',
+    // //         ['uncons',
+    // //             ['dup2', "operator", "play",
+    // //                 ['swap', ['swap', ['push'], 'dip'], 'dip'],
+    // //                 ['swap', ['push'], 'dip'], 'if-else'], 'dip',
+    // //         ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
+    // //     ], "pounce"]
+    // // },
     'split': {
         compose: [["cutVal", "theList", "operator"], [
-                [], [], "cutVal", "theList",
-                'size',
-                ['uncons',
-                    ['dup2', "operator", "play",
-                        ['swap', ['swap', ['push'], 'dip'], 'dip'],
-                        ['swap', ['push'], 'dip'], 'if-else'], 'dip',
-                ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
+                "theList", "cutVal", "operator", "cons", ["!"], "concat", "filter", "cutVal", "push",
+                "theList", "cutVal", "operator", "cons", "filter",
             ], "pounce"]
     },
     'size': {
@@ -4165,7 +4171,7 @@ var preProcessDefs = function (pl, coreWords) {
             var word = toPLOrNull(next_pl[def_i - 2]);
             var key = toStringOrNull(r.head(toArrOrNull(next_pl[def_i - 1])));
             next_pl.splice(def_i - 2, 3); // splice is particularly mutant
-            next_wd = defineWord(next_wd, key, { "compose": word, typeCompose: "compose" });
+            next_wd = defineWord(next_wd, key, { "compose": word });
         }
         def_i = r.findIndex(function (word) { return word === 'compose'; }, next_pl);
     }
@@ -4345,19 +4351,19 @@ function purr(pl, wd, cycleLimit) {
 
 var dtWords = {
     'comp': {
-        sig: [[], []],
-        typeCompose: "compose",
+        // sig: [[], []],
+        // typeCompose: "compose",
         compose: parser("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error] if-else")
     },
     'run': {
-        sig: [[], []],
-        typeCompose: "compose",
+        // sig: [[], []],
+        // typeCompose: "compose",
         compose: ["play"]
         // compose: parse('[size 0 <=] [drop] [uncons] [] linrec')
     },
     'bind': {
-        sig: [[], []],
-        typeCompose: "compose",
+        // sig: [[], []],
+        // typeCompose: "compose",
         compose: function (s, pl) {
             var fo = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var fi = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());

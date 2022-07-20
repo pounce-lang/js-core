@@ -1249,18 +1249,24 @@ export const coreWords: WordDictionary = {
             [], 'linrec5'
         ], "pounce"]
     },
-
+    // // 'split': {
+    // //     compose: [["cutVal", "theList", "operator"], [
+    // //         [], [], "cutVal", "theList",
+    // //         'size',
+    // //         ['uncons',
+    // //             ['dup2', "operator", "play",
+    // //                 ['swap', ['swap', ['push'], 'dip'], 'dip'],
+    // //                 ['swap', ['push'], 'dip'], 'if-else'], 'dip',
+    // //         ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
+    // //     ], "pounce"]
+    // // },
     'split': {
         compose: [["cutVal", "theList", "operator"], [
-            [], [], "cutVal", "theList",
-            'size',
-            ['uncons',
-                ['dup2', "operator", "play",
-                    ['swap', ['swap', ['push'], 'dip'], 'dip'],
-                    ['swap', ['push'], 'dip'], 'if-else'], 'dip',
-            ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
+            "theList", "cutVal", "operator", "cons", ["!"], "concat", "filter", "cutVal", "push",
+            "theList", "cutVal", "operator", "cons", "filter",
         ], "pounce"]
     },
+
     'size': {
         compose: s => {
             const arr = toArrOrNull(s[s.length - 1]);

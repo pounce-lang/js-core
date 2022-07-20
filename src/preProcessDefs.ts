@@ -1,6 +1,6 @@
 // preProcessDefs (aka: incisor)
 import * as r from 'ramda';
-import { ProgramList, WordSignature, Word, TypeStack, TypeList } from './types';
+import { ProgramList } from './types';
 import { WordDictionary, WordValue } from "./WordDictionary.types";
 import { toPLOrNull, toStringOrNull, toArrOrNull } from './words/core';
 import { unParser as unparse, parser } from './parser/Pinna';
@@ -27,7 +27,7 @@ export const preProcessDefs = (pl: ProgramList, coreWords: WordDictionary): [Pro
       const word = toPLOrNull(next_pl[def_i - 2]);
       const key = toStringOrNull(r.head(toArrOrNull(next_pl[def_i - 1])));
       next_pl.splice(def_i - 2, 3); // splice is particularly mutant
-      next_wd = defineWord(next_wd, key, { "compose": word , typeCompose: "compose"});
+      next_wd = defineWord(next_wd, key, { "compose": word });
     }
     def_i = r.findIndex(word => word === 'compose', next_pl);
   }

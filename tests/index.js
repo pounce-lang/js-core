@@ -223,7 +223,7 @@ allPassing &= testIt("[1 2] size", [[1, 2], 2]);
 allPassing &= testIt("[1 2] [3] concat", [[1, 2, 3]]);
 
 allPassing &= testIt("6 [3 8 5 7 10 2 9 1] [>] split", [[3, 5, 2, 1, 6], [8, 7, 10, 9]]);
-allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [[3, 2, 1, 5], [6, 8, 7, 10, 5, 9]]);
+allPassing &= testIt("5 [3 6 8 7 10 5 2 9 1] [>] split", [[3, 5, 2, 1, 5], [6, 8, 7, 10, 9]]);
 
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 % 0 ==] map", [[false, true, false, false, true, true, false, false]]);
 allPassing &= testIt("[3 8 5 7 10 2 9 1] [2 *] map", [[6, 16, 10, 14, 20, 4, 18, 2]]);
@@ -249,13 +249,21 @@ allPassing &= testIt("[4 2.1 'string' [4] [a [b]]] false [dup == ||] reduce", [t
 
 
 allPassing &= testIt(`
+[5 6 3 8 4 7 2 9 1] 
+[size 1 <=] [] [uncons [>=] split] [concat] binrec
+`, [[1, 2, 3, 4, 5, 6, 7, 8, 9]]);
+allPassing &= testIt(`
 [5 6 3 8 4 5 7 2 9 1] 
-[size 1 <=] [] [uncons [>] split] [concat] binrec
+[size 1 <=] [] [uncons [>=] split] [concat] binrec
 `, [[1, 2, 3, 4, 5, 5, 6, 7, 8, 9]]);
 allPassing &= testIt(`
-[f d b c a h b j e g] 
-[size 1 <=] [] [uncons [>] split] [concat] binrec
-`, [["a", "b", "b", "c", "d", "e", "f", "g", "h", "j"]]);
+[a d b c f h j e g] 
+[size 1 <=] [] [uncons [>=] split] [concat] binrec
+`, [["a", "b", "c", "d", "e", "f", "g", "h", "j"]]);
+allPassing &= testIt(`
+[a d b c f h j e g f] 
+[size 1 <=] [] [uncons [>=] split] [concat] binrec
+`, [["a", "b", "c", "d", "e", "f", "f", "g", "h", "j"]]);
 
 allPassing &= testIt("0 0 [a b] [a b +] crouch", [[0, 0, '+']]);
 allPassing &= testIt("22 -3 [a b] [a b a + *] crouch", [[22, -3, 22, '+', '*']]);

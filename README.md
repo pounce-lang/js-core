@@ -23,7 +23,7 @@ To start Pounce programming in the browser, you can [try this sampler](https://p
 ``` Javascript
 // Run a small Pounce program that doubles 21.
 // When logLevel > 0, intermediate states of the stack and program are displayed. 
-var core = require("@pounce-lang/core")
+var core = require("node_modules/@pounce-lang/core")
 var interp = core.interpreter(core.parse("21 dup +"), {logLevel:1});
 var pounceState = interp.next();
 while (pounceState.value.active) {
@@ -40,7 +40,7 @@ npm i
 npm run build
 ```
 
-and run the tests 
+### and run the tests 
 ```
 npm run test
 ```

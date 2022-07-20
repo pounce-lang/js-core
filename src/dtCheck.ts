@@ -7,19 +7,19 @@ import { purr } from './interpreter';
 
 const dtWords: WordDictionary = {
   'comp': {
-      sig: [[], []],
-      typeCompose: "compose",
+      // sig: [[], []],
+      // typeCompose: "compose",
       compose: parse("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error] if-else")
   },
   'run': {
-      sig: [[], []],
-      typeCompose: "compose",
+      // sig: [[], []],
+      // typeCompose: "compose",
       compose: ["play"]
       // compose: parse('[size 0 <=] [drop] [uncons] [] linrec')
   },
   'bind': {
-      sig: [[], []],
-      typeCompose: "compose",
+      // sig: [[], []],
+      // typeCompose: "compose",
       compose: (s, pl) => {
           let fo = toArrOfStrOrNull(s?.pop());
           const fi = toArrOfStrOrNull(s?.pop());
