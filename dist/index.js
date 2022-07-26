@@ -3894,6 +3894,12 @@ var coreWords = {
                 "theList", "cutVal", "operator", "cons", "filter",
             ], "pounce"]
     },
+    'spliti': {
+        compose: [["theList", "cutValIndex", "operator"], [
+                "theList", "cutValIndex", "outAt", "operator", "cons", ["!"], "concat", "filter",
+                "theList", "cutValIndex", "outAt", "operator", "cons", "filter",
+            ], "pounce"]
+    },
     'size': {
         compose: function (s) {
             var arr = toArrOrNull(s[s.length - 1]);

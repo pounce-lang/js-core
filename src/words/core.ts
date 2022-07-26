@@ -1260,10 +1260,17 @@ export const coreWords: WordDictionary = {
     // //         ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
     // //     ], "pounce"]
     // // },
+
     'split': {
         compose: [["cutVal", "theList", "operator"], [
             "theList", "cutVal", "operator", "cons", ["!"], "concat", "filter", "cutVal", "push",
             "theList", "cutVal", "operator", "cons", "filter",
+        ], "pounce"]
+    },
+    'spliti': {
+        compose: [["theList", "cutValIndex", "operator"], [
+            "theList", "cutValIndex", "outAt", "operator", "cons", ["!"], "concat", "filter",
+            "theList", "cutValIndex", "outAt", "operator", "cons", "filter",
         ], "pounce"]
     },
 

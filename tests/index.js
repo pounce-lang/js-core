@@ -247,6 +247,22 @@ allPassing &= testIt("[4 2 a] false [dup == ||] reduce", [true]);
 allPassing &= testIt("[4 2 'string'] false [dup == ||] reduce", [true]);
 allPassing &= testIt("[4 2.1 'string' [4] [a [b]]] false [dup == ||] reduce", [true]);
 
+allPassing &= testIt("[1 2 3 4 5] size 2 / ceil", [[ 1, 2, 3, 4, 5 ], 3]);
+allPassing &= testIt("[1 4 8] size 2 / floor ", [[ 1, 4, 8 ],  1 ]);
+allPassing &= testIt("[1 4] size 2 / floor ", [[ 1, 4 ],  1 ]);
+allPassing &= testIt("[1] size 2 / floor ", [[ 1 ],  0 ]);
+allPassing &= testIt("[1 4 8] size 2 / floor [<=] spliti", [[ 8 ], [ 1, 4 ]]);
+allPassing &= testIt("[1 4] size 2 / floor [<] spliti", [[ 4 ], [ 1 ]]);
+allPassing &= testIt("[1 4 8] size 2 / floor [>=] spliti", [[ 1 ], [ 4, 8 ]]);
+allPassing &= testIt("[1 4] size 2 / floor [>] spliti", [[ 1, 4 ], [ ]]);
+// allPassing &= testIt(`
+// [3 1 2 1] 
+// [size 1 <=] [] [size 2 / floor [<=] spliti] [concat] binrec
+// `, [[3, 2, 1, 1]]);
+allPassing &= testIt(`
+[3 1 2] 
+[size 1 <=] [] [uncons [<=] split] [concat] binrec
+`, [[3, 2, 1]]);
 
 allPassing &= testIt(`
 [5 6 3 8 4 7 2 9 1] 
