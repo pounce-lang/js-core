@@ -3742,8 +3742,9 @@ var coreWords = {
                 pl = __spreadArrays(initial, increment, condition, [__spreadArrays(recurse, nextRec), final, 'if-else']).concat(pl);
             }
             else {
-                console.error("In 'constrec' some stack value(s) not found");
+                // console.error("In 'constrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
+                return [null];
             }
             return [s, pl];
         }
@@ -3766,8 +3767,9 @@ var coreWords = {
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
             }
             else {
-                console.error("In 'linrec' some stack value(s) not found");
+                // console.error("In 'linrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
+                return [null];
             }
             // console.log('*** s pl ***', s, pl);
             return [s, pl];
@@ -3793,8 +3795,9 @@ var coreWords = {
                 pl = __spreadArrays(init, termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
             }
             else {
-                console.error("In 'linrec5' some stack value(s) not found");
+                // console.error("In 'linrec5' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
+                return [null];
             }
             // console.log('*** s pl ***', s, pl);
             return [s, pl];
@@ -3817,8 +3820,9 @@ var coreWords = {
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, [__spreadArrays(nextRec), 'dip'], nextRec, final), 'if-else']).concat(pl);
             }
             else {
-                console.error("In 'binrec' some stack value(s) not found");
+                // console.error("In 'binrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
+                return [null];
             }
             // console.log('*** s pl ***', s, pl);
             return [s, pl];
@@ -3922,7 +3926,7 @@ var coreWords = {
                 s.push(str[i]);
                 return [s];
             }
-            console.error("In 'outAt' some stack value(s) not found", "i =", i, arr, str);
+            // console.error("In 'outAt' some stack value(s) not found", "i =", i, arr, str);
             // throw new Error("stack value(s) not found");
             return [null];
         }
@@ -3937,7 +3941,7 @@ var coreWords = {
                 s.push(arr);
             }
             else {
-                console.error("In 'inAt' some stack value(s) not found");
+                // console.error("In 'inAt' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
                 return [null];
             }

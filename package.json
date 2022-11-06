@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "A concatenative programming language written in Javascript, Pounce has roots in Forth, Joy, Cat and Kitten.",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",

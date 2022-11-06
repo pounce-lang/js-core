@@ -144,7 +144,7 @@ allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("2 5 +", [7]);
-// allPassing &= testIt("5 +", null);
+allPassing &= testIt("5 +", null);
 allPassing &= testIt(".1 .2 +", [0.3]);
 allPassing &= testIt("2 5 -", [-3]);
 allPassing &= testIt("1.0 0.9 -", [0.1]);
@@ -177,14 +177,14 @@ allPassing &= testIt("false !", [true]);
 allPassing &= testIt("true !", [false]);
 
 
-// not valid program tests (should not crash)
-// allPassing &= testIt("/", null);
-// allPassing &= testIt("2 0 /", null);
-// allPassing &= testIt("2  /", null);
-// allPassing &= testIt("- 16", null);
-// allPassing &= testIt("5 - 16 ", null);
-// allPassing &= testIt("3 - 16 /", null);
-// allPassing &= testIt("- 16 /", null);
+// // not valid program tests (should not crash)
+allPassing &= testIt("/", null);
+allPassing &= testIt("2 0 /", null);
+allPassing &= testIt("2  /", null);
+allPassing &= testIt("- 16", null);
+allPassing &= testIt("5 - 16 ", null);
+allPassing &= testIt("3 - 16 /", null);
+allPassing &= testIt("- 16 /", null);
 
 // compose tests
 allPassing &= testIt("[1 +] [add-one] compose 22 add-one", [23]);
@@ -206,13 +206,13 @@ allPassing &= testIt("[1 2] pop swap cons", [[2, 1]]);
 
 allPassing &= testIt("[1 2] 0 outAt", [[1, 2], 1]);
 allPassing &= testIt("[1 2 c] 2 outAt", [[1, 2, 'c'], 'c']);
-// allPassing &= testIt("[1 2] 5 outAt", null);
+allPassing &= testIt("[1 2] 5 outAt", null);
 allPassing &= testIt("[1 2 3] 2 outAt", [[1, 2, 3], 3]);
 
 allPassing &= testIt("[1 2] 8 0 inAt", [[8, 2]]);
 allPassing &= testIt("[1 2] 0 1 inAt", [[1, 0]]);
 allPassing &= testIt("[1 2 c] d 2 inAt", [[1, 2, 'd']]);
-// allPassing &= testIt("[1 2] 5 inAt", null);
+allPassing &= testIt("[1 2] 5 inAt", null);
 allPassing &= testIt("[1 88 3] 2 1 inAt", [[1, 2, 3]]);
 
 allPassing &= testIt("[1 66 3] dup 1 outAt 2 - 1 inAt", [[1, 66, 3], [1, 64, 3]]);
