@@ -5,45 +5,26 @@ import { coreWords, toPLOrNull, toStringOrNull } from './words/core';
 import { parser } from './parser/Pinna';
 import { preProcessDefs } from './preProcessDefs';
 
-const debugLevel = (ics: string[], logLevel: number) => (ics.length <= logLevel);
-// user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
-const debugCleanPL = (pl: ProgramList) => r.filter((w) => (w !== "popInternalCallStack"), pl);
 
-// const startsWith = (s: string, patt: string) => s.indexOf(patt) === 0;
-// const isCap = (s: string) => s.search(/[A-Z]/) === 0;
-
-// type IRT = { stack: ValueStack; prog: ProgramList; active: Boolean; };
-
-// a slow purr (due to run-time type-checking)
-export function* interpreter(
+// an interpreter that calls purr after parsing and preprocessing, so you dont have to
+export function interpreter(
   pl_in: ProgramList | string,
   opt: { logLevel: number, yieldOnId: boolean, maxCycles?: number, wd?: WordDictionary } =
     { logLevel: 0, yieldOnId: false }
 ) {
-  // preProcess if needed 
+  // the word dictionary 
   const wd_in = opt.wd ? opt.wd : coreWords;
-  let internalCallStack = [];
   
-  // programList and wordDictionary are preProcessed and parsed (if needed) 
+  // the program list and word dictionary are preProcessed and parsed (if needed) 
   let [pl, wd] = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parser(pl_in.toString()) : pl_in, wd_in);
 
-  // type check ahead
+  // TBD type check ahead
   // console.log("preCheckTypes(pl, wd)", preCheckTypes(pl, wd));
 
   let s: ValueStack = [];
-  opt?.logLevel ? yield { stack: s, prog: pl, active: true } : null;
-  let w;
-  const maxCycles = opt.maxCycles || 1;
+  const maxCycles = opt.maxCycles || 100000;
   
-  const purrer = purr(pl, wd, maxCycles);
-  const state1 = purrer.next(maxCycles);
-  console.log(state1);
-  while(!purrer.done) {
-    const state = purrer.next(maxCycles);
-    console.log(state.prog);
-    yeild purrer.next(maxCycles);
-  }
-  return purrer.value;
+  return purr(pl, wd, maxCycles);
 }
 
 // (more closer to a) production version interpreter

@@ -1,6 +1,6 @@
 {
   "name": "@pounce-lang/core",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "A concatenative programming language written in Javascript, Pounce has roots in Forth, Joy, Cat and Kitten.",
   "main": "dist/index.js",
   "module": "dist/index.ems.js",
@@ -12,7 +12,7 @@
     "build": "rollup -c",
     "watch": "rollup -cw",
     "publish": "rollup -c; npm publish --access public",
-    "test": "node ./tests/parser_test.js; node ./tests/index.js; node ./tests/dt_test.js"
+    "test": "node ./tests/parser_test.js; node ./tests/index.js"
   },
   "repository": "https://github.com/pounce-lang/core.git",
   "author": "Nate Morse",

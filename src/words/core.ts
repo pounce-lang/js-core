@@ -176,7 +176,7 @@ export const coreWords: WordDictionary = {
         }
     },
     '/': {
-        dt: '[[N N][N] comp]',
+        dt: '[[N N][N] comp  [N|0 !=] guard]',
         compose: s => {
             const b = toNumOrNull(s?.pop());
             const a = toNumOrNull(s?.pop());
@@ -1110,7 +1110,7 @@ export const coreWords: WordDictionary = {
                 pl = [...initial, ...increment, ...condition, [...recurse, ...nextRec], final, 'if-else'].concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'constrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             return [s, pl];
@@ -1134,7 +1134,7 @@ export const coreWords: WordDictionary = {
                 pl = [...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'linrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -1161,7 +1161,7 @@ export const coreWords: WordDictionary = {
                 pl = [...init, ...termtest, terminal, [...recurse, ...nextRec], 'if-else'].concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'linrec5' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -1186,7 +1186,7 @@ export const coreWords: WordDictionary = {
                 pl = [...termtest, terminal, [...recurse, [...nextRec], 'dip', ...nextRec, ...final], 'if-else'].concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'binrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -1289,13 +1289,16 @@ export const coreWords: WordDictionary = {
             const arr = toArrOrNull(s[s.length - 1]);
             if (i !== null && arr && arr.length - 1 >= i) {
                 s.push(arr[i]);
+                return [s];
             }
-            else {
-                console.error("some stack value(s) not found");
-                // throw new Error("stack value(s) not found");
-                return [null]
+            const str = toStringOrNull(s[s.length - 1]);
+            if (i !== null && str && str.length - 1 >= i) {
+                s.push(str[i]);
+                return [s];
             }
-            return [s];
+            console.error("In 'outAt' some stack value(s) not found", "i =", i, arr, str);
+            // throw new Error("stack value(s) not found");
+            return [null]
         }
     },
     'inAt': {
@@ -1308,7 +1311,7 @@ export const coreWords: WordDictionary = {
                 s.push(arr);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'inAt' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
                 return [null]
             }

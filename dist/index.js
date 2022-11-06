@@ -2817,7 +2817,7 @@ var coreWords = {
         }
     },
     '/': {
-        dt: '[[N N][N] comp]',
+        dt: '[[N N][N] comp  [N|0 !=] guard]',
         compose: function (s) {
             var b = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var a = toNumOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -3742,7 +3742,7 @@ var coreWords = {
                 pl = __spreadArrays(initial, increment, condition, [__spreadArrays(recurse, nextRec), final, 'if-else']).concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'constrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             return [s, pl];
@@ -3766,7 +3766,7 @@ var coreWords = {
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'linrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -3793,7 +3793,7 @@ var coreWords = {
                 pl = __spreadArrays(init, termtest, [terminal, __spreadArrays(recurse, nextRec), 'if-else']).concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'linrec5' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -3817,7 +3817,7 @@ var coreWords = {
                 pl = __spreadArrays(termtest, [terminal, __spreadArrays(recurse, [__spreadArrays(nextRec), 'dip'], nextRec, final), 'if-else']).concat(pl);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'binrec' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
             }
             // console.log('*** s pl ***', s, pl);
@@ -3915,13 +3915,16 @@ var coreWords = {
             var arr = toArrOrNull(s[s.length - 1]);
             if (i !== null && arr && arr.length - 1 >= i) {
                 s.push(arr[i]);
+                return [s];
             }
-            else {
-                console.error("some stack value(s) not found");
-                // throw new Error("stack value(s) not found");
-                return [null];
+            var str = toStringOrNull(s[s.length - 1]);
+            if (i !== null && str && str.length - 1 >= i) {
+                s.push(str[i]);
+                return [s];
             }
-            return [s];
+            console.error("In 'outAt' some stack value(s) not found", "i =", i, arr, str);
+            // throw new Error("stack value(s) not found");
+            return [null];
         }
     },
     'inAt': {
@@ -3934,7 +3937,7 @@ var coreWords = {
                 s.push(arr);
             }
             else {
-                console.error("some stack value(s) not found");
+                console.error("In 'inAt' some stack value(s) not found");
                 // throw new Error("stack value(s) not found");
                 return [null];
             }
@@ -4184,125 +4187,15 @@ var preProcessDefs = function (pl, coreWords) {
     return [next_pl, r.mergeRight(coreWords, next_wd)];
 };
 
-var debugLevel = function (ics, logLevel) { return (ics.length <= logLevel); };
-// user debug sessions do not need to see the housekeeping words (e.g. popInternalCallStack) 
-var debugCleanPL = function (pl) { return r.filter(function (w) { return (w !== "popInternalCallStack"); }, pl); };
-// const startsWith = (s: string, patt: string) => s.indexOf(patt) === 0;
-// const isCap = (s: string) => s.search(/[A-Z]/) === 0;
-// type IRT = { stack: ValueStack; prog: ProgramList; active: Boolean; };
-// a slow purr (due to run-time type-checking)
+// an interpreter that calls purr after parsing and preprocessing, so you dont have to
 function interpreter(pl_in, opt) {
-    var wd_in, internalCallStack, _a, pl, wd, s, _b, w, maxCycles, cycles, wds, _d, plist, _f;
-    var _g, _h;
     if (opt === void 0) { opt = { logLevel: 0, yieldOnId: false }; }
-    return __generator(this, function (_j) {
-        switch (_j.label) {
-            case 0:
-                wd_in = opt.wd ? opt.wd : coreWords;
-                internalCallStack = [];
-                _a = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parser(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
-                s = [];
-                if (!(opt === null || opt === void 0 ? void 0 : opt.logLevel)) return [3 /*break*/, 2];
-                return [4 /*yield*/, { stack: s, prog: pl, active: true }];
-            case 1:
-                _b = _j.sent();
-                return [3 /*break*/, 3];
-            case 2:
-                _b = null;
-                _j.label = 3;
-            case 3:
-                maxCycles = opt.maxCycles || 1000000;
-                cycles = 0;
-                _j.label = 4;
-            case 4:
-                if (!(cycles < maxCycles && internalCallStack.length < 1000
-                    && (w = pl.shift()) !== undefined
-                    && !((s === null || s === void 0 ? void 0 : s.length) === 1 && s[0] === null))) return [3 /*break*/, 17];
-                cycles += 1;
-                wds = r.is(String, w) ? wd[w] : null;
-                if (!wds) return [3 /*break*/, 10];
-                if (!(opt.logLevel && !opt.yieldOnId)) return [3 /*break*/, 8];
-                if (!debugLevel(internalCallStack, opt.logLevel)) return [3 /*break*/, 6];
-                return [4 /*yield*/, { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
-            case 5:
-                _d = _j.sent();
-                return [3 /*break*/, 7];
-            case 6:
-                _d = null;
-                _j.label = 7;
-            case 7:
-                return [3 /*break*/, 9];
-            case 8:
-                _j.label = 9;
-            case 9:
-                if (typeof wds.compose === 'function') {
-                    _g = wds.compose(s, pl), s = _g[0], _h = _g[1], pl = _h === void 0 ? pl : _h;
-                    // if(r.isNil(s_ret)) {
-                    //   cycles = maxCycles;
-                    // }
-                    // else {
-                    //   s = s_ret;
-                    // }
-                }
-                else {
-                    if (w === "popInternalCallStack") {
-                        internalCallStack.pop();
-                    }
-                    else {
-                        plist = toPLOrNull(wds.compose);
-                        if (plist) {
-                            internalCallStack.push(toStringOrNull(w));
-                            pl = __spreadArrays(plist, ["popInternalCallStack"], pl);
-                        }
-                    }
-                }
-                return [3 /*break*/, 16];
-            case 10:
-                if (!(w !== undefined)) return [3 /*break*/, 16];
-                if (r.is(Array, w)) {
-                    s === null || s === void 0 ? void 0 : s.push([].concat(w));
-                }
-                else {
-                    s === null || s === void 0 ? void 0 : s.push(w);
-                }
-                if (!(opt.logLevel && opt.yieldOnId)) return [3 /*break*/, 14];
-                if (!(debugLevel(internalCallStack, opt.logLevel))) return [3 /*break*/, 12];
-                return [4 /*yield*/, { stack: s, prog: debugCleanPL([w].concat(pl)), active: true, internalCallStack: __spreadArrays(internalCallStack) }];
-            case 11:
-                _f = _j.sent();
-                return [3 /*break*/, 13];
-            case 12:
-                _f = null;
-                _j.label = 13;
-            case 13:
-                return [3 /*break*/, 15];
-            case 14:
-                _j.label = 15;
-            case 15:
-                _j.label = 16;
-            case 16: return [3 /*break*/, 4];
-            case 17:
-                if (!((s === null || s === void 0 ? void 0 : s.length) === 1 && s[0] === null)) return [3 /*break*/, 19];
-                console.log("s has null");
-                return [4 /*yield*/, { stack: [], prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "a word did not find required data on the stack" }];
-            case 18:
-                _j.sent();
-                _j.label = 19;
-            case 19:
-                if (!(cycles >= maxCycles)) return [3 /*break*/, 21];
-                return [4 /*yield*/, { stack: s, prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "maxCycles size exceeded: this may be an infinite loop" }];
-            case 20:
-                _j.sent();
-                _j.label = 21;
-            case 21:
-                if (!(internalCallStack.length >= 1000)) return [3 /*break*/, 23];
-                return [4 /*yield*/, { stack: s, prog: pl, active: false, internalCallStack: __spreadArrays(internalCallStack), error: "callStack size exceeded: this may be an infinite loop" }];
-            case 22:
-                _j.sent();
-                _j.label = 23;
-            case 23: return [2 /*return*/, { stack: s, prog: pl, active: false }];
-        }
-    });
+    // the word dictionary 
+    var wd_in = opt.wd ? opt.wd : coreWords;
+    // the program list and word dictionary are preProcessed and parsed (if needed) 
+    var _a = r.is(Array, pl_in) ? [toPLOrNull(pl_in), wd_in] : preProcessDefs(r.is(String, pl_in) ? parser(pl_in.toString()) : pl_in, wd_in), pl = _a[0], wd = _a[1];
+    var maxCycles = opt.maxCycles || 100000;
+    return purr(pl, wd, maxCycles);
 }
 // (more closer to a) production version interpreter
 // Assumes that you have run and tested the interpreter with parsed pre processed input 
@@ -4312,7 +4205,7 @@ function purr(pl, wd, cycleLimit) {
     var s, cycles, w, wds, plist;
     var _a, _b;
     var _c;
-    if (cycleLimit === void 0) { cycleLimit = 100000; }
+    if (cycleLimit === void 0) { cycleLimit = 10000; }
     return __generator(this, function (_d) {
         switch (_d.label) {
             case 0:
@@ -4356,20 +4249,20 @@ function purr(pl, wd, cycleLimit) {
 }
 
 var dtWords = {
+    'guard': {
+        compose: ["play"]
+    },
+    '=dt=': {
+        compose: parser('[0 outAt] dip 0 outAt [swap] dip == [drop drop] dip')
+    },
     'comp': {
-        // sig: [[], []],
-        // typeCompose: "compose",
-        compose: parser("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error] if-else")
+        compose: parser("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error in composition of type] if-else")
     },
     'run': {
-        // sig: [[], []],
-        // typeCompose: "compose",
         compose: ["play"]
         // compose: parse('[size 0 <=] [drop] [uncons] [] linrec')
     },
     'bind': {
-        // sig: [[], []],
-        // typeCompose: "compose",
         compose: function (s, pl) {
             var fo = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             var fi = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -4429,10 +4322,10 @@ function typeConversion(orig_pl) {
         }
         else if (w !== undefined && s !== null) {
             if (toNumOrNull(w) !== null) {
-                s.push("N");
+                s.push("N|" + toNumOrNull(w));
             }
             else if (toStringOrNull(w) !== null) {
-                if (w === "comp" || w === "bind" || w === "run" || w === "drop") {
+                if (w === "comp" || w === "bind" || w === "run" || w === "drop" || w === "guard") {
                     s.push(w);
                 }
                 else {
