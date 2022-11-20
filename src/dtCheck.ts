@@ -7,7 +7,7 @@ import { purr } from './interpreter';
 
 const dtWords: WordDictionary = {
   'guard': { // guard dependant types
-    compose: ["play"]
+    compose: ["leap"]
   },
   '=dt=': {
     compose: parse('[0 outAt] dip 0 outAt [swap] dip == [drop drop] dip')
@@ -16,7 +16,7 @@ const dtWords: WordDictionary = {
     compose: parse("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error in composition of type] if-else")
   },
   'run': { // run types
-    compose: ["play"]
+    compose: ["leap"]
     // compose: parse('[size 0 <=] [drop] [uncons] [] linrec')
   },
   'bind': { // bind types

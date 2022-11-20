@@ -99,7 +99,7 @@ allPassing &= testIt('A B C rollup', ['C', 'A', 'B']);
 allPassing &= testIt('A B C rolldown', ['B', 'C', 'A']);
 allPassing &= testIt("true [5] [7] if-else", [5]);
 allPassing &= testIt("false [5] [7] if-else", [7]);
-allPassing &= testIt("false [5] [7 3 [+] play] if-else", [10]);
+allPassing &= testIt("false [5] [7 3 [+] leap] if-else", [10]);
 allPassing &= testIt("2 1 [>] [5] [7] ifte", [5]);
 allPassing &= testIt("2 2 [>] [5] [7] ifte", [7]);
 allPassing &= testIt("z w [>] [5] [7] ifte", [5]);
@@ -140,7 +140,7 @@ allPassing &= testIt("a b !=", [true]);
 allPassing &= testIt("4 b !=", [true]);
 allPassing &= testIt("[a] a !=", [true]);
 allPassing &= testIt("b b !=", [false]);
-allPassing &= testIt("2 1[<] [5] [7 3 [+] play] ifte", [10]);
+allPassing &= testIt("2 1[<] [5] [7 3 [+] leap] ifte", [10]);
 allPassing &= testIt("0 1 [dup] dip dup [swap] dip +", [0, 1, 1]);
 allPassing &= testIt("0 1 dup2 +", [0, 1, 1]);
 allPassing &= testIt("2 5 +", [7]);
@@ -190,8 +190,8 @@ allPassing &= testIt("- 16 /", null);
 allPassing &= testIt("[1 +] [add-one] compose 22 add-one", [23]);
 allPassing &= testIt("[dup2 +] [fib] compose 0 1 [fib] 5 times", [0, 1, 1, 2, 3, 5, 8]);
 
-//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] compose 5 [1 swap] play fac
-allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] compose 5 [1 swap] play fac", [120]);
+//# [dup 1 - dup 0 > [[*] dip fac] [drop drop] ifte] [fac] compose 5 [1 swap] leap fac
+allPassing &= testIt("[dup 1 - dup 0 > [[*] dip fac] [drop drop] if-else] [fac] compose 5 [1 swap] leap fac", [120]);
 allPassing &= testIt("5 [1 swap] [dup 1 -] [dup 0 >] [[*] dip] [drop drop] constrec", [120]);
 allPassing &= testIt("5 [0 =] [1 +] [dup 1 -] [*] linrec", [120]);
 
@@ -285,7 +285,7 @@ allPassing &= testIt(`
 allPassing &= testIt("0 0 [a b] [a b +] crouch", [[0, 0, '+']]);
 allPassing &= testIt("22 -3 [a b] [a b a + *] crouch", [[22, -3, 22, '+', '*']]);
 allPassing &= testIt(`0.5 1 [m b] [[x] [m x * b +] pounce] crouch`, [[['x'], [0.5, 'x', '*', 1, '+'], 'pounce']]);
-allPassing &= testIt(`4 0.5 1 [m b] [[x] [m x * b +] pounce] crouch play`, [3]);
+allPassing &= testIt(`4 0.5 1 [m b] [[x] [m x * b +] pounce] crouch leap`, [3]);
 
 allPassing &= testIt("0 0 [a b] [a b +] pounce", [0]);
 allPassing &= testIt("0 [a] [a] pounce", [0]);
@@ -296,6 +296,18 @@ allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] poun
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] crouch", [[2, 4, "*", 3, "+"]]);
 allPassing &= testIt("1 2 [3 4] [a b [c d]] [a b c d] crouch", [[1, 2, 3, 4]]);
 allPassing &= testIt("1 2 [3 4] [a b [c d]] [a b c d] pounce", [1, 2, 3, 4]);
+allPassing &= testIt("[1 2] [3 4] [[a b] [c d]] [a b c d] pounce", [1, 2, 3, 4]);
+allPassing &= testIt("[[1] [2]] [4 5] [concat] reduce", [[ 4, 5, 1, 2 ]]);
+
+// // allPassing &= testIt(`
+// // [1 2 3 4 5 6 7]
+// // [1 0] 
+// // [[[acc_ i_] e_] [e_ acc_ [i_ 2 % 0 ==] [*] [+] ifte 1 i_ +] pounce [] cons cons [e_] dip] 
+// // reduce`, []); 
+
+allPassing &= testIt(`
+7 [1 0] 
+[[acc i]] [acc [i 2 % 0 ==] [*] [+] ifte 1 i +] pounce `, [7,1]); 
 
 allPassing &= testIt("3 type-of", ['Nat']);
 allPassing &= testIt("-3 type-of", ['Neg']);

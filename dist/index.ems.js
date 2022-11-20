@@ -3398,7 +3398,7 @@ var coreWords = {
             return [null];
         }
     },
-    'play': {
+    'leap': {
         dt: '[[F][F run] bind]',
         compose: function (s, pl) {
             var block = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
@@ -3522,7 +3522,7 @@ var coreWords = {
     },
     'ifte': {
         dt: '[[F G G][F run G G] bind [B F F] [F run] bind]',
-        compose: [['play'], 'dip2', 'if-else']
+        compose: [['leap'], 'dip2', 'if-else']
     },
     '=': {
         dt: '[[N N][N B] comp]',
@@ -3855,7 +3855,7 @@ var coreWords = {
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', ["swap", ["phrase", 'play'], 'dip', "swap", 'push'], 'dip'],
+                ['uncons', ["swap", ["phrase", 'leap'], 'dip', "swap", 'push'], 'dip'],
                 [], 'linrec5'
             ], "pounce"]
     },
@@ -3868,7 +3868,7 @@ var coreWords = {
                 ['drop'],
                 [
                     'uncons', 'uncons',
-                    ['phrase', 'play', 'push'], 'dip'
+                    ['phrase', 'leap', 'push'], 'dip'
                 ],
                 [], 'linrec5'
             ], "pounce"]
@@ -3881,7 +3881,7 @@ var coreWords = {
                 [[], "list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', ["swap", ["dup", "phrase", 'play'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
+                ['uncons', ["swap", ["dup", "phrase", 'leap'], 'dip', "rollup", ['push'], ['drop'], 'if-else'], 'dip'],
                 [], 'linrec5'
             ], "pounce"]
     },
@@ -3890,11 +3890,11 @@ var coreWords = {
         // { type: 'accumulater (word)' },
         // { type: 'phrase extends (list<words>)' }],
         // [{ type: 'resultValueList extends (list<words>)' }]],
-        compose: [["list", "acc", "phrase"], [
-                ["acc", "list"],
+        compose: [["_list", "_acc", "_phrase"], [
+                ["_acc", "_list"],
                 ['size', 0, '<='],
                 ['drop'],
-                ['uncons', ["phrase", "play"], 'dip'],
+                ['uncons', ["_phrase", "leap"], 'dip'],
                 [], 'linrec5'
             ], "pounce"]
     },
@@ -3903,7 +3903,7 @@ var coreWords = {
     // //         [], [], "cutVal", "theList",
     // //         'size',
     // //         ['uncons',
-    // //             ['dup2', "operator", "play",
+    // //             ['dup2', "operator", "leap",
     // //                 ['swap', ['swap', ['push'], 'dip'], 'dip'],
     // //                 ['swap', ['push'], 'dip'], 'if-else'], 'dip',
     // //         ], 'swap', 'times', 'drop', 'swap', ['push'], 'dip'
@@ -4271,7 +4271,7 @@ function purr(pl, wd, cycleLimit) {
 
 var dtWords = {
     'guard': {
-        compose: ["play"]
+        compose: ["leap"]
     },
     '=dt=': {
         compose: parser('[0 outAt] dip 0 outAt [swap] dip == [drop drop] dip')
@@ -4280,7 +4280,7 @@ var dtWords = {
         compose: parser("[true [[size 0 <=] dip swap] [[drop] dip] [[pop swap [==] dip swap] dip &&] [] linrec] dip [Error in composition of type] if-else")
     },
     'run': {
-        compose: ["play"]
+        compose: ["leap"]
         // compose: parse('[size 0 <=] [drop] [uncons] [] linrec')
     },
     'bind': {

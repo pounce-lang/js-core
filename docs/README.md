@@ -15,7 +15,7 @@ Categories: Arithmetic, String, Stack, List, Flow and Introspection
 
 ### words `[Introspection]`
 This word lists all words in the core dictionary with the exception of `compose`.
-[words word dup swap drop round + - / % * & | ^ ~ && || ! E LN10 LN2 LOG10E LOG2E PI SQRT1_2 SQRT2 abs acos acosh asin asinh atan atan2 atanh cbrt ceil cos cosh exp expm1 floor hypot log log10 log1p log2 max min pow random sign sin sinh sqrt tan tanh trunc play pounce dip dip2 rotate rollup rolldown if-else ifte = == != > < >= <= concat cons uncons push pop constrec linrec linrec5 binrec dup2 times map filter reduce split size depth stack-copy]
+[words word dup swap drop round + - / % * & | ^ ~ && || ! E LN10 LN2 LOG10E LOG2E PI SQRT1_2 SQRT2 abs acos acosh asin asinh atan atan2 atanh cbrt ceil cos cosh exp expm1 floor hypot log log10 log1p log2 max min pow random sign sin sinh sqrt tan tanh trunc leap pounce dip dip2 rotate rollup rolldown if-else ifte = == != > < >= <= concat cons uncons push pop constrec linrec linrec5 binrec dup2 times map filter reduce split size depth stack-copy]
 
 ### word `[Introspection]`
 
@@ -137,19 +137,21 @@ The only reserved word in Pounce, `compose` is processed before runtime. It affe
 
 `compose`, stores a phrase of words as a named-word in the runtime word dictionary
 
-### play [Flow]
-The word 'play' concatinates words onto the running program. A list containing a phrase is dequoted prepended at the beginning of the program.
-> [a phrase of words] play
+### leap [Flow]
+The word 'leap' concatinates words onto the running program. A list containing a phrase is dequoted prepended at the beginning of the program.
+> [a phrase of words] leap
 
-> [1 1 +] play # Yeilds `2` on the stack
+> [1 1 +] leap # Yeilds `2` on the stack
 
-`play` is equivalent to the Joy language word `i`
+`leap` is equivalent to the Joy language word `i`
 
 ### pounce [Flow]
 The word `pounce` first moves stack values into the phrase and then concatinates the modified words onto the running program. A list of named stack references and a list containing a phrase to be dequoted and prepended at the beginning of the program.
 > [a etc] [a phrase of words] pounce
 
 > 3 2 [a b] [b a -] pounce # Yeilds `-1` on the stack
+
+`pounce` is equivilant to `crouch leap`
 
 
 ### dip [Flow] 
