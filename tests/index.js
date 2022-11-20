@@ -294,6 +294,8 @@ allPassing &= testIt("1 2 3 4 [a b c x] [a x x * * b x * c + +] pounce", [27]);
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] pounce", [11]);
 
 allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] crouch", [[2, 4, "*", 3, "+"]]);
+allPassing &= testIt("1 2 [3 4] [a b [c d]] [a b c d] crouch", [[1, 2, 3, 4]]);
+allPassing &= testIt("1 2 [3 4] [a b [c d]] [a b c d] pounce", [1, 2, 3, 4]);
 
 allPassing &= testIt("3 type-of", ['Nat']);
 allPassing &= testIt("-3 type-of", ['Neg']);

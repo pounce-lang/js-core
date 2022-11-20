@@ -1,4 +1,4 @@
-import { is, keys, omit, path, map, zipObj, reverse, head, tail, init, last, propOr, findIndex, mergeRight, concat } from 'ramda';
+import { is, keys, omit, path, map, reverse, head, tail, init, last, propOr, findIndex, mergeRight, concat } from 'ramda';
 import NP from 'number-precision';
 import Prando from 'prando';
 
@@ -2731,6 +2731,25 @@ var subInWD = function (localWD, words) {
     var resolveWord = consReslover(localWD);
     return map(resolveWord, words);
 };
+var deepZipObj = function (n, s) {
+    if (!n.length || !s.length) {
+        return {};
+    }
+    var name = n.pop();
+    if (is(String, name)) {
+        var value = s.pop();
+        var def = {};
+        def[name] = value;
+        return __assign(__assign({}, deepZipObj(n, s)), def);
+    }
+    if (is(Array, name)) {
+        var value = s.pop();
+        if (is(Array, name)) {
+            return __assign(__assign({}, deepZipObj(n, s)), deepZipObj(name, value));
+        }
+    }
+    return null;
+};
 var coreWords = {
     'words': {
         compose: function (s) {
@@ -3392,7 +3411,7 @@ var coreWords = {
             return [s, pl];
         }
     },
-    // binds names to stack values within one phrase of words
+    // binds names to stack values within a phrase of words
     'crouch': {
         dt: '[[[S+]F][F]]',
         compose: function (s, pl) {
@@ -3400,7 +3419,9 @@ var coreWords = {
             var argList = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             if (words !== null && argList) {
                 var values = map(function () { return s === null || s === void 0 ? void 0 : s.pop(); }, argList);
-                var localWD = zipObj(reverse(argList), values);
+                // const localWD: { [index: string]: Word } =
+                //     r.zipObj(r.flatten(r.reverse(argList)), r.flatten(values));
+                var localWD = deepZipObj(reverse(argList), values);
                 var newWords = toPLOrNull(subInWD(localWD, words));
                 if (newWords) {
                     s.push(newWords);
@@ -3416,7 +3437,9 @@ var coreWords = {
             var argList = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
             if (words !== null && argList) {
                 var values = map(function () { return s === null || s === void 0 ? void 0 : s.pop(); }, argList);
-                var localWD = zipObj(reverse(argList), values);
+                // const localWD: { [index: string]: Word } =
+                //     r.zipObj(r.flatten(r.reverse(argList)), r.flatten(values));
+                var localWD = deepZipObj(reverse(argList), values);
                 var newWords = toPLOrNull(subInWD(localWD, words));
                 if (newWords) {
                     pl = newWords.concat(pl);

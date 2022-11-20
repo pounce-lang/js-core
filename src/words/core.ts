@@ -95,6 +95,25 @@ const subInWD = (localWD: { [index: string]: Word }, words: Word[]): Word[] => {
     return r.map(resolveWord, words);
 }
 
+const deepZipObj = (n: Word[], s: Word[]): { [index: string]: Word } => {
+    if(!n.length || !s.length) {
+      return {};
+    }
+    const name = n.pop();
+    if (r.is(String, name)) {
+      const value = s.pop();
+      let def: { [index: string]: Word } = {};
+      def[name as string] = value;
+      return {...deepZipObj(n, s), ...def};
+    }
+    if (r.is(Array, name)) {
+      const value = s.pop();
+      if (r.is(Array, name)) {
+        return {...deepZipObj(n, s), ...deepZipObj(name as Word[], value as Word[])};
+      }
+    }
+    return null;
+  };
 
 export const coreWords: WordDictionary = {
     'words': {
@@ -757,7 +776,7 @@ export const coreWords: WordDictionary = {
             return [s, pl];
         }
     },
-    // binds names to stack values within one phrase of words
+    // binds names to stack values within a phrase of words
     'crouch': {
         dt: '[[[S+]F][F]]',
         compose: (s, pl) => {
@@ -765,8 +784,10 @@ export const coreWords: WordDictionary = {
             const argList = toArrOfStrOrNull(s?.pop());
             if (words !== null && argList) {
                 const values: Word[] = r.map(() => s?.pop(), argList);
-                const localWD: { [index: string]: Word } =
-                    r.zipObj(r.reverse(argList), values);
+                // const localWD: { [index: string]: Word } =
+                //     r.zipObj(r.flatten(r.reverse(argList)), r.flatten(values));
+                const localWD: { [index: string]: Word } = 
+                    deepZipObj(r.reverse(argList), values);
                 const newWords: ProgramList =
                     toPLOrNull(subInWD(localWD, words));
 
@@ -784,8 +805,10 @@ export const coreWords: WordDictionary = {
             const argList = toArrOfStrOrNull(s?.pop());
             if (words !== null && argList) {
                 const values: Word[] = r.map(() => s?.pop(), argList);
-                const localWD: { [index: string]: Word } =
-                    r.zipObj(r.reverse(argList), values);
+                // const localWD: { [index: string]: Word } =
+                //     r.zipObj(r.flatten(r.reverse(argList)), r.flatten(values));
+                const localWD: { [index: string]: Word } = 
+                    deepZipObj(r.reverse(argList), values);
                 const newWords: ProgramList =
                     toPLOrNull(subInWD(localWD, words));
 
