@@ -3422,7 +3422,7 @@ var coreWords = {
         dt: '[[[S+]F][F]]',
         compose: function (s, pl) {
             var words = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            var argList = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            var argList = r.clone(toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop()));
             if (words !== null && argList) {
                 var values = r.map(function () { return s === null || s === void 0 ? void 0 : s.pop(); }, argList);
                 // const localWD: { [index: string]: Word } =
@@ -3440,7 +3440,7 @@ var coreWords = {
         dt: '[[[S+]F][F run]]',
         compose: function (s, pl) {
             var words = toPLOrNull(s === null || s === void 0 ? void 0 : s.pop());
-            var argList = toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop());
+            var argList = r.clone(toArrOfStrOrNull(s === null || s === void 0 ? void 0 : s.pop()));
             if (words !== null && argList) {
                 var values = r.map(function () { return s === null || s === void 0 ? void 0 : s.pop(); }, argList);
                 // const localWD: { [index: string]: Word } =

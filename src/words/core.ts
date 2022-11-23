@@ -781,7 +781,7 @@ export const coreWords: WordDictionary = {
         dt: '[[[S+]F][F]]',
         compose: (s, pl) => {
             const words = toPLOrNull(s?.pop());
-            const argList = toArrOfStrOrNull(s?.pop());
+            const argList = r.clone(toArrOfStrOrNull(s?.pop()));
             if (words !== null && argList) {
                 const values: Word[] = r.map(() => s?.pop(), argList);
                 // const localWD: { [index: string]: Word } =
@@ -802,7 +802,7 @@ export const coreWords: WordDictionary = {
         dt: '[[[S+]F][F run]]',
         compose: (s, pl) => {
             const words = toPLOrNull(s?.pop());
-            const argList = toArrOfStrOrNull(s?.pop());
+            const argList = r.clone(toArrOfStrOrNull(s?.pop()));
             if (words !== null && argList) {
                 const values: Word[] = r.map(() => s?.pop(), argList);
                 // const localWD: { [index: string]: Word } =
@@ -1556,23 +1556,18 @@ export const clone = <T>(source: T): T => {
 //     if (typeof value !== 'object' || value === null) {
 //       return value;
 //     }
-
 //     if (value instanceof Set) {
 //       return new Set(Array.from(value, deepClone)) as T;
 //     }
-
 //     if (value instanceof Map) {
 //       return new Map(Array.from(value, ([k, v]) => [k, deepClone(v)])) as T;
 //     }
-
 //     if (value instanceof Date) {
 //       return new Date(value) as T;
 //     }
-
 //     if (value instanceof RegExp) {
 //       return new RegExp(value.source, value.flags) as T;
 //     }
-
 //     return Object.keys(value).reduce((acc, key) => {
 //       return Object.assign(acc, { [key]: deepClone(value[key]) });
 //     }, (Array.isArray(value) ? [] : {}) as T);

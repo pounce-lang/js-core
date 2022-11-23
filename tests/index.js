@@ -248,14 +248,14 @@ allPassing &= testIt("[4 2 a] false [dup == ||] reduce", [true]);
 allPassing &= testIt("[4 2 'string'] false [dup == ||] reduce", [true]);
 allPassing &= testIt("[4 2.1 'string' [4] [a [b]]] false [dup == ||] reduce", [true]);
 
-allPassing &= testIt("[1 2 3 4 5] size 2 / ceil", [[ 1, 2, 3, 4, 5 ], 3]);
-allPassing &= testIt("[1 4 8] size 2 / floor ", [[ 1, 4, 8 ],  1 ]);
-allPassing &= testIt("[1 4] size 2 / floor ", [[ 1, 4 ],  1 ]);
-allPassing &= testIt("[1] size 2 / floor ", [[ 1 ],  0 ]);
-allPassing &= testIt("[1 4 8] size 2 / floor [<=] spliti", [[ 8 ], [ 1, 4 ]]);
-allPassing &= testIt("[1 4] size 2 / floor [<] spliti", [[ 4 ], [ 1 ]]);
-allPassing &= testIt("[1 4 8] size 2 / floor [>=] spliti", [[ 1 ], [ 4, 8 ]]);
-allPassing &= testIt("[1 4] size 2 / floor [>] spliti", [[ 1, 4 ], [ ]]);
+allPassing &= testIt("[1 2 3 4 5] size 2 / ceil", [[1, 2, 3, 4, 5], 3]);
+allPassing &= testIt("[1 4 8] size 2 / floor ", [[1, 4, 8], 1]);
+allPassing &= testIt("[1 4] size 2 / floor ", [[1, 4], 1]);
+allPassing &= testIt("[1] size 2 / floor ", [[1], 0]);
+allPassing &= testIt("[1 4 8] size 2 / floor [<=] spliti", [[8], [1, 4]]);
+allPassing &= testIt("[1 4] size 2 / floor [<] spliti", [[4], [1]]);
+allPassing &= testIt("[1 4 8] size 2 / floor [>=] spliti", [[1], [4, 8]]);
+allPassing &= testIt("[1 4] size 2 / floor [>] spliti", [[1, 4], []]);
 // allPassing &= testIt(`
 // [3 1 2 1] 
 // [size 1 <=] [] [size 2 / floor [<=] spliti] [concat] binrec
@@ -297,17 +297,30 @@ allPassing &= testIt("2 3 4 [slope y-intercept x] [slope x * y-intercept +] crou
 allPassing &= testIt("1 2 [3 4] [a b [c d]] [a b c d] crouch", [[1, 2, 3, 4]]);
 allPassing &= testIt("1 2 [3 4] [a b [c d]] [a b c d] pounce", [1, 2, 3, 4]);
 allPassing &= testIt("[1 2] [3 4] [[a b] [c d]] [a b c d] pounce", [1, 2, 3, 4]);
-allPassing &= testIt("[[1] [2]] [4 5] [concat] reduce", [[ 4, 5, 1, 2 ]]);
+allPassing &= testIt("[[1] [2]] [4 5] [concat] reduce", [[4, 5, 1, 2]]);
 
-// // allPassing &= testIt(`
-// // [1 2 3 4 5 6 7]
-// // [1 0] 
-// // [[[acc_ i_] e_] [e_ acc_ [i_ 2 % 0 ==] [*] [+] ifte 1 i_ +] pounce [] cons cons [e_] dip] 
-// // reduce`, []); 
+
+allPassing &= testIt(`[6 7 8]
+[4 0] [[[a i] b] [a b + [] cons i 1 + push] pounce]
+[[acc p] [uncons swap acc swap p leap p] pounce] 1 times`, [[7, 8], [10, 1], [[["a", "i"], "b"], ["a", "b", "+", [], "cons", "i", 1, "+", "push"], "pounce"]])
+
+allPassing &= testIt(`[6 7 8]
+[4 0] [[[a i] b] [a b + [] cons i 1 + push] pounce]
+[[acc p] [uncons swap acc swap p leap p] pounce] 2 times`, [[8], [17, 2], [[["a", "i"], "b"], ["a", "b", "+", [], "cons", "i", 1, "+", "push"], "pounce"]])
+
+allPassing &= testIt(`[6 7 8]
+[4 0] [[[a i] b] [a b + [] cons i 1 + push] pounce]
+[[acc p] [uncons swap acc swap p leap p] pounce] 3 times`, [[], [25, 3], [[["a", "i"], "b"], ["a", "b", "+", [], "cons", "i", 1, "+", "push"], "pounce"]]);
+
+allPassing &= testIt(`
+[1 2 3 4 5 6 7]
+[1 0] 
+[[[acc i] e] [e acc [i 2 % 0 ==] [*] [+] ifte 1 i + [] cons cons] pounce] 
+reduce`, [[497, 7]]);
 
 allPassing &= testIt(`
 7 [1 0] 
-[[acc i]] [acc [i 2 % 0 ==] [*] [+] ifte 1 i +] pounce `, [7,1]); 
+[[acc i]] [acc [i 2 % 0 ==] [*] [+] ifte 1 i +] pounce `, [7, 1]);
 
 allPassing &= testIt("3 type-of", ['Nat']);
 allPassing &= testIt("-3 type-of", ['Neg']);
