@@ -16,7 +16,19 @@ Pounce follows in the footsteps of Forth, Joy, Cat and Kitten, in that it is, [C
 * programs are built up by composing words (rather than the application of functions to variable arguments), concatenative programming is essentially functional composition (taken to an extreem). It can be viewed as all the words in your program being composed into a single function.
 
 ## Quick Start
-To start Pounce programming in the browser, you can [try this sampler](https://pounce-lang-show-case.netlify.app/). or `npm install @pounce-lang/js-core` into a JS/TS project. 
+To start Pounce programming in the browser, you can [try this sampler](https://pounce-lang-show-case.netlify.app/). OR 
+install Pounce into a TypeScript or JavaScript project
+```
+npm install pounce-lang/js-core
+```
+and use it like this
+```
+import { interpreter , unParse} from '@pounce-lang/core';
+
+const interp = interpreter('3 4 +');
+const { value } = interp.next();
+console.log(value.stack)
+```
 
 ## Try it in RunKit 
 [RunKit https://runkit.com/embed/rq1ez0jvgfsh](https://runkit.com/embed/rq1ez0jvgfsh)
@@ -34,7 +46,8 @@ while (pounceState.value.active) {
 }
 console.log(pounceState.value.stack);
 ```
-## to peek in on the code, build and test: clone this repo, then
+## to peek in on the code, build and test: 
+clone this repo, then
 ```
 npm i
 npm run build
