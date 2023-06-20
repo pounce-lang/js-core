@@ -17,13 +17,13 @@ Pounce follows in the footsteps of Forth, Joy, Cat and Kitten, in that it is, [C
 
 ## Quick Start
 To start Pounce programming in the browser, you can [try this sampler](https://pounce-lang-show-case.netlify.app/). OR 
-install Pounce into a TypeScript or JavaScript project
+install Pounce into a Typescript or Javascript project
 ```
 npm install pounce-lang/js-core
 ```
 and use it like this
-```
-import { interpreter , unParse} from '@pounce-lang/core';
+``` Typescript
+import { interpreter } from '@pounce-lang/core';
 
 const interp = interpreter('3 4 +');
 const { value } = interp.next();
