@@ -19,7 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/ramda": "^0.26.38",
-    "rollup": "^1.27.13",
+    "rollup": "^3.29.5",
     "rollup-plugin-typescript2": "^0.25.3",
     "typescript": "^3.7.3",
     "canopy": "^0.3.0"
